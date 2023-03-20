@@ -1,4 +1,4 @@
-package org.helensbot;
+package org.helensbot.bot;
 
 import org.helensbot.dto.UserInfoDTO;
 import org.helensbot.enums.States;
@@ -25,6 +25,16 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
         parseMessage(msg.getText(), getUserById(id));
     }
 
+    @Override
+    public String getBotUsername() {
+        return "English_Schoo_lBot";
+    }
+
+    @Override
+    public String getBotToken() {
+        return "5915260285:AAGpgfcCYCu6kxD38WcE6QYVFXCv4JjbdwA";
+    }
+
     private UserInfoDTO getUserById(Long id) {
         for (UserInfoDTO userInfoDTO : dto) {
             if (Objects.equals(userInfoDTO.getId(), id)) {
@@ -48,35 +58,25 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
         return containsId;
     }
 
-    @Override
-    public String getBotUsername() {
-        return "English_Schoo_lBot";
-    }
-
-    @Override
-    public String getBotToken() {
-        return "5915260285:AAGpgfcCYCu6kxD38WcE6QYVFXCv4JjbdwA";
-    }
-
     public void parseMessage(String textMsg, UserInfoDTO user) {
         switch (user.getState()) {
             case START:
                 startHandler(user);
                 break;
             case GETNAME:
-                getnameHandler(textMsg, user);
+                getNameHandler(textMsg, user);
                 break;
             case GETSURNAME:
-                getsurnameHandler(textMsg, user);
+                getSurnameHandler(textMsg, user);
                 break;
             case GETUSERNAME:
-                getusernameHandler(textMsg, user);
+                getUsernameHandler(textMsg, user);
                 break;
-            case GETPHONE:
-                getphoneHandler(textMsg, user);
+            case GETPHONENUMBER:
+                getPhoneNumberHandler(textMsg, user);
                 break;
             case GETREVIEW:
-                getreviewHandler(textMsg, user);
+                getReviewHandler(textMsg, user);
                 break;
             case TEST:
                 testHandler();
@@ -95,35 +95,35 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
                                     "Введите, пожалуйста, Ваше имя");
     }
 
-    private void getnameHandler(String textMsg, UserInfoDTO user) {
+    private void getNameHandler(String textMsg, UserInfoDTO user) {
         user.setName(textMsg);
         user.setState(States.GETSURNAME);
 
         sendText(user.getId(), "Теперь введите, пожалуйста, Фамилию");
     }
 
-    private void getsurnameHandler(String textMsg, UserInfoDTO user) {
+    private void getSurnameHandler(String textMsg, UserInfoDTO user) {
         user.setSurname(textMsg);
         user.setState(States.GETUSERNAME);
 
         sendText(user.getId(), "Теперь введите, пожалуйста, юзернейм в телеграм");
     }
 
-    private void getusernameHandler(String textMsg, UserInfoDTO user) {
+    private void getUsernameHandler(String textMsg, UserInfoDTO user) {
         user.setUsername(textMsg);
-        user.setState(States.GETPHONE);
+        user.setState(States.GETPHONENUMBER);
 
         sendText(user.getId(), "Теперь введите, пожалуйста, номер телефона");
     }
 
-    private void getphoneHandler(String textMsg, UserInfoDTO user) {
+    private void getPhoneNumberHandler(String textMsg, UserInfoDTO user) {
         user.setPhoneNumber(textMsg);
         user.setState(States.GETREVIEW);
 
         sendText(user.getId(), "Откуда вы о нас услышали?");
     }
 
-    private void getreviewHandler(String textMsg, UserInfoDTO user) {
+    private void getReviewHandler(String textMsg, UserInfoDTO user) {
         user.setReview(textMsg);
         user.setState(States.TEST);
 
@@ -134,12 +134,12 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
 
     public void sendText(Long who, String what){
         SendMessage sm = SendMessage.builder()
-                .chatId(who.toString()) //Who are we sending a message to
-                .text(what).build();    //Message content
+                .chatId(who.toString())
+                .text(what).build();
         try {
-            execute(sm);                        //Actually sending the message
+            execute(sm);
         } catch (TelegramApiException e) {
-            throw new RuntimeException(e);      //Any error will be printed here
+            throw new RuntimeException(e);
         }
     }
 

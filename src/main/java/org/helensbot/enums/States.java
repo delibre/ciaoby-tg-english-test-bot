@@ -5,7 +5,7 @@ public enum States {
     GETNAME,
     GETSURNAME,
     GETUSERNAME,
-    GETPHONE,
+    GETPHONENUMBER,
     GETREVIEW,
     TEST
 }

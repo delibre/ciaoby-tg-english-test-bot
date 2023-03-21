@@ -2,6 +2,7 @@ package org.helensbot.bot;
 
 import org.helensbot.dto.UserInfoDTO;
 import org.helensbot.enums.States;
+import org.helensbot.utils.Regexps;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -20,7 +21,7 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
         var id = user.getId();
 
         if(!contains(id))
-            dto.add(new UserInfoDTO(id));
+            dto.add(new UserInfoDTO(id, user.getUserName()));
 
         parseMessage(msg.getText(), getUserById(id));
     }
@@ -36,11 +37,9 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
     }
 
     private UserInfoDTO getUserById(Long id) {
-        for (UserInfoDTO userInfoDTO : dto) {
-            if (Objects.equals(userInfoDTO.getId(), id)) {
+        for (UserInfoDTO userInfoDTO : dto)
+            if (Objects.equals(userInfoDTO.getId(), id))
                 return userInfoDTO;
-            }
-        }
 
         throw new AssertionError();
     }
@@ -48,12 +47,11 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
     private boolean contains(Long id) {
         boolean containsId = false;
 
-        for(UserInfoDTO userInfoDTO : dto) {
+        for(UserInfoDTO userInfoDTO : dto)
             if(Objects.equals(userInfoDTO.getId(), id)) {
                 containsId = true;
                 break;
             }
-        }
 
         return containsId;
     }
@@ -69,9 +67,9 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
             case GETSURNAME:
                 getSurnameHandler(textMsg, user);
                 break;
-            case GETUSERNAME:
-                getUsernameHandler(textMsg, user);
-                break;
+//            case GETUSERNAME:
+//                getUsernameHandler(textMsg, user);
+//                break;
             case GETPHONENUMBER:
                 getPhoneNumberHandler(textMsg, user);
                 break;
@@ -83,13 +81,12 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
             default:
                 throw new IllegalStateException();
         }
-
     }
 
     private void startHandler(UserInfoDTO user) {
         user.setState(States.GETNAME);
 
-        sendText(user.getId(), "Привет!\n\n" +
+        sendText(user.getId(), "Привет!\uD83D\uDC4B\n\n" +
                                     "Сейчас мы проверим Ваши знания английского\uD83D\uDD25\n" +
                                     "Но для начала давайте познакомимся\uD83D\uDE42\n\n" +
                                     "Введите, пожалуйста, Ваше имя");
@@ -104,19 +101,24 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
 
     private void getSurnameHandler(String textMsg, UserInfoDTO user) {
         user.setSurname(textMsg);
-        user.setState(States.GETUSERNAME);
-
-        sendText(user.getId(), "Теперь введите, пожалуйста, юзернейм в телеграм");
-    }
-
-    private void getUsernameHandler(String textMsg, UserInfoDTO user) {
-        user.setUsername(textMsg);
         user.setState(States.GETPHONENUMBER);
 
         sendText(user.getId(), "Теперь введите, пожалуйста, номер телефона");
     }
 
+//    private void getUsernameHandler(String textMsg, UserInfoDTO user) {
+//        user.setUsername(textMsg);
+//        user.setState(States.GETPHONENUMBER);
+//
+//        sendText(user.getId(), "Теперь введите, пожалуйста, номер телефона");
+//    }
+
     private void getPhoneNumberHandler(String textMsg, UserInfoDTO user) {
+        if(!Regexps.checkPhoneNumber(textMsg)) {
+            sendText(user.getId(), "Неверный формат номера. Попробуйте, пожалуйста, ещё раз");
+            return;
+        }
+
         user.setPhoneNumber(textMsg);
         user.setState(States.GETREVIEW);
 

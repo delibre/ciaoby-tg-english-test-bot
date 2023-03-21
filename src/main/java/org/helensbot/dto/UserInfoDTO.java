@@ -12,8 +12,9 @@ public class UserInfoDTO {
     private String review;
     private Integer numberOfQuestion;
 
-    public UserInfoDTO(Long id) {
+    public UserInfoDTO(Long id, String username) {
         this.id = id;
+        this.username = username;
     }
 
     public States getState() {

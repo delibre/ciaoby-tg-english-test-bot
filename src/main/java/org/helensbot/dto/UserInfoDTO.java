@@ -1,5 +1,6 @@
 package org.helensbot.dto;
 
+import org.helensbot.englishtest.UsersTestState;
 import org.helensbot.enums.States;
 
 public class UserInfoDTO {
@@ -10,7 +11,7 @@ public class UserInfoDTO {
     private String username;
     private String phoneNumber;
     private String review;
-    private Integer numberOfQuestion;
+    private UsersTestState testState = new UsersTestState();
 
     public UserInfoDTO(Long id, String username) {
         this.id = id;
@@ -73,11 +74,11 @@ public class UserInfoDTO {
         this.review = review;
     }
 
-    public Integer getNumberOfQuestion() {
-        return numberOfQuestion;
+    public UsersTestState getTestState() {
+        return testState;
     }
 
-    public void setNumberOfQuestion(Integer numberOfQuestion) {
-        this.numberOfQuestion = numberOfQuestion;
+    public void setTestState(UsersTestState testState) {
+        this.testState = testState;
     }
 }

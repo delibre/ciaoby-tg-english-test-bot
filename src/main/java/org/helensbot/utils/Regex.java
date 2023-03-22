@@ -2,7 +2,7 @@ package org.helensbot.utils;
 
 import java.util.regex.Pattern;
 
-public class Regexps {
+public class Regex {
     public static boolean checkPhoneNumber(String phoneNumber) {
         String patterns
                 = "^(\\+\\d{1,3}( )?)?((\\(\\d{3}\\))|\\d{3})[- .]?\\d{3}[- .]?\\d{4}$"

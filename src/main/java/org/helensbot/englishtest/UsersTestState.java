@@ -49,7 +49,7 @@ public class UsersTestState {
             lvl = EnglishLevel.A2;
             return lvl;
         }
-        if (correctAnswers > 7) {
+        if (correctAnswers > 6) {
             lvl = EnglishLevel.A1;
             return lvl;
         }

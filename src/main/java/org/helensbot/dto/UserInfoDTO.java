@@ -2,9 +2,11 @@ package org.helensbot.dto;
 
 import org.helensbot.englishtest.UsersTestState;
 import org.helensbot.enums.States;
+import org.telegram.telegrambots.meta.api.objects.Message;
 
 public class UserInfoDTO {
-    private States state = States.START;
+    private States state = null;
+    private Message lastMessage;
     private Long id;
     private String name;
     private String surname;
@@ -18,12 +20,29 @@ public class UserInfoDTO {
         this.username = username;
     }
 
+    public void clearAll() {
+        this.name = "";
+        this.surname = "";
+        this.username = "";
+        this.phoneNumber = "";
+        this.review = "";
+        testState = new UsersTestState();
+    }
+
     public States getState() {
         return state;
     }
 
     public void setState(States state) {
         this.state = state;
+    }
+
+    public Message getLastMessage() {
+        return lastMessage;
+    }
+
+    public void setLastMessage(Message lastMessage) {
+        this.lastMessage = lastMessage;
     }
 
     public Long getId() {

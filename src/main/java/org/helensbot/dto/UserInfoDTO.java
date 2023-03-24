@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 public class UserInfoDTO {
     private States state = null;
     private Message lastMessage;
-    private Long id;
+    private Long chatId;
     private String name;
     private String surname;
     private String username;
@@ -15,8 +15,8 @@ public class UserInfoDTO {
     private String review;
     private UsersTestState testState = new UsersTestState();
 
-    public UserInfoDTO(Long id, String username) {
-        this.id = id;
+    public UserInfoDTO(Long chatId, String username) {
+        this.chatId = chatId;
         this.username = username;
     }
 
@@ -45,12 +45,12 @@ public class UserInfoDTO {
         this.lastMessage = lastMessage;
     }
 
-    public Long getId() {
-        return id;
+    public Long getChatId() {
+        return chatId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
     }
 
     public String getName() {

@@ -61,4 +61,8 @@ public class UsersTestState {
     public int getCorrectAnswers() {
         return correctAnswers;
     }
+
+    public EnglishLevel getLvl() {
+        return lvl;
+    }
 }

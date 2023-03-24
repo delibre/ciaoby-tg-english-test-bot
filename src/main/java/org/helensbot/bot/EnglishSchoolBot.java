@@ -20,13 +20,11 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasMessage()){
             var msg = update.getMessage();
-            var user = msg.getFrom();
-            var id = msg.getChatId();
 
-            if(!contains(id))
-                dto.add(new UserInfoDTO(id, user.getUserName()));
+            if(!contains(msg.getChatId()))
+                dto.add(new UserInfoDTO(msg.getChatId(), msg.getFrom().getUserName()));
 
-            parseMessage(msg.getText(), getUserById(id));
+            parseMessage(msg.getText(), getUserById(msg.getChatId()));
         }
         else if(update.hasCallbackQuery() && Objects.equals(update.getCallbackQuery().getData(), "Начать")) {
             parseMessage(update.getCallbackQuery().getData(), getUserById(update.getCallbackQuery().getFrom().getId()));
@@ -37,7 +35,8 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
                 !getUserById(update.getCallbackQuery().getMessage().getChatId()).getTestState().isFinished()) {
 
             parseMessage(update.getCallbackQuery().getData(), getUserById(update.getCallbackQuery().getFrom().getId()));
-        } else if(update.hasCallbackQuery() && !getUserById(update.getCallbackQuery().getMessage().getChatId()).getTestState().isFinished()){
+        }
+        else if(update.hasCallbackQuery() && !getUserById(update.getCallbackQuery().getMessage().getChatId()).getTestState().isFinished()){
             sendText(update.getCallbackQuery().getMessage().getChatId(), "Вы должны отвечать только на последний вопрос");
 //            sendLastMessage(getUserById(update.getCallbackQuery().getMessage().getChatId()).getLastMessage());
         }
@@ -154,8 +153,15 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
             testEndedHandler(user);
             return;
         }
+
         sendQuestion(user);
         user.setState(States.CHECK_ANSWER);
+
+        try {
+            Thread.sleep(1500); // 1000 milliseconds = 1 second
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void checkAnswerHandler(String answer, UserInfoDTO user) {
@@ -169,6 +175,7 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
                         "Ваш уровень английского " + user.getTestState().getResults() + ".\n" +
                         "Вы молодец, Вам осталось совсем немного, и скоро мы свяжемся для прохождения устного тестирования"
                 );
+        sendDataToAdmin(user);
     }
 
     private void sendQuestion(UserInfoDTO user){
@@ -230,6 +237,23 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
         rowsInline.add(rowInline);
         markupInline.setKeyboard(rowsInline);
         sm.setReplyMarkup(markupInline);
+
+        try {
+            execute(sm);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendDataToAdmin(UserInfoDTO user) {
+        var sm = SendMessage.builder()
+                .chatId(user.getChatId().toString()).
+                text(   "Имя: " + user.getName() + "\n" +
+                        "Фамилия: " + user.getSurname() + "\n" +
+                        "Ник в телеграмм: @" + user.getUsername() + "\n" +
+                        "Откуда узнали: " + user.getReview() + "\n" +
+                        "Отвечено верно на: " + user.getTestState().getCorrectAnswers() + " вопросов.\n" +
+                        "Уровень английского: " + user.getTestState().getLvl()).build();
 
         try {
             execute(sm);

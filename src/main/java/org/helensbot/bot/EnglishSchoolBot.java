@@ -2,7 +2,6 @@ package org.helensbot.bot;
 
 import org.helensbot.dto.UserInfoDTO;
 import org.helensbot.enums.States;
-import org.helensbot.utils.Regexps;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -67,12 +66,6 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
             case GETSURNAME:
                 getSurnameHandler(textMsg, user);
                 break;
-//            case GETUSERNAME:
-//                getUsernameHandler(textMsg, user);
-//                break;
-            case GETPHONENUMBER:
-                getPhoneNumberHandler(textMsg, user);
-                break;
             case GETREVIEW:
                 getReviewHandler(textMsg, user);
                 break;
@@ -101,25 +94,6 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
 
     private void getSurnameHandler(String textMsg, UserInfoDTO user) {
         user.setSurname(textMsg);
-        user.setState(States.GETPHONENUMBER);
-
-        sendText(user.getId(), "Теперь введите, пожалуйста, номер телефона");
-    }
-
-//    private void getUsernameHandler(String textMsg, UserInfoDTO user) {
-//        user.setUsername(textMsg);
-//        user.setState(States.GETPHONENUMBER);
-//
-//        sendText(user.getId(), "Теперь введите, пожалуйста, номер телефона");
-//    }
-
-    private void getPhoneNumberHandler(String textMsg, UserInfoDTO user) {
-        if(!Regexps.checkPhoneNumber(textMsg)) {
-            sendText(user.getId(), "Неверный формат номера. Попробуйте, пожалуйста, ещё раз");
-            return;
-        }
-
-        user.setPhoneNumber(textMsg);
         user.setState(States.GETREVIEW);
 
         sendText(user.getId(), "Откуда вы о нас услышали?");

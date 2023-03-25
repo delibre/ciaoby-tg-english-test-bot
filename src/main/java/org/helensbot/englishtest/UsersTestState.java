@@ -1,10 +1,12 @@
 package org.helensbot.englishtest;
 
+import lombok.Getter;
 import org.helensbot.enums.EnglishLevel;
 
 import java.util.LinkedList;
 import java.util.Objects;
 
+@Getter
 public class UsersTestState {
     private final LinkedList<Question> questions = new LinkedList<>();
     private int correctAnswers = 0;
@@ -55,14 +57,6 @@ public class UsersTestState {
         }
 
         lvl = EnglishLevel.A0;
-        return lvl;
-    }
-
-    public int getCorrectAnswers() {
-        return correctAnswers;
-    }
-
-    public EnglishLevel getLvl() {
         return lvl;
     }
 }

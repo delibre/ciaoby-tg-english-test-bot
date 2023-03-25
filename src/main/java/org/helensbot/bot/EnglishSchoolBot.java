@@ -35,7 +35,7 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
         if (update.getMessage() != null && update.getMessage().getContact() != null) {
             getPhoneNumberHandler(update.getMessage().getContact().getPhoneNumber(), getUserById(update.getMessage().getChatId()));
         }
-        else if (update.hasCallbackQuery() && Objects.equals(update.getCallbackQuery().getData(), "Начать")) {
+        else if (update.hasCallbackQuery() && Objects.equals(update.getCallbackQuery().getData(), "Начать тестирование\uD83C\uDFC1")) {
             parseMessage(update.getCallbackQuery().getData(), getUserById(update.getCallbackQuery().getFrom().getId()));
         }
         else if (update.hasCallbackQuery() &&
@@ -85,8 +85,13 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
             user.setState(States.START);
             user.clearTest();
         } else if (user.getState() == null) {
-            sendText(user.getChatId(), "Нет такой комманды");
+            sendText(user.getChatId(), "Нет такой команды");
             return;
+        }
+
+        if (textMsg.equals("Начать тестирование\uD83C\uDFC1")) {
+            user.setState(States.QUESTION_TO_SEND);
+            user.clearTest();
         }
 
         switch (user.getState()) {
@@ -191,8 +196,9 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
     }
 
     private void testToDoHandler(String textMsg, UserInfoDTO user) {
-        if (Objects.equals(textMsg, "Начать")) {
+        if (Objects.equals(textMsg, "Начать тестирование\uD83C\uDFC1")) {
             user.setState(States.QUESTION_TO_SEND);
+            user.clearTest();
             questionToSendHandler(user);
         }
         else
@@ -205,24 +211,17 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
             return;
         }
 
-        deleteMessage(user);
         sendQuestion(user);
         user.setState(States.CHECK_ANSWER);
-
-//        try {
-//            Thread.sleep(1500); // 1000 milliseconds = 1 second
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
     }
 
     private void checkAnswerHandler(String answer, UserInfoDTO user) {
+//        deleteMessage(user);
         user.getTestState().registerAnswer(answer);
         questionToSendHandler(user);
     }
 
     private void testEndedHandler(UserInfoDTO user) {
-        deleteMessage(user);
         sendText(user.getChatId(),
                 "Вы ответили верно на " + user.getTestState().getCorrectAnswers() + " вопросов.\n" +
                         "Ваш уровень английского " + user.getTestState().getResults() + ".\n" +
@@ -256,6 +255,10 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
         sm.setReplyMarkup(markup);
 
         try {
+            if(user.getLastMessage() != null) {
+                deleteMessage(user);
+            }
+
             user.setLastMessage(execute(sm));
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
@@ -276,23 +279,24 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
     private void sendStartButton(UserInfoDTO user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
-                .text("Ну что же, приступим к тесту.\nНажите кнопку \"начать тест\", когда будете готовы.").build();
+                .text("Ну что же, приступим к тесту.\nНажите кнопку \"Начать тестирование\", когда будете готовы.").build();
 
-        var markupInline = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-        List<InlineKeyboardButton> rowInline = new ArrayList<>();
+        var keyboard = new ReplyKeyboardMarkup();
+        keyboard.setResizeKeyboard(true);
+        keyboard.setOneTimeKeyboard(false);
 
-        var inlineKeyboardButton = new InlineKeyboardButton();
-        inlineKeyboardButton.setText("Начать");
-        inlineKeyboardButton.setCallbackData("Начать");
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
 
-        rowInline.add(inlineKeyboardButton);
-        rowsInline.add(rowInline);
-        markupInline.setKeyboard(rowsInline);
-        sm.setReplyMarkup(markupInline);
+        var row = new KeyboardRow();
+        row.add(new KeyboardButton("Начать тестирование\uD83C\uDFC1"));
+
+        keyboardRows.add(row);
+
+        keyboard.setKeyboard(keyboardRows);
+        sm.setReplyMarkup(keyboard);
 
         try {
-            user.setLastMessage(execute(sm));
+            execute(sm);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
@@ -308,7 +312,7 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
 
         var keyboard = new ReplyKeyboardMarkup();
         keyboard.setResizeKeyboard(true);
-        keyboard.setOneTimeKeyboard(true);
+        keyboard.setOneTimeKeyboard(false);
 
         List<KeyboardRow> keyboardRows = new ArrayList<>();
 

@@ -11,7 +11,7 @@ public class UserInfoDTO {
     private String name;
     private String surname;
     private String username;
-    private String phoneNumber;
+//    private String phoneNumber;
     private String review;
     private UsersTestState testState = new UsersTestState();
 
@@ -20,12 +20,7 @@ public class UserInfoDTO {
         this.username = username;
     }
 
-    public void clearAll() {
-        this.name = "";
-        this.surname = "";
-        this.username = "";
-        this.phoneNumber = "";
-        this.review = "";
+    public void clearTest() {
         testState = new UsersTestState();
     }
 
@@ -77,13 +72,13 @@ public class UserInfoDTO {
         this.username = username;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
+//    public String getPhoneNumber() {
+//        return phoneNumber;
+//    }
+//
+//    public void setPhoneNumber(String phoneNumber) {
+//        this.phoneNumber = phoneNumber;
+//    }
 
     public String getReview() {
         return review;

@@ -21,12 +21,12 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
         if (update.hasMessage()){
             var msg = update.getMessage();
 
-            if(!contains(msg.getChatId()))
+            if (!contains(msg.getChatId()))
                 dto.add(new UserInfoDTO(msg.getChatId(), msg.getFrom().getUserName()));
 
             parseMessage(msg.getText(), getUserById(msg.getChatId()));
         }
-        else if(update.hasCallbackQuery() && Objects.equals(update.getCallbackQuery().getData(), "Начать")) {
+        else if (update.hasCallbackQuery() && Objects.equals(update.getCallbackQuery().getData(), "Начать")) {
             parseMessage(update.getCallbackQuery().getData(), getUserById(update.getCallbackQuery().getFrom().getId()));
         }
         else if (update.hasCallbackQuery() &&
@@ -36,7 +36,7 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
 
             parseMessage(update.getCallbackQuery().getData(), getUserById(update.getCallbackQuery().getFrom().getId()));
         }
-        else if(update.hasCallbackQuery() && !getUserById(update.getCallbackQuery().getMessage().getChatId()).getTestState().isFinished()){
+        else if (update.hasCallbackQuery() && !getUserById(update.getCallbackQuery().getMessage().getChatId()).getTestState().isFinished()){
             sendText(update.getCallbackQuery().getMessage().getChatId(), "Вы должны отвечать только на последний вопрос");
 //            sendLastMessage(getUserById(update.getCallbackQuery().getMessage().getChatId()).getLastMessage());
         }
@@ -75,7 +75,7 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
     private void parseMessage(String textMsg, UserInfoDTO user) {
         if (textMsg.equals("/start")) {
             user.setState(States.START);
-            user.clearAll();
+            user.clearTest();
         } else if (user.getState() == null) {
             sendText(user.getChatId(), "Нет такой комманды");
             return;

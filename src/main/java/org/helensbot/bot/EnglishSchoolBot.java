@@ -151,14 +151,14 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
         }
 
         user.setState(States.GET_REVIEW);
-        sendText(user.getChatId(), "Откуда вы о нас услышали?");
+        sendOptionsForReview(user);
     }
 
     //TODO clean the code
     private void getPhoneNumberHandler(String textMsg, UserInfoDTO user) {
         if (textMsg.equals("Пропустить")) {
             var replyKeyboardRemove = new ReplyKeyboardRemove(true);
-            var removeMessage = new SendMessage(user.getChatId().toString(), "Откуда вы о нас услышали?");
+            var removeMessage = new SendMessage(user.getChatId().toString(), "");
             removeMessage.setReplyMarkup(replyKeyboardRemove);
 
             try {
@@ -168,6 +168,7 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
             }
 
             user.setState(States.GET_REVIEW);
+            sendOptionsForReview(user);
             return;
         }
 
@@ -177,7 +178,7 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
         }
 
         var replyKeyboardRemove = new ReplyKeyboardRemove(true);
-        var removeMessage = new SendMessage(user.getChatId().toString(), "Откуда вы о нас услышали?");
+        var removeMessage = new SendMessage(user.getChatId().toString(), "");
         removeMessage.setReplyMarkup(replyKeyboardRemove);
 
         try {
@@ -188,6 +189,7 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
 
         user.setPhoneNumber(textMsg);
         user.setState(States.GET_REVIEW);
+        sendOptionsForReview(user);
     }
 
     private void getReviewHandler(String textMsg, UserInfoDTO user) {
@@ -229,6 +231,129 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
                         "Вы молодец, Вам осталось совсем немного, и скоро мы свяжемся с Вами для прохождения устного тестирования"
                 );
         sendDataToAdmin(user);
+    }
+
+    private void sendOptionsForReview(UserInfoDTO user) {
+        var sm = SendMessage.builder()
+                .chatId(user.getChatId().toString())
+                .text("Откуда вы о нас услышали?\n" +
+                        "Выберете один из вариантов ниже или же впишите свой").build();
+
+        var markup = new InlineKeyboardMarkup();
+
+        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+
+        var button1 = new InlineKeyboardButton();
+        button1.setText("Google");
+        button1.setCallbackData("Google");
+        List<InlineKeyboardButton> row1 = new ArrayList<>();
+        row1.add(button1);
+        keyboard.add(row1);
+
+        var button2 = new InlineKeyboardButton();
+        button2.setText("Яндекс");
+        button2.setCallbackData("Яндекс");
+        List<InlineKeyboardButton> row2 = new ArrayList<>();
+        row2.add(button2);
+        keyboard.add(row2);
+
+        var button3 = new InlineKeyboardButton();
+        button3.setText("Instagram/Facebook/VK/Tik-Tok");
+        button3.setCallbackData("Instagram/Facebook/VK/Tik-Tok");
+        List<InlineKeyboardButton> row3 = new ArrayList<>();
+        row3.add(button3);
+        keyboard.add(row3);
+
+        var button4 = new InlineKeyboardButton();
+        button4.setText("Vse-kursy");
+        button4.setCallbackData("Vse-kursy");
+        List<InlineKeyboardButton> row4 = new ArrayList<>();
+        row4.add(button4);
+        keyboard.add(row4);
+
+        var button5 = new InlineKeyboardButton();
+        button5.setText("Еnguide");
+        button5.setCallbackData("Еnguide");
+        List<InlineKeyboardButton> row5 = new ArrayList<>();
+        row5.add(button5);
+        keyboard.add(row5);
+
+        var button6 = new InlineKeyboardButton();
+        button6.setText("Рекомендация от друзей");
+        button6.setCallbackData("Рекомендация от друзей");
+        List<InlineKeyboardButton> row6 = new ArrayList<>();
+        row6.add(button6);
+        keyboard.add(row6);
+
+        markup.setKeyboard(keyboard);
+        sm.setReplyMarkup(markup);
+
+        try {
+            execute(sm);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void sendPhoneOrSkipButtons(UserInfoDTO user) {
+        var sm = SendMessage.builder()
+                .chatId(user.getChatId().toString())
+                .text("Мы заметили, что на вашем аккаунте нет никнейма. " +
+                        "Чтобы нам было удобнее с вами связаться после прохождения теста, " +
+                        "укажите, пожалуйста, ваш номер телефона.").build();
+
+
+        var keyboard = new ReplyKeyboardMarkup();
+        keyboard.setResizeKeyboard(true);
+        keyboard.setOneTimeKeyboard(false);
+
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
+
+        var row1 = new KeyboardRow();
+        var button1 = new KeyboardButton("Поделится номером");
+        button1.setRequestContact(true);
+        row1.add(button1);
+
+        var row2 = new KeyboardRow();
+        row1.add(new KeyboardButton("Пропустить"));
+
+        keyboardRows.add(row1);
+        keyboardRows.add(row2);
+
+        keyboard.setKeyboard(keyboardRows);
+        sm.setReplyMarkup(keyboard);
+
+        try {
+            execute(sm);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void sendStartButton(UserInfoDTO user) {
+        var sm = SendMessage.builder()
+                .chatId(user.getChatId().toString())
+                .text("Ну что же, приступим к тесту.\nНажмите кнопку \"Начать тестирование\", когда будете готовы.").build();
+
+        var keyboard = new ReplyKeyboardMarkup();
+        keyboard.setResizeKeyboard(true);
+        keyboard.setOneTimeKeyboard(false);
+
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
+
+        var row = new KeyboardRow();
+        row.add(new KeyboardButton("Начать тестирование\uD83C\uDFC1"));
+
+        keyboardRows.add(row);
+
+        keyboard.setKeyboard(keyboardRows);
+        sm.setReplyMarkup(keyboard);
+
+        try {
+            execute(sm);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
     }
 
     private void sendQuestion(UserInfoDTO user){
@@ -278,67 +403,6 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
         var sm = SendMessage.builder()
                 .chatId(who.toString())
                 .text(what).build();
-        try {
-            execute(sm);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void sendStartButton(UserInfoDTO user) {
-        var sm = SendMessage.builder()
-                .chatId(user.getChatId().toString())
-                .text("Ну что же, приступим к тесту.\nНажмите кнопку \"Начать тестирование\", когда будете готовы.").build();
-
-        var keyboard = new ReplyKeyboardMarkup();
-        keyboard.setResizeKeyboard(true);
-        keyboard.setOneTimeKeyboard(false);
-
-        List<KeyboardRow> keyboardRows = new ArrayList<>();
-
-        var row = new KeyboardRow();
-        row.add(new KeyboardButton("Начать тестирование\uD83C\uDFC1"));
-
-        keyboardRows.add(row);
-
-        keyboard.setKeyboard(keyboardRows);
-        sm.setReplyMarkup(keyboard);
-
-        try {
-            execute(sm);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void sendPhoneOrSkipButtons(UserInfoDTO user) {
-        var sm = SendMessage.builder()
-                .chatId(user.getChatId().toString())
-                .text("Мы заметили, что на вашем аккаунте нет никнейма. " +
-                        "Чтобы нам было удобнее с вами связаться после прохождения теста, " +
-                        "укажите, пожалуйста, ваш номер телефона.").build();
-
-
-        var keyboard = new ReplyKeyboardMarkup();
-        keyboard.setResizeKeyboard(true);
-        keyboard.setOneTimeKeyboard(false);
-
-        List<KeyboardRow> keyboardRows = new ArrayList<>();
-
-        var row1 = new KeyboardRow();
-        var button1 = new KeyboardButton("Поделится номером");
-        button1.setRequestContact(true);
-        row1.add(button1);
-
-        var row2 = new KeyboardRow();
-        row1.add(new KeyboardButton("Пропустить"));
-
-        keyboardRows.add(row1);
-        keyboardRows.add(row2);
-
-        keyboard.setKeyboard(keyboardRows);
-        sm.setReplyMarkup(keyboard);
-
         try {
             execute(sm);
         } catch (TelegramApiException e) {

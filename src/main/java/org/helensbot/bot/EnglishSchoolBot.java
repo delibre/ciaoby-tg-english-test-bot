@@ -157,7 +157,6 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
     //TODO clean the code
     private void getPhoneNumberHandler(String textMsg, UserInfoDTO user) {
         if (textMsg.equals("Пропустить")) {
-            user.setPhoneNumber("нет");
             var replyKeyboardRemove = new ReplyKeyboardRemove(true);
             var removeMessage = new SendMessage(user.getChatId().toString(), "Откуда вы о нас услышали?");
             removeMessage.setReplyMarkup(replyKeyboardRemove);
@@ -227,7 +226,7 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
         sendText(user.getChatId(),
                 "Вы ответили верно на " + user.getTestState().getCorrectAnswers() + " вопросов.\n" +
                         "Ваш уровень английского " + user.getTestState().getResults() + ".\n" +
-                        "Вы молодец, Вам осталось совсем немного, и скоро мы свяжемся для прохождения устного тестирования"
+                        "Вы молодец, Вам осталось совсем немного, и скоро мы свяжемся с Вами для прохождения устного тестирования"
                 );
         sendDataToAdmin(user);
     }
@@ -289,7 +288,7 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
     private void sendStartButton(UserInfoDTO user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
-                .text("Ну что же, приступим к тесту.\nНажите кнопку \"Начать тестирование\", когда будете готовы.").build();
+                .text("Ну что же, приступим к тесту.\nНажмите кнопку \"Начать тестирование\", когда будете готовы.").build();
 
         var keyboard = new ReplyKeyboardMarkup();
         keyboard.setResizeKeyboard(true);
@@ -315,9 +314,9 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
     private void sendPhoneOrSkipButtons(UserInfoDTO user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
-                .text("Мы заметили что на этом акаунте нету никнейма, " +
-                        "но нам нужно будет связатся с вами после теста, для прохождения усного тестирования. " +
-                        "Вы можете указать номер телефона или же пропустить этот этап.").build();
+                .text("Мы заметили, что на вашем аккаунте нет никнейма. " +
+                        "Чтобы нам было удобнее с вами связаться после прохождения теста, " +
+                        "укажите, пожалуйста, ваш номер телефона.").build();
 
 
         var keyboard = new ReplyKeyboardMarkup();

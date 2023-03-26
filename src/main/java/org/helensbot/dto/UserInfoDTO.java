@@ -15,7 +15,7 @@ public class UserInfoDTO {
     private String name;
     private String surname;
     private String username;
-    private String phoneNumber;
+    private String phoneNumber = "нет";
     private String review;
     private UsersTestState testState = new UsersTestState();
 

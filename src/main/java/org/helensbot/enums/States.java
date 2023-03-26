@@ -9,5 +9,6 @@ public enum States {
     TEST_TODO,
     QUESTION_TO_SEND,
     CHECK_ANSWER,
-    TEST_ENDED
+    TEST_ENDED,
+    END_ALL
 }

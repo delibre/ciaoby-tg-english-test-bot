@@ -121,6 +121,9 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
             case TEST_ENDED:
                 testEndedHandler(user);
                 break;
+            case END_ALL:
+                testEndAllHandler(user);
+                break;
             default:
                 throw new IllegalStateException();
         }
@@ -131,7 +134,9 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
 
         sendText(user.getChatId(), "Привет!\uD83D\uDC4B\n\n" +
                                     "Сейчас мы проверим Ваши знания английского\uD83D\uDD25\n" +
-                                    "Но для начала давайте познакомимся\uD83D\uDE42\n\n" +
+                                    "Вы пройдете тест, который состоит из 30 вопросов.\n" +
+                                    "После этого, вы сможете проходить его, когда захотите.\uD83D\uDE0A\n\n" +
+                                    "Но для начала давайте познакомимся\uD83D\uDE09\n\n" +
                                     "Введите, пожалуйста, Ваше имя");
     }
 
@@ -139,7 +144,7 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
         user.setName(textMsg);
         user.setState(States.GET_SURNAME);
 
-        sendText(user.getChatId(), "Теперь введите, пожалуйста, Фамилию");
+        sendText(user.getChatId(), "Теперь введите, пожалуйста, фамилию");
     }
 
     private void getSurnameHandler(String textMsg, UserInfoDTO user) {
@@ -154,19 +159,9 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
         sendOptionsForReview(user);
     }
 
-    //TODO clean the code
     private void getPhoneNumberHandler(String textMsg, UserInfoDTO user) {
         if (textMsg.equals("Пропустить")) {
-            var replyKeyboardRemove = new ReplyKeyboardRemove(true);
-            var removeMessage = new SendMessage(user.getChatId().toString(), "");
-            removeMessage.setReplyMarkup(replyKeyboardRemove);
-
-            try {
-                execute(removeMessage);
-            } catch (TelegramApiException e) {
-                throw new RuntimeException(e);
-            }
-
+            removeReplyKeyboard(textMsg, user);
             user.setState(States.GET_REVIEW);
             sendOptionsForReview(user);
             return;
@@ -177,8 +172,24 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
             return;
         }
 
+        removeReplyKeyboard(textMsg, user);
+
+        user.setPhoneNumber(textMsg);
+        user.setState(States.GET_REVIEW);
+        sendOptionsForReview(user);
+    }
+
+    private void removeReplyKeyboard(String textMsg, UserInfoDTO user) {
+        String msg;
+
+        if (textMsg.equals("Пропустить")) {
+            msg = "Нам приятно, что вы пользуетесь нашим сервисом. Можем продолжать\uD83D\uDE0A";
+        } else {
+            msg = "Спасибо! Можем продолжать\uD83D\uDE0A";
+        }
+
         var replyKeyboardRemove = new ReplyKeyboardRemove(true);
-        var removeMessage = new SendMessage(user.getChatId().toString(), "");
+        var removeMessage = new SendMessage(user.getChatId().toString(), msg);
         removeMessage.setReplyMarkup(replyKeyboardRemove);
 
         try {
@@ -187,9 +198,11 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
             throw new RuntimeException(e);
         }
 
-        user.setPhoneNumber(textMsg);
-        user.setState(States.GET_REVIEW);
-        sendOptionsForReview(user);
+        try {
+            Thread.sleep(500); // Delay for 1.5 seconds (1500 milliseconds)
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void getReviewHandler(String textMsg, UserInfoDTO user) {
@@ -225,12 +238,21 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
     }
 
     private void testEndedHandler(UserInfoDTO user) {
+        user.setState(States.END_ALL);
         sendText(user.getChatId(),
                 "Вы ответили верно на " + user.getTestState().getCorrectAnswers() + " вопросов.\n" +
                         "Ваш уровень английского " + user.getTestState().getResults() + ".\n" +
                         "Вы молодец, Вам осталось совсем немного, и скоро мы свяжемся с Вами для прохождения устного тестирования"
                 );
+
         sendDataToAdmin(user);
+    }
+
+    private void testEndAllHandler(UserInfoDTO user) {
+        sendText(user.getChatId(),
+                "Извините, не роспознал Вашу команду.\n" +
+                        "Если хотите пройти тест заново - нажмите кнопку \"Начать тестирование\"\uD83E\uDD17"
+        );
     }
 
     private void sendOptionsForReview(UserInfoDTO user) {
@@ -298,9 +320,12 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
     private void sendPhoneOrSkipButtons(UserInfoDTO user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
-                .text("Мы заметили, что на вашем аккаунте нет никнейма. " +
-                        "Чтобы нам было удобнее с вами связаться после прохождения теста, " +
-                        "укажите, пожалуйста, ваш номер телефона.").build();
+                .text("Мы заметили, что на Вашем аккаунте нет никнейма. " +
+                        "Чтобы нам было удобнее с Вами связаться для прохождения усного теста позже, " +
+                        "укажите, пожалуйста, Ваш номер телефона.\n\n" +
+                        "Вы можете нажать на кнопку \"Поделится номером\", и указать номер, к которому привязан Ваш телеграм, " +
+                        "либо же указать другой, вписав его в формате +12345678900. " +
+                        "Или же просто пропустить этот этап и заказать от нас звонок после теста.").build();
 
 
         var keyboard = new ReplyKeyboardMarkup();

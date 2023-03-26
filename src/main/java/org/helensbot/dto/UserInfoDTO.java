@@ -26,5 +26,6 @@ public class UserInfoDTO {
 
     public void clearTest() {
         testState = new UsersTestState();
+        lastMessage = null;
     }
 }

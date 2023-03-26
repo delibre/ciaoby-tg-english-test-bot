@@ -4,8 +4,9 @@ import org.helensbot.dto.UserInfoDTO;
 import org.helensbot.enums.States;
 import org.helensbot.utils.Regex;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -32,21 +33,19 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
 
             parseMessage(msg.getText(), getUserById(msg.getChatId()));
         }
-        if (update.getMessage() != null && update.getMessage().getContact() != null) {
+        else if (update.getMessage() != null && update.getMessage().getContact() != null) {
             getPhoneNumberHandler(update.getMessage().getContact().getPhoneNumber(), getUserById(update.getMessage().getChatId()));
         }
-        else if (update.hasCallbackQuery() && Objects.equals(update.getCallbackQuery().getData(), "Начать тестирование\uD83C\uDFC1")) {
+        else if (update.hasCallbackQuery()) {
             parseMessage(update.getCallbackQuery().getData(), getUserById(update.getCallbackQuery().getFrom().getId()));
-        }
-        else if (update.hasCallbackQuery() &&
-                Objects.equals(update.getCallbackQuery().getMessage().getMessageId(),
-                        getUserById(update.getCallbackQuery().getMessage().getChatId()).getLastMessage().getMessageId()) &&
-                !getUserById(update.getCallbackQuery().getMessage().getChatId()).getTestState().isFinished()) {
+            var close = AnswerCallbackQuery.builder()
+                    .callbackQueryId(update.getCallbackQuery().getId()).build();
 
-            parseMessage(update.getCallbackQuery().getData(), getUserById(update.getCallbackQuery().getFrom().getId()));
-        }
-        else if (update.hasCallbackQuery() && !getUserById(update.getCallbackQuery().getMessage().getChatId()).getTestState().isFinished()){
-            sendText(update.getCallbackQuery().getMessage().getChatId(), "Вы должны отвечать только на последний вопрос");
+            try {
+                execute(close);
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -119,6 +118,9 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
             case CHECK_ANSWER:
                 checkAnswerHandler(textMsg, user);
                 break;
+            case TEST_ENDED:
+                testEndedHandler(user);
+                break;
             default:
                 throw new IllegalStateException();
         }
@@ -155,6 +157,7 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
     //TODO clean the code
     private void getPhoneNumberHandler(String textMsg, UserInfoDTO user) {
         if (textMsg.equals("Пропустить")) {
+            user.setPhoneNumber("нет");
             var replyKeyboardRemove = new ReplyKeyboardRemove(true);
             var removeMessage = new SendMessage(user.getChatId().toString(), "Откуда вы о нас услышали?");
             removeMessage.setReplyMarkup(replyKeyboardRemove);
@@ -216,7 +219,6 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
     }
 
     private void checkAnswerHandler(String answer, UserInfoDTO user) {
-//        deleteMessage(user);
         user.getTestState().registerAnswer(answer);
         questionToSendHandler(user);
     }
@@ -255,11 +257,19 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
         sm.setReplyMarkup(markup);
 
         try {
-            if(user.getLastMessage() != null) {
-                deleteMessage(user);
-            }
+            if (user.getLastMessage() != null && user.getLastMessage().getChatId() != 0 && user.getLastMessage().getMessageId() != 0) {
+                var editMessageText = EditMessageText.builder()
+                        .chatId(user.getLastMessage().getChatId().toString())
+                        .messageId(user.getLastMessage().getMessageId())
+                        .text(user.getTestState().getCurrentQuestion().getNumberOfQuestion() + ". "
+                                + user.getTestState().getCurrentQuestion().getQuestion()).build();
 
-            user.setLastMessage(execute(sm));
+                editMessageText.setReplyMarkup(markup);
+
+                execute(editMessageText);
+            } else {
+                user.setLastMessage(execute(sm));
+            }
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
@@ -334,18 +344,6 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
             execute(sm);
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private void deleteMessage(UserInfoDTO user) {
-        DeleteMessage deleteMessage = new DeleteMessage(
-                user.getChatId().toString(),
-                user.getLastMessage().getMessageId());
-
-        try {
-            execute(deleteMessage);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
         }
     }
 

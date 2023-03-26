@@ -6,6 +6,7 @@ import org.helensbot.utils.Regex;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -27,6 +28,11 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()){
             var msg = update.getMessage();
+
+            if(contains(msg.getChatId()) && getUserById(msg.getChatId()).getState() == States.CHECK_ANSWER) {
+                sendText(getUserById(msg.getChatId()).getChatId(), "Отвечать можно только нажав кнопку с одним из вариантов ответа");
+                return;
+            }
 
             if (!contains(msg.getChatId()))
                 dto.add(new UserInfoDTO(msg.getChatId(), msg.getFrom().getUserName()));
@@ -238,11 +244,13 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
     }
 
     private void testEndedHandler(UserInfoDTO user) {
+        deleteMessage(user);
+
         user.setState(States.END_ALL);
         sendText(user.getChatId(),
                 "Вы ответили верно на " + user.getTestState().getCorrectAnswers() + " вопросов.\n" +
                         "Ваш уровень английского " + user.getTestState().getResults() + ".\n" +
-                        "Вы молодец, Вам осталось совсем немного, и скоро мы свяжемся с Вами для прохождения устного тестирования"
+                        "Вы молодец, Вам осталось совсем немного, и скоро мы свяжемся с Вами для прохождения усного тестирования"
                 );
 
         sendDataToAdmin(user);
@@ -421,6 +429,18 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
             }
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void deleteMessage(UserInfoDTO user) {
+        DeleteMessage deleteMessage = new DeleteMessage();
+        deleteMessage.setChatId(user.getChatId().toString());
+        deleteMessage.setMessageId(user.getLastMessage().getMessageId());
+
+        try {
+            execute(deleteMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
         }
     }
 

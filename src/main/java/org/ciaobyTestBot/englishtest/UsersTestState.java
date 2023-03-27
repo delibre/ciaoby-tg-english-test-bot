@@ -1,7 +1,7 @@
-package org.helensbot.englishtest;
+package org.ciaobyTestBot.englishtest;
 
 import lombok.Getter;
-import org.helensbot.enums.EnglishLevel;
+import org.ciaobyTestBot.enums.EnglishLevel;
 
 import java.util.LinkedList;
 import java.util.Objects;

@@ -1,9 +1,9 @@
-package org.helensbot.dto;
+package org.ciaobyTestBot.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.helensbot.englishtest.UsersTestState;
-import org.helensbot.enums.States;
+import org.ciaobyTestBot.englishtest.UsersTestState;
+import org.ciaobyTestBot.enums.States;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 @Getter

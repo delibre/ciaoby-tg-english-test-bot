@@ -1,4 +1,4 @@
-package org.helensbot.englishtest;
+package org.ciaobyTestBot.englishtest;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

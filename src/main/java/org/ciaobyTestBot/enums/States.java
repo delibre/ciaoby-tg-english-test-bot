@@ -1,4 +1,4 @@
-package org.helensbot.enums;
+package org.ciaobyTestBot.enums;
 
 public enum States {
     START,

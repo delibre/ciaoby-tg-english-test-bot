@@ -1,6 +1,6 @@
-package org.helensbot;
+package org.ciaobyTestBot;
 
-import org.helensbot.bot.EnglishSchoolBot;
+import org.ciaobyTestBot.bot.CiaoByBot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -15,7 +15,7 @@ public class Application {
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
         try {
             log.info("Registering bot...");
-            telegramBotsApi.registerBot(new EnglishSchoolBot());
+            telegramBotsApi.registerBot(new CiaoByBot());
         } catch (TelegramApiRequestException e) {
             log.error("Failed to register bot(check internet connection / bot token or make sure only one instance of bot is running).", e);
         }

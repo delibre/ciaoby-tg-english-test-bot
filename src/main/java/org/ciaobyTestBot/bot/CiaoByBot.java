@@ -1,8 +1,8 @@
-package org.helensbot.bot;
+package org.ciaobyTestBot.bot;
 
-import org.helensbot.dto.UserInfoDTO;
-import org.helensbot.enums.States;
-import org.helensbot.utils.Regex;
+import org.ciaobyTestBot.dto.UserInfoDTO;
+import org.ciaobyTestBot.enums.States;
+import org.ciaobyTestBot.utils.Regex;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class EnglishSchoolBot extends TelegramLongPollingBot {
+public class CiaoByBot extends TelegramLongPollingBot {
     private final ArrayList<UserInfoDTO> dto = new ArrayList<>();
 
     @Override

@@ -65,9 +65,8 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>questions30.ods</include>
+                    <include>**/*</include>
                 </includes>
-                <targetPath>src/main/resources</targetPath>
             </resource>
         </resources>
 

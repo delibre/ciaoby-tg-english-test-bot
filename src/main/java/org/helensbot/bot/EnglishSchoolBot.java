@@ -457,7 +457,7 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
 
     private void sendDataToAdmin(UserInfoDTO user) {
         var sm = SendMessage.builder()
-                .chatId("5105539803").
+                .chatId("931441991").
                 text(   "Имя: " + user.getName() + "\n" +
                         "Фамилия: " + user.getSurname() + "\n" +
                         "Номер телефона: " + user.getPhoneNumber() + "\n" +

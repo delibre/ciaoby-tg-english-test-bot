@@ -57,12 +57,12 @@ public class EnglishSchoolBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "English_Schoo_lBot";
+        return "ciaoby_bot";
     }
 
     @Override
     public String getBotToken() {
-        return "5915260285:AAGpgfcCYCu6kxD38WcE6QYVFXCv4JjbdwA";
+        return "6118270229:AAEAs0HoHAKmcD_fMEsFXO1fdIbFpXCyhuY";
     }
 
     private UserInfoDTO getUserById(Long id) {

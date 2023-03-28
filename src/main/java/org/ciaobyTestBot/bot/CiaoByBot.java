@@ -266,7 +266,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
     private void sendOptionsForReview(UserInfoDTO user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
-                .text("Откуда вы о нас услышали?\n" +
+                .text("Откуда вы о нас узнали?\n" +
                         "Выберете один из вариантов ниже или же впишите свой").build();
 
         var markup = new InlineKeyboardMarkup();
@@ -328,12 +328,13 @@ public class CiaoByBot extends TelegramLongPollingBot {
     private void sendPhoneOrSkipButtons(UserInfoDTO user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
-                .text("Мы заметили, что на Вашем аккаунте нет никнейма. " +
-                        "Чтобы нам было удобнее с Вами связаться для прохождения усного теста позже, " +
-                        "укажите, пожалуйста, Ваш номер телефона.\n\n" +
-                        "Вы можете нажать на кнопку \"Поделится номером\", и указать номер, к которому привязан Ваш телеграм, " +
+                .text("Мы заметили, что на Вашем аккаунте нет никнейма.\uD83E\uDD14 " +
+                        "Чтобы нам было удобнее с Вами связаться для прохождения устного теста позже, " +
+                        "укажите, пожалуйста, Ваш номер телефона.\uD83D\uDE0A\n\n" +
+                        "Вы можете нажать на кнопку \"Поделиться номером\", и указать номер, к которому привязан Ваш телеграм, " +
                         "либо же указать другой, вписав его в формате +12345678900. " +
-                        "Или же просто пропустить этот этап и заказать от нас звонок после теста.").build();
+                        "Или же просто пропустить этот этап и заказать от нас звонок после теста, " +
+                        "связавшись с нашим менеджером по ссылке в описании бота\uD83D\uDE0A").build();
 
 
         var keyboard = new ReplyKeyboardMarkup();
@@ -343,7 +344,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         List<KeyboardRow> keyboardRows = new ArrayList<>();
 
         var row1 = new KeyboardRow();
-        var button1 = new KeyboardButton("Поделится номером");
+        var button1 = new KeyboardButton("Поделиться номером");
         button1.setRequestContact(true);
         row1.add(button1);
 

@@ -2,8 +2,7 @@ package org.ciaobyTestBot.enums;
 
 public enum States {
     START,
-    GET_NAME,
-    GET_SURNAME,
+    GET_NAME_AND_SURNAME,
     GET_PHONE_NUMBER,
     GET_REVIEW,
     TEST_TODO,

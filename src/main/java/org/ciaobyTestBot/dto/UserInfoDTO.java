@@ -12,8 +12,7 @@ public class UserInfoDTO {
     private States state = null;
     private Message lastMessage;
     private Long chatId;
-    private String name;
-    private String surname;
+    private String nameAndSurname;
     private String username;
     private String phoneNumber = "нет";
     private String review;

@@ -103,11 +103,8 @@ public class CiaoByBot extends TelegramLongPollingBot {
             case START:
                 startHandler(user);
                 break;
-            case GET_NAME:
-                getNameHandler(textMsg, user);
-                break;
-            case GET_SURNAME:
-                getSurnameHandler(textMsg, user);
+            case GET_NAME_AND_SURNAME:
+                getNameAndSurnameHandler(textMsg, user);
                 break;
             case GET_PHONE_NUMBER:
                 getPhoneNumberHandler(textMsg, user);
@@ -136,63 +133,38 @@ public class CiaoByBot extends TelegramLongPollingBot {
     }
 
     private void startHandler(UserInfoDTO user) {
-        user.setState(States.GET_NAME);
+        user.setState(States.GET_NAME_AND_SURNAME);
 
         sendText(user.getChatId(), "Привет!\uD83D\uDC4B\n\n" +
                                     "Сейчас мы проверим Ваши знания английского\uD83D\uDD25\n" +
                                     "Вы пройдете тест, который состоит из 30 вопросов.\n" +
                                     "После этого, вы сможете проходить его, когда захотите.\uD83D\uDE0A\n\n" +
                                     "Но для начала давайте познакомимся\uD83D\uDE09\n\n" +
-                                    "Введите, пожалуйста, Ваше имя");
+                                    "Введите, пожалуйста, Ваше имя и фамилию");
     }
 
-    private void getNameHandler(String textMsg, UserInfoDTO user) {
-        user.setName(textMsg);
-        user.setState(States.GET_SURNAME);
+    private void getNameAndSurnameHandler(String textMsg, UserInfoDTO user) {
+        user.setNameAndSurname(textMsg);
+        user.setState(States.GET_PHONE_NUMBER);
 
-        sendText(user.getChatId(), "Теперь введите, пожалуйста, фамилию");
-    }
-
-    private void getSurnameHandler(String textMsg, UserInfoDTO user) {
-        user.setSurname(textMsg);
-        if (user.getUsername() == null) {
-            user.setState(States.GET_PHONE_NUMBER);
-            sendPhoneOrSkipButtons(user);
-            return;
-        }
-
-        user.setState(States.GET_REVIEW);
-        sendOptionsForReview(user);
+        sendPhoneOrSkipButtons(user);
     }
 
     private void getPhoneNumberHandler(String textMsg, UserInfoDTO user) {
-        if (textMsg.equals("Пропустить")) {
-            removeReplyKeyboard(textMsg, user);
-            user.setState(States.GET_REVIEW);
-            sendOptionsForReview(user);
-            return;
-        }
-
         if (!Regex.checkPhoneNumber(textMsg)) {
             sendText(user.getChatId(), "Неверный формат номера. Попробуйте, пожалуйста, ещё раз");
             return;
         }
 
-        removeReplyKeyboard(textMsg, user);
+        removeReplyKeyboard(user);
 
         user.setPhoneNumber(textMsg);
         user.setState(States.GET_REVIEW);
         sendOptionsForReview(user);
     }
 
-    private void removeReplyKeyboard(String textMsg, UserInfoDTO user) {
-        String msg;
-
-        if (textMsg.equals("Пропустить")) {
-            msg = "Нам приятно, что вы пользуетесь нашим сервисом. Можем продолжать\uD83D\uDE0A";
-        } else {
-            msg = "Спасибо! Можем продолжать\uD83D\uDE0A";
-        }
+    private void removeReplyKeyboard(UserInfoDTO user) {
+        String msg = "Спасибо! Можем продолжать\uD83D\uDE0A";
 
         var replyKeyboardRemove = new ReplyKeyboardRemove(true);
         var removeMessage = new SendMessage(user.getChatId().toString(), msg);
@@ -328,13 +300,10 @@ public class CiaoByBot extends TelegramLongPollingBot {
     private void sendPhoneOrSkipButtons(UserInfoDTO user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
-                .text("Мы заметили, что на Вашем аккаунте нет никнейма.\uD83E\uDD14 " +
-                        "Чтобы нам было удобнее с Вами связаться для прохождения устного теста позже, " +
-                        "укажите, пожалуйста, Ваш номер телефона.\uD83D\uDE0A\n\n" +
+                .text("Чтобы нам было удобнее с Вами связаться для прохождения устного теста, " +
+                        "укажите, пожалуйста, Ваш номер телефона\uD83D\uDE0A\n\n" +
                         "Вы можете нажать на кнопку \"Поделиться номером\", и указать номер, к которому привязан Ваш телеграм, " +
-                        "либо же указать другой, вписав его в формате +12345678900. " +
-                        "Или же просто пропустить этот этап и заказать от нас звонок после теста, " +
-                        "связавшись с нашим менеджером по ссылке в описании бота\uD83D\uDE0A").build();
+                        "либо же указать другой, вписав его в формате +12345678900.\uD83D\uDE0A\n\n").build();
 
 
         var keyboard = new ReplyKeyboardMarkup();
@@ -348,11 +317,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         button1.setRequestContact(true);
         row1.add(button1);
 
-        var row2 = new KeyboardRow();
-        row1.add(new KeyboardButton("Пропустить"));
-
         keyboardRows.add(row1);
-        keyboardRows.add(row2);
 
         keyboard.setKeyboard(keyboardRows);
         sm.setReplyMarkup(keyboard);
@@ -367,7 +332,9 @@ public class CiaoByBot extends TelegramLongPollingBot {
     private void sendStartButton(UserInfoDTO user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
-                .text("Ну что же, приступим к тесту.\nНажмите кнопку \"Начать тестирование\", когда будете готовы.").build();
+                .text("Ну что же, приступим к тесту. Сейчас Вам нужно будет ответить на 30 вопросов.\uD83E\uDDD0 " +
+                        "Ограничений по времени нет.\n" +
+                        "\nНажмите кнопку \"Начать тестирование\", когда будете готовы.").build();
 
         var keyboard = new ReplyKeyboardMarkup();
         keyboard.setResizeKeyboard(true);
@@ -459,8 +426,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
     private void sendDataToAdmin(UserInfoDTO user) {
         var sm = SendMessage.builder()
                 .chatId("931441991").
-                text(   "Имя: " + user.getName() + "\n" +
-                        "Фамилия: " + user.getSurname() + "\n" +
+                text(   "Имя и Фамилия: " + user.getNameAndSurname() + "\n" +
                         "Номер телефона: " + user.getPhoneNumber() + "\n" +
                         "Ник в телеграмм: @" + user.getUsername() + "\n" +
                         "Откуда узнали: " + user.getReview() + "\n" +

@@ -57,12 +57,12 @@ public class CiaoByBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "ciaoby_bot";
+        return "English_Schoo_lBot";
     }
 
     @Override
     public String getBotToken() {
-        return "6118270229:AAEAs0HoHAKmcD_fMEsFXO1fdIbFpXCyhuY";
+        return "5915260285:AAGpgfcCYCu6kxD38WcE6QYVFXCv4JjbdwA";
     }
 
     private UserInfoDTO getUserById(Long id) {
@@ -147,7 +147,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         user.setNameAndSurname(textMsg);
         user.setState(States.GET_PHONE_NUMBER);
 
-        sendPhoneOrSkipButtons(user);
+        sendPhoneButton(user);
     }
 
     private void getPhoneNumberHandler(String textMsg, UserInfoDTO user) {
@@ -297,12 +297,12 @@ public class CiaoByBot extends TelegramLongPollingBot {
         }
     }
 
-    private void sendPhoneOrSkipButtons(UserInfoDTO user) {
+    private void sendPhoneButton(UserInfoDTO user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
-                .text("Чтобы нам было удобнее с Вами связаться для прохождения устного теста, " +
+                .text("Чтобы нам было удобнее с Вами связаться для согласования второго этапа (устного тестирования), " +
                         "укажите, пожалуйста, Ваш номер телефона\uD83D\uDE0A\n\n" +
-                        "Вы можете нажать на кнопку \"Поделиться номером\", и указать номер, к которому привязан Ваш телеграм, " +
+                        "Вы можете нажать на кнопку \"Поделиться номером\" и указать номер, к которому привязан Ваш телеграм, " +
                         "либо же указать другой, вписав его в формате +12345678900.\uD83D\uDE0A\n\n").build();
 
 
@@ -425,7 +425,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
 
     private void sendDataToAdmin(UserInfoDTO user) {
         var sm = SendMessage.builder()
-                .chatId("931441991").
+                .chatId("5105539803").
                 text(   "Имя и Фамилия: " + user.getNameAndSurname() + "\n" +
                         "Номер телефона: " + user.getPhoneNumber() + "\n" +
                         "Ник в телеграмм: @" + user.getUsername() + "\n" +

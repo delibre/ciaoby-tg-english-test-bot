@@ -236,7 +236,7 @@ public class BotService {
         return sm;
     }
 
-    protected EditMessageText serviceEditQuestion(UserInfoDTO user, InlineKeyboardMarkup markup) {
+    protected EditMessageText editQuestion(UserInfoDTO user, InlineKeyboardMarkup markup) {
         var editMessageText = EditMessageText.builder()
                 .chatId(user.getLastMessage().getChatId().toString())
                 .messageId(user.getLastMessage().getMessageId())

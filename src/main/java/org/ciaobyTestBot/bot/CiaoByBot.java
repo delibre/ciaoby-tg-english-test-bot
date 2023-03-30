@@ -20,28 +20,27 @@ public class CiaoByBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()){
             var msg = update.getMessage();
+            var id = msg.getChatId();
 
-            if(service.contains(msg.getChatId()) && service.getUserById(msg.getChatId()).getState() == States.CHECK_ANSWER) {
-                sendText(service.getUserById(msg.getChatId()).getChatId(), "Отвечать можно только нажав кнопку с одним из вариантов ответа");
+            if(service.contains(id) && service.getUserById(id).getState() == States.CHECK_ANSWER) {
+                sendText(service.getUserById(id).getChatId(), "Отвечать можно только нажав кнопку с одним из вариантов ответа");
                 return;
             }
+            if (!service.contains(id))  service.dto.add(new UserInfoDTO(id, msg.getFrom().getUserName()));
 
-            if (!service.contains(msg.getChatId()))
-                service.dto.add(new UserInfoDTO(msg.getChatId(), msg.getFrom().getUserName()));
+            parseMessage(msg.getText(), service.getUserById(id));
 
-            parseMessage(msg.getText(), service.getUserById(msg.getChatId()));
-        }
-        else if (update.getMessage() != null && update.getMessage().getContact() != null) {
+        }  else if (update.getMessage() != null && update.getMessage().getContact() != null) {
             getPhoneNumberHandler(update.getMessage().getContact().getPhoneNumber(),
-                    service.getUserById(update.getMessage().getChatId()));
-        }
-        else if (update.hasCallbackQuery() && service.contains(update.getCallbackQuery().getFrom().getId())) {
-            parseMessage(update.getCallbackQuery().getData(), service.getUserById(update.getCallbackQuery().getFrom().getId()));
-            var close = AnswerCallbackQuery.builder()
-                    .callbackQueryId(update.getCallbackQuery().getId()).build();
+                                    service.getUserById(update.getMessage().getChatId()));
+
+        } else if (update.hasCallbackQuery() && service.contains(update.getCallbackQuery().getFrom().getId())) {
+            var qry = update.getCallbackQuery();
+            parseMessage(qry.getData(), service.getUserById(qry.getFrom().getId()));
 
             try {
-                execute(close);
+                execute( AnswerCallbackQuery.builder()
+                        .callbackQueryId(qry.getId()).build());
             } catch (TelegramApiException e) {
                 throw new RuntimeException(e);
             }
@@ -192,7 +191,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
     private void sendQuestion(UserInfoDTO user) {
         try {
             if (user.getLastMessage() != null && user.getLastMessage().getChatId() != 0 && user.getLastMessage().getMessageId() != 0) {
-                execute(service.serviceEditQuestion(user,
+                execute(service.editQuestion(user,
                         (InlineKeyboardMarkup) service.serviceSendQuestion(user).getReplyMarkup()));
             } else {
                 user.setLastMessage(execute(service.serviceSendQuestion(user)));

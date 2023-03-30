@@ -266,10 +266,4 @@ public class BotService {
                         "Отвечено верно на: " + user.getTestState().getCorrectAnswers() + " вопросов.\n" +
                         "Уровень английского: " + user.getTestState().getLvl()).build();
     }
-
-    protected SendMessage buildMessage(Long who, String what) {
-        return SendMessage.builder()
-                .chatId(who.toString())
-                .text(what).build();
-    }
 }

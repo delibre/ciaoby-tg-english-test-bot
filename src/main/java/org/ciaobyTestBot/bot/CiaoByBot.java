@@ -30,7 +30,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
 
             parseMessage(msg.getText(), service.getUserById(id));
 
-        }  else if (update.getMessage() != null && update.getMessage().getContact() != null) {
+        }  else if (update.hasMessage() && update.getMessage().getContact() != null) {
             getPhoneNumberHandler(update.getMessage().getContact().getPhoneNumber(),
                                     service.getUserById(update.getMessage().getChatId()));
 

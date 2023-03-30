@@ -42,7 +42,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         else if (update.getMessage() != null && update.getMessage().getContact() != null) {
             getPhoneNumberHandler(update.getMessage().getContact().getPhoneNumber(), getUserById(update.getMessage().getChatId()));
         }
-        else if (update.hasCallbackQuery()) {
+        else if (update.hasCallbackQuery() && contains(update.getCallbackQuery().getFrom().getId())) {
             parseMessage(update.getCallbackQuery().getData(), getUserById(update.getCallbackQuery().getFrom().getId()));
             var close = AnswerCallbackQuery.builder()
                     .callbackQueryId(update.getCallbackQuery().getId()).build();
@@ -57,12 +57,12 @@ public class CiaoByBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "English_Schoo_lBot";
+        return "ciaoby_bot";
     }
 
     @Override
     public String getBotToken() {
-        return "5915260285:AAGpgfcCYCu6kxD38WcE6QYVFXCv4JjbdwA";
+        return "6118270229:AAEAs0HoHAKmcD_fMEsFXO1fdIbFpXCyhuY";
     }
 
     private UserInfoDTO getUserById(Long id) {
@@ -70,8 +70,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
             if (Objects.equals(userInfoDTO.getChatId(), id))
                 return userInfoDTO;
 
-        sendText(id, "Please restart the bot");
-        return null;
+        throw new RuntimeException("No such user");
     }
 
     private boolean contains(Long id) {
@@ -223,7 +222,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         sendText(user.getChatId(),
                 "Вы ответили верно на " + user.getTestState().getCorrectAnswers() + " вопросов.\n" +
                         "Ваш уровень английского " + user.getTestState().getResults() + ".\n" +
-                        "Вы молодец, Вам осталось совсем немного, и скоро мы свяжемся с Вами для прохождения усного тестирования\uD83D\uDE0A"
+                        "Вы молодец, Вам осталось совсем немного, и скоро мы свяжемся с Вами для прохождения устного тестирования\uD83D\uDE0A"
                 );
 
         sendDataToAdmin(user);
@@ -436,7 +435,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
 
     private void sendDataToAdmin(UserInfoDTO user) {
         var sm = SendMessage.builder()
-                .chatId("5105539803").
+                .chatId("931441991").
                 text(   "Имя и Фамилия: " + user.getNameAndSurname() + "\n" +
                         "Номер телефона: " + user.getPhoneNumber() + "\n" +
                         "Ник в телеграмм: @" + user.getUsername() + "\n" +

@@ -29,8 +29,8 @@ public class CiaoByBot extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()){
             var msg = update.getMessage();
 
-            if(contains(msg.getChatId()) && getUserById(msg.getChatId()).getState() == States.CHECK_ANSWER) {
-                sendText(getUserById(msg.getChatId()).getChatId(), "Отвечать можно только нажав кнопку с одним из вариантов ответа");
+            if(contains(msg.getChatId()) && Objects.requireNonNull(getUserById(msg.getChatId())).getState() == States.CHECK_ANSWER) {
+                sendText(Objects.requireNonNull(getUserById(msg.getChatId())).getChatId(), "Отвечать можно только нажав кнопку с одним из вариантов ответа");
                 return;
             }
 
@@ -70,7 +70,8 @@ public class CiaoByBot extends TelegramLongPollingBot {
             if (Objects.equals(userInfoDTO.getChatId(), id))
                 return userInfoDTO;
 
-        throw new AssertionError();
+        sendText(id, "Please restart the bot");
+        return null;
     }
 
     private boolean contains(Long id) {
@@ -222,7 +223,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         sendText(user.getChatId(),
                 "Вы ответили верно на " + user.getTestState().getCorrectAnswers() + " вопросов.\n" +
                         "Ваш уровень английского " + user.getTestState().getResults() + ".\n" +
-                        "Вы молодец, Вам осталось совсем немного, и скоро мы свяжемся с Вами для прохождения усного тестирования"
+                        "Вы молодец, Вам осталось совсем немного, и скоро мы свяжемся с Вами для прохождения усного тестирования\uD83D\uDE0A"
                 );
 
         sendDataToAdmin(user);
@@ -357,7 +358,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         }
     }
 
-    private void sendQuestion(UserInfoDTO user){
+    private void sendQuestion(UserInfoDTO user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
                 .text(user.getTestState().getCurrentQuestion().getNumberOfQuestion() + ". "
@@ -365,20 +366,30 @@ public class CiaoByBot extends TelegramLongPollingBot {
 
         var markup = new InlineKeyboardMarkup();
 
-        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+        List<InlineKeyboardButton> rowInline;
 
         for (String answer : user.getTestState().getCurrentQuestion().getAnswers()) {
-            List<InlineKeyboardButton> rowInline = new ArrayList<>();
+            rowInline = new ArrayList<>();
 
             var inlineKeyboardButton = new InlineKeyboardButton();
             inlineKeyboardButton.setText(answer);
             inlineKeyboardButton.setCallbackData(answer);
 
             rowInline.add(inlineKeyboardButton);
-            rowsInline.add(rowInline);
+            keyboard.add(rowInline);
         }
 
-        markup.setKeyboard(rowsInline);
+        rowInline = new ArrayList<>();
+
+        var inlineKeyboardButton = new InlineKeyboardButton();
+        inlineKeyboardButton.setText("Пропустить");
+        inlineKeyboardButton.setCallbackData("Пропустить");
+
+        rowInline.add(inlineKeyboardButton);
+        keyboard.add(rowInline);
+
+        markup.setKeyboard(keyboard);
         sm.setReplyMarkup(markup);
 
         try {

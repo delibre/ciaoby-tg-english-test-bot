@@ -1,5 +1,6 @@
 package org.ciaobyTestBot.bot;
 
+import lombok.AllArgsConstructor;
 import org.ciaobyTestBot.dto.UserInfoDTO;
 import org.ciaobyTestBot.enums.States;
 import org.ciaobyTestBot.utils.Regex;
@@ -19,13 +20,10 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@AllArgsConstructor
 public class BotService {
     protected final ArrayList<UserInfoDTO> dto = new ArrayList<>();
     private final ServiceCallback ex;
-
-    public BotService(ServiceCallback ex) {
-        this.ex = ex;
-    }
 
     protected void startHandler(UserInfoDTO user) {
         user.setState(States.GET_NAME_AND_SURNAME);

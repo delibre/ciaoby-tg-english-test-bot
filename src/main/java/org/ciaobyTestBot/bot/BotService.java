@@ -2,6 +2,7 @@ package org.ciaobyTestBot.bot;
 
 import org.ciaobyTestBot.dto.UserInfoDTO;
 import org.ciaobyTestBot.enums.States;
+import org.ciaobyTestBot.utils.Regex;
 import org.jvnet.hk2.annotations.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
@@ -20,66 +21,92 @@ import java.util.Objects;
 @Service
 public class BotService {
     protected final ArrayList<UserInfoDTO> dto = new ArrayList<>();
+    private final Execute ex;
 
-    protected UserInfoDTO getUserById(Long id) {
-        for (var userInfoDTO : dto)
-            if (Objects.equals(userInfoDTO.getChatId(), id))
-                return userInfoDTO;
-
-        throw new RuntimeException("No such user");
+    public BotService(Execute ex) {
+        this.ex = ex;
     }
 
-    protected boolean contains(Long id) {
-        var containsId = false;
-
-        for(var userInfoDTO : dto)
-            if(Objects.equals(userInfoDTO.getChatId(), id)) {
-                containsId = true;
-                break;
-            }
-
-        return containsId;
-    }
-
-    protected String serviceStartHandler(UserInfoDTO user) {
+    protected void startHandler(UserInfoDTO user) {
         user.setState(States.GET_NAME_AND_SURNAME);
 
-        return "Привет!\uD83D\uDC4B\n\n" +
+        sendText(user.getChatId(), "Привет!\uD83D\uDC4B\n\n" +
                 "Сейчас мы проверим Ваши знания английского\uD83D\uDD25\n" +
                 "Вы пройдете тест, который состоит из 30 вопросов.\n" +
                 "После этого, вы сможете проходить его, когда захотите.\uD83D\uDE0A\n\n" +
                 "Но для начала давайте познакомимся\uD83D\uDE09\n\n" +
-                "Введите, пожалуйста, Ваше имя и фамилию";
+                "Введите, пожалуйста, Ваше имя и фамилию");
     }
 
-    protected void serviceGetNameAndSurnameHandler(String textMsg, UserInfoDTO user) {
+    protected void getNameAndSurnameHandler(String textMsg, UserInfoDTO user) {
         user.setNameAndSurname(textMsg);
         user.setState(States.GET_PHONE_NUMBER);
+
+        sendPhoneButton(user);
     }
 
-    protected void serviceGetPhoneNumberHandler(String textMsg, UserInfoDTO user) {
+    protected void getPhoneNumberHandler(String textMsg, UserInfoDTO user) {
+        if (!Regex.checkPhoneNumber(textMsg)) {
+            sendText(user.getChatId(), "Неверный формат номера. Попробуйте, пожалуйста, ещё раз");
+            return;
+        }
+
         user.setPhoneNumber(textMsg);
         user.setState(States.GET_REVIEW);
+
+        removeReplyKeyboard(user);
+        sendOptionsForReview(user);
     }
 
-    protected void serviceGetReviewHandler(String textMsg, UserInfoDTO user) {
+    protected void getReviewHandler(String textMsg, UserInfoDTO user) {
         user.setReview(textMsg);
         user.setState(States.TEST_TODO);
+
+        sendStartButton(user);
     }
 
-    protected void serviceTestToDoHandler(UserInfoDTO user) {
-        user.setState(States.QUESTION_TO_SEND);
-        user.clearTest();
+    protected void testToDoHandler(String textMsg, UserInfoDTO user) {
+        if (Objects.equals(textMsg, "Начать тестирование\uD83C\uDFC1")) {
+            user.setState(States.QUESTION_TO_SEND);
+            user.clearTest();
+            questionToSendHandler(user);
+        }
+        else sendStartButton(user);
     }
 
-    protected String serviceTestEndedHandler(UserInfoDTO user) {
+    protected void questionToSendHandler(UserInfoDTO user){
+        if (user.getTestState().isFinished()) {
+            user.setState(States.TEST_ENDED);
+            testEndedHandler(user);
+            return;
+        }
+
+        sendQuestion(user);
+        user.setState(States.CHECK_ANSWER);
+    }
+
+    protected void checkAnswerHandler(String answer, UserInfoDTO user) {
+        user.getTestState().registerAnswer(answer);
+        questionToSendHandler(user);
+    }
+
+    protected void testEndedHandler(UserInfoDTO user) {
         user.setState(States.END_ALL);
-        return "Вы ответили верно на " + user.getTestState().getCorrectAnswers() + " вопросов.\n" +
+        deleteMessage(user);
+        sendText(user.getChatId(), "Вы ответили верно на " + user.getTestState().getCorrectAnswers() + " вопросов.\n" +
                 "Ваш уровень английского " + user.getTestState().getResults() + ".\n" +
-                "Вы молодец, Вам осталось совсем немного, и скоро мы свяжемся с Вами для прохождения устного тестирования\uD83D\uDE0A";
+                "Вы молодец, Вам осталось совсем немного, и скоро мы свяжемся с Вами для прохождения устного тестирования\uD83D\uDE0A");
+        sendDataToAdmin(user);
     }
 
-    protected SendMessage serviceSendPhoneButton(UserInfoDTO user) {
+    protected void testEndAllHandler(UserInfoDTO user) {
+        sendText(user.getChatId(),
+                "Извините, не роспознал Вашу команду.\n" +
+                        "Если хотите пройти тест заново - нажмите кнопку \"Начать тестирование\"\uD83E\uDD17"
+        );
+    }
+
+    protected void sendPhoneButton(UserInfoDTO user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
                 .text("Чтобы нам было удобнее с Вами связаться для согласования второго этапа (устного тестирования), " +
@@ -104,20 +131,26 @@ public class BotService {
         keyboard.setKeyboard(keyboardRows);
         sm.setReplyMarkup(keyboard);
 
-        return sm;
+        ex.execute(sm, null, null);
     }
 
-    protected SendMessage serviceRemoveReplyKeyboard(UserInfoDTO user) {
+    protected void removeReplyKeyboard(UserInfoDTO user) {
         String msg = "Спасибо! Можем продолжать\uD83D\uDE0A";
 
         var replyKeyboardRemove = new ReplyKeyboardRemove(true);
         var removeMessage = new SendMessage(user.getChatId().toString(), msg);
         removeMessage.setReplyMarkup(replyKeyboardRemove);
 
-        return removeMessage;
+        ex.execute(removeMessage, null, null);
+
+        try {
+            Thread.sleep(500); // Delay for 1.5 seconds (1500 milliseconds)
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
-    protected SendMessage serviceSendOptionsForReview(UserInfoDTO user) {
+    protected void sendOptionsForReview(UserInfoDTO user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
                 .text("Откуда вы о нас узнали?\n" +
@@ -172,10 +205,10 @@ public class BotService {
         markup.setKeyboard(keyboard);
         sm.setReplyMarkup(markup);
 
-        return sm;
+        ex.execute(sm, null, null);
     }
 
-    protected SendMessage serviceSendStartButton(UserInfoDTO user) {
+    protected void sendStartButton(UserInfoDTO user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
                 .text("Ну что же, приступим к тесту. Сейчас Вам нужно будет ответить на 30 вопросов.\uD83E\uDDD0 " +
@@ -196,10 +229,10 @@ public class BotService {
         keyboard.setKeyboard(keyboardRows);
         sm.setReplyMarkup(keyboard);
 
-        return sm;
+        ex.execute(sm, null, null);
     }
 
-    protected SendMessage serviceSendQuestion(UserInfoDTO user) {
+    protected void sendQuestion(UserInfoDTO user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
                 .text(user.getTestState().getCurrentQuestion().getNumberOfQuestion() + ". "
@@ -233,37 +266,66 @@ public class BotService {
         markup.setKeyboard(keyboard);
         sm.setReplyMarkup(markup);
 
-        return sm;
+        if (user.getLastMessage() != null) {
+            var editMessageText = EditMessageText.builder()
+                    .chatId(user.getLastMessage().getChatId().toString())
+                    .messageId(user.getLastMessage().getMessageId())
+                    .text(user.getTestState().getCurrentQuestion().getNumberOfQuestion() + ". "
+                            + user.getTestState().getCurrentQuestion().getQuestion()).build();
+
+            editMessageText.setReplyMarkup(markup);
+
+            ex.execute(null, null, editMessageText);
+        } else {
+            user.setLastMessage(ex.execute(sm, null, null));
+        }
     }
 
-    protected EditMessageText editQuestion(UserInfoDTO user, InlineKeyboardMarkup markup) {
-        var editMessageText = EditMessageText.builder()
-                .chatId(user.getLastMessage().getChatId().toString())
-                .messageId(user.getLastMessage().getMessageId())
-                .text(user.getTestState().getCurrentQuestion().getNumberOfQuestion() + ". "
-                        + user.getTestState().getCurrentQuestion().getQuestion()).build();
-
-        editMessageText.setReplyMarkup(markup);
-
-        return editMessageText;
-    }
-
-    protected DeleteMessage serviceDeleteMessage(UserInfoDTO user) {
+    protected void deleteMessage(UserInfoDTO user) {
         DeleteMessage deleteMessage = new DeleteMessage();
         deleteMessage.setChatId(user.getChatId().toString());
         deleteMessage.setMessageId(user.getLastMessage().getMessageId());
 
-        return deleteMessage;
+        ex.execute(null, deleteMessage, null);
     }
 
-    protected SendMessage serviceSendDataToAdmin(UserInfoDTO user) {
-        return SendMessage.builder()
+    protected void sendDataToAdmin(UserInfoDTO user) {
+        ex.execute(SendMessage.builder()
                 .chatId("5105539803").
                 text(   "Имя и Фамилия: " + user.getNameAndSurname() + "\n" +
                         "Номер телефона: " + user.getPhoneNumber() + "\n" +
                         "Ник в телеграмм: @" + user.getUsername() + "\n" +
                         "Откуда узнали: " + user.getReview() + "\n" +
                         "Отвечено верно на: " + user.getTestState().getCorrectAnswers() + " вопросов.\n" +
-                        "Уровень английского: " + user.getTestState().getLvl()).build();
+                        "Уровень английского: " + user.getTestState().getLvl()).build(), null, null);
     }
+
+    protected void sendText(Long who, String what){
+        var sm = SendMessage.builder()
+                .chatId(who.toString())
+                .text(what).build();
+
+        ex.execute(sm, null, null);
+    }
+
+    protected UserInfoDTO getUserById(Long id) {
+        for (var userInfoDTO : dto)
+            if (Objects.equals(userInfoDTO.getChatId(), id))
+                return userInfoDTO;
+
+        throw new RuntimeException("No such user");
+    }
+
+    protected boolean contains(Long id) {
+        var containsId = false;
+
+        for(var userInfoDTO : dto)
+            if(Objects.equals(userInfoDTO.getChatId(), id)) {
+                containsId = true;
+                break;
+            }
+
+        return containsId;
+    }
+
 }

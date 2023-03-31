@@ -4,6 +4,7 @@ import org.ciaobyTestBot.dto.UserInfoDTO;
 import org.ciaobyTestBot.enums.States;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -30,7 +31,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
             var id = msg.getChatId();
 
             if(service.contains(id) && service.getUserById(id).getState() == States.CHECK_ANSWER) {
-                service.sendText(service.getUserById(id).getChatId(), "Отвечать можно только нажав кнопку с одним из вариантов ответа");
+                sendText(service.getUserById(id).getChatId(), "Отвечать можно только нажав кнопку с одним из вариантов ответа");
                 return;
             }
             if (!service.contains(id))  service.dto.add(new UserInfoDTO(id, msg.getFrom().getUserName()));
@@ -69,7 +70,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
             user.setState(States.START);
             user.clearTest();
         } else if (user.getState() == null) {
-            service.sendText(user.getChatId(), "Нет такой команды");
+            sendText(user.getChatId(), "Нет такой команды");
             return;
         }
 
@@ -108,6 +109,18 @@ public class CiaoByBot extends TelegramLongPollingBot {
                 break;
             default:
                 throw new IllegalStateException();
+        }
+    }
+
+    public void sendText(Long who, String what){
+        var sm = SendMessage.builder()
+                .chatId(who.toString())
+                .text(what).build();
+
+        try {
+            execute(sm);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
         }
     }
 }

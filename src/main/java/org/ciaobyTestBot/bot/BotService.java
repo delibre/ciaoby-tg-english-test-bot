@@ -21,9 +21,9 @@ import java.util.Objects;
 @Service
 public class BotService {
     protected final ArrayList<UserInfoDTO> dto = new ArrayList<>();
-    private final Execute ex;
+    private final ServiceCallback ex;
 
-    public BotService(Execute ex) {
+    public BotService(ServiceCallback ex) {
         this.ex = ex;
     }
 

@@ -6,5 +6,5 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 public interface ServiceCallback {
-    Message execute(SendMessage sm, DeleteMessage dm, EditMessageText em);
+    Message execute(final SendMessage sm, final DeleteMessage dm, final EditMessageText em);
 }

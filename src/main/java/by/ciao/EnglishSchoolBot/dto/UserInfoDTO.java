@@ -18,7 +18,7 @@ public class UserInfoDTO {
     private String review;
     private UsersTestState testState = new UsersTestState();
 
-    public UserInfoDTO(Long chatId, String username) {
+    public UserInfoDTO(final Long chatId, final String username) {
         this.chatId = chatId;
         this.username = username;
     }

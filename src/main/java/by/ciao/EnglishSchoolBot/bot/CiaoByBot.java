@@ -113,7 +113,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         }
     }
 
-    public void sendText(Long who, String what){
+    public void sendText(final Long who, final String what){
         var sm = SendMessage.builder()
                 .chatId(who.toString())
                 .text(what).build();

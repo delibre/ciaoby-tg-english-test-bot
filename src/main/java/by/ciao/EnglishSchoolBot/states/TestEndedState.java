@@ -8,12 +8,12 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 
 public class TestEndedState extends AbstractState {
-    public TestEndedState(ServiceCallback serviceCallback) {
+    public TestEndedState(final ServiceCallback serviceCallback) {
         super(serviceCallback, States.TEST_ENDED);
     }
 
     @Override
-    public void apply(String textMsg, UserInfoDTO user) {
+    public void apply(final String textMsg, final UserInfoDTO user) {
         user.setState(States.END_ALL);
         deleteMessage(user);
         sendText(user.getChatId(), "Вы ответили верно на " + user.getTestState().getCorrectAnswers() + " вопросов.\n" +
@@ -22,7 +22,7 @@ public class TestEndedState extends AbstractState {
         sendDataToAdmin(user);
     }
 
-    private void deleteMessage(UserInfoDTO user) {
+    private void deleteMessage(final UserInfoDTO user) {
         DeleteMessage deleteMessage = new DeleteMessage();
         deleteMessage.setChatId(user.getChatId().toString());
         deleteMessage.setMessageId(user.getLastMessage().getMessageId());
@@ -30,7 +30,7 @@ public class TestEndedState extends AbstractState {
         getServiceCallback().execute(null, deleteMessage, null);
     }
 
-    private void sendDataToAdmin(UserInfoDTO user) {
+    private void sendDataToAdmin(final UserInfoDTO user) {
         getServiceCallback().execute(SendMessage.builder()
                             .chatId("5105539803").
                             text(   "Имя и Фамилия: " + user.getNameAndSurname() + "\n" +

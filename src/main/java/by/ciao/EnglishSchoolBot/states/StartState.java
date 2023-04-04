@@ -6,12 +6,12 @@ import by.ciao.EnglishSchoolBot.enums.States;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
 
 public class StartState extends AbstractState {
-    public StartState(ServiceCallback serviceCallback) {
+    public StartState(final ServiceCallback serviceCallback) {
         super(serviceCallback, States.START);
     }
 
     @Override
-    public void apply(String textMsg, UserInfoDTO user) {
+    public void apply(final String textMsg, final UserInfoDTO user) {
         user.setState(States.GET_NAME_AND_SURNAME);
 
         sendText(user.getChatId(), "Привет!\uD83D\uDC4B\n\n" +

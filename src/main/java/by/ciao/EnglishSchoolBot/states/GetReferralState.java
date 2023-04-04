@@ -1,7 +1,7 @@
 package by.ciao.EnglishSchoolBot.states;
 
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
-import by.ciao.EnglishSchoolBot.userinfo.UserInfo;
+import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
@@ -12,7 +12,7 @@ public class GetReferralState extends AbstractState implements UserMessageHandle
     }
 
     @Override
-    public void apply(final String textMsg, final UserInfo user) {
+    public void apply(final String textMsg, final User user) {
         user.setGetReferral(textMsg);
         user.setState(StateEnum.START_TEST);
 

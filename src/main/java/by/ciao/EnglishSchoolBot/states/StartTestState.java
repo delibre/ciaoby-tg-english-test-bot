@@ -1,7 +1,7 @@
 package by.ciao.EnglishSchoolBot.states;
 
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
-import by.ciao.EnglishSchoolBot.userinfo.UserInfo;
+import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
@@ -15,7 +15,7 @@ public class StartTestState extends AbstractState implements UserMessageHandlerS
     }
 
     @Override
-    public void apply(final String textMsg, final UserInfo user) {
+    public void apply(final String textMsg, final User user) {
         if (Objects.equals(textMsg, "Начать тестирование\uD83C\uDFC1")) {
             user.setState(StateEnum.SEND_QUESTION);
             user.clearTest();

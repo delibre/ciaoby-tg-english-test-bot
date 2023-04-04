@@ -1,4 +1,4 @@
-package by.ciao.EnglishSchoolBot.userinfo;
+package by.ciao.EnglishSchoolBot.user;
 
 import by.ciao.EnglishSchoolBot.englishtest.UsersTestState;
 import by.ciao.EnglishSchoolBot.enums.StateEnum;
@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 
 @Getter
 @Setter
-public class UserInfo {
+public class User {
     private StateEnum state = null;
     private Message lastMessage;
     private Long chatId;
@@ -18,7 +18,7 @@ public class UserInfo {
     private String getReferral;
     private UsersTestState testState = new UsersTestState();
 
-    public UserInfo(final Long chatId, final String username) {
+    public User(final Long chatId, final String username) {
         this.chatId = chatId;
         this.username = username;
     }

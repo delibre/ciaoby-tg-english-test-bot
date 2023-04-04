@@ -5,7 +5,7 @@ import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
 import by.ciao.EnglishSchoolBot.utils.Regex;
-import by.ciao.EnglishSchoolBot.userinfo.UserInfo;
+import by.ciao.EnglishSchoolBot.user.User;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
@@ -20,7 +20,7 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
     }
 
     @Override
-    public void apply(final String textMsg, final UserInfo user) {
+    public void apply(final String textMsg, final User user) {
         if (!Regex.checkPhone(textMsg)) {
             sendText(user.getChatId(), "Неверный формат номера. Попробуйте, пожалуйста, ещё раз");
             return;
@@ -33,7 +33,7 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
         sendOptionsForReferral(user);
     }
 
-    private void removeReplyKeyboard(final UserInfo user) {
+    private void removeReplyKeyboard(final User user) {
         String msg = "Спасибо! Можем продолжать\uD83D\uDE0A";
 
         var replyKeyboardRemove = new ReplyKeyboardRemove(true);
@@ -49,7 +49,7 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
         }
     }
 
-    private void sendOptionsForReferral(final UserInfo user) {
+    private void sendOptionsForReferral(final User user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
                 .text("Откуда вы о нас узнали?\n" +

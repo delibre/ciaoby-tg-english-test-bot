@@ -1,7 +1,7 @@
 package by.ciao.EnglishSchoolBot.states;
 
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
-import by.ciao.EnglishSchoolBot.userinfo.UserInfo;
+import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
@@ -19,7 +19,7 @@ public class SendQuestionState extends AbstractState implements UserHandlerState
     }
 
     @Override
-    public void apply(final UserInfo user) {
+    public void apply(final User user) {
         if (user.getTestState().isFinished()) {
             user.setState(StateEnum.TEST_FINISHED);
             UserHandlerState state = new TestFinishedState(getServiceCallback());
@@ -31,7 +31,7 @@ public class SendQuestionState extends AbstractState implements UserHandlerState
         user.setState(StateEnum.CHECK_ANSWER);
     }
 
-    private void sendQuestion(final UserInfo user) {
+    private void sendQuestion(final User user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
                 .text(user.getTestState().getCurrentQuestion().getNumberOfQuestion() + ". "

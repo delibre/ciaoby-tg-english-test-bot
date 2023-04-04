@@ -4,6 +4,7 @@ import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
 import by.ciao.EnglishSchoolBot.enums.States;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
 import by.ciao.EnglishSchoolBot.dto.UserInfoDTO;
+import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
@@ -12,7 +13,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetNameAndSurnameState extends AbstractState {
+public class GetNameAndSurnameState extends AbstractState implements UserMessageHandlerState {
     public GetNameAndSurnameState(final ServiceCallback serviceCallback) {
         super(serviceCallback, States.GET_NAME_AND_SURNAME);
     }

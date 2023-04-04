@@ -3,8 +3,8 @@ package by.ciao.EnglishSchoolBot.states;
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
 import by.ciao.EnglishSchoolBot.dto.UserInfoDTO;
 import by.ciao.EnglishSchoolBot.enums.States;
-import by.ciao.EnglishSchoolBot.states.statesservice.State;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
+import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -13,17 +13,17 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import java.util.ArrayList;
 import java.util.List;
 
-public class QuestionToSendState extends AbstractState {
+public class QuestionToSendState extends AbstractState implements UserHandlerState {
     public QuestionToSendState(final ServiceCallback serviceCallback) {
         super(serviceCallback, States.QUESTION_TO_SEND);
     }
 
     @Override
-    public void apply(final String textMsg, final UserInfoDTO user) {
+    public void apply(final UserInfoDTO user) {
         if (user.getTestState().isFinished()) {
             user.setState(States.TEST_ENDED);
-            State state = new TestEndedState(getServiceCallback());
-            state.apply(textMsg, user);
+            UserHandlerState state = new TestEndedState(getServiceCallback());
+            state.apply(user);
             return;
         }
 

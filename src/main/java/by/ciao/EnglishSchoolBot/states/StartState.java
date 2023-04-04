@@ -4,14 +4,15 @@ import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
 import by.ciao.EnglishSchoolBot.dto.UserInfoDTO;
 import by.ciao.EnglishSchoolBot.enums.States;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
+import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
 
-public class StartState extends AbstractState {
+public class StartState extends AbstractState implements UserHandlerState {
     public StartState(final ServiceCallback serviceCallback) {
         super(serviceCallback, States.START);
     }
 
     @Override
-    public void apply(final String textMsg, final UserInfoDTO user) {
+    public void apply(final UserInfoDTO user) {
         user.setState(States.GET_NAME_AND_SURNAME);
 
         sendText(user.getChatId(), "Привет!\uD83D\uDC4B\n\n" +

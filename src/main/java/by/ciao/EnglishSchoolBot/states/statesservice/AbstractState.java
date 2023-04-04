@@ -3,8 +3,7 @@ package by.ciao.EnglishSchoolBot.states.statesservice;
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import by.ciao.EnglishSchoolBot.dto.UserInfoDTO;
-import by.ciao.EnglishSchoolBot.enums.States;
+import by.ciao.EnglishSchoolBot.userinfo.UserInfo;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
@@ -17,7 +16,6 @@ import java.util.List;
 @Getter
 public abstract class AbstractState {
     private final ServiceCallback serviceCallback;
-    private final States state;
 
     protected void sendText(final Long who, final String what){
         var sm = SendMessage.builder()
@@ -27,7 +25,7 @@ public abstract class AbstractState {
         serviceCallback.execute(sm, null, null);
     }
 
-    protected void sendStartButton(final UserInfoDTO user) {
+    protected void sendStartButton(final UserInfo user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
                 .text("Ну что же, приступим к тесту. Сейчас Вам нужно будет ответить на 30 вопросов.\uD83E\uDDD0 " +

@@ -1,21 +1,21 @@
 package by.ciao.EnglishSchoolBot.states;
 
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
-import by.ciao.EnglishSchoolBot.dto.UserInfoDTO;
-import by.ciao.EnglishSchoolBot.enums.States;
+import by.ciao.EnglishSchoolBot.userinfo.UserInfo;
+import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 
-public class TestEndedState extends AbstractState implements UserHandlerState {
-    public TestEndedState(final ServiceCallback serviceCallback) {
-        super(serviceCallback, States.TEST_ENDED);
+public class TestFinishedState extends AbstractState implements UserHandlerState {
+    public TestFinishedState(final ServiceCallback serviceCallback) {
+        super(serviceCallback);
     }
 
     @Override
-    public void apply(final UserInfoDTO user) {
-        user.setState(States.END_ALL);
+    public void apply(final UserInfo user) {
+        user.setState(StateEnum.INFO_SENT);
         deleteMessage(user);
         sendText(user.getChatId(), "Вы ответили верно на " + user.getTestState().getCorrectAnswers() + " вопросов.\n" +
                 "Ваш уровень английского " + user.getTestState().getResults() + ".\n" +
@@ -23,7 +23,7 @@ public class TestEndedState extends AbstractState implements UserHandlerState {
         sendDataToAdmin(user);
     }
 
-    private void deleteMessage(final UserInfoDTO user) {
+    private void deleteMessage(final UserInfo user) {
         DeleteMessage deleteMessage = new DeleteMessage();
         deleteMessage.setChatId(user.getChatId().toString());
         deleteMessage.setMessageId(user.getLastMessage().getMessageId());
@@ -31,13 +31,13 @@ public class TestEndedState extends AbstractState implements UserHandlerState {
         getServiceCallback().execute(null, deleteMessage, null);
     }
 
-    private void sendDataToAdmin(final UserInfoDTO user) {
+    private void sendDataToAdmin(final UserInfo user) {
         getServiceCallback().execute(SendMessage.builder()
                             .chatId("5105539803").
-                            text(   "Имя и Фамилия: " + user.getNameAndSurname() + "\n" +
-                                    "Номер телефона: " + user.getPhoneNumber() + "\n" +
+                            text(   "Имя и Фамилия: " + user.getFullName() + "\n" +
+                                    "Номер телефона: " + user.getPhone() + "\n" +
                                     "Ник в телеграмм: @" + user.getUsername() + "\n" +
-                                    "Откуда узнали: " + user.getReview() + "\n" +
+                                    "Откуда узнали: " + user.getGetReferral() + "\n" +
                                     "Отвечено верно на: " + user.getTestState().getCorrectAnswers() + " вопросов.\n" +
                                     "Уровень английского: " + user.getTestState().getLvl()).build(), null, null);
     }

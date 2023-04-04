@@ -1,7 +1,7 @@
 package by.ciao.EnglishSchoolBot.bot;
 
-import by.ciao.EnglishSchoolBot.dto.UserInfoDTO;
-import by.ciao.EnglishSchoolBot.enums.States;
+import by.ciao.EnglishSchoolBot.userinfo.UserInfo;
+import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -30,17 +30,17 @@ public class CiaoByBot extends TelegramLongPollingBot {
             var msg = update.getMessage();
             var id = msg.getChatId();
 
-            if(service.getRegisteredUsers().containsKey(id) && service.getRegisteredUsers().get(id).getState() == States.CHECK_ANSWER) {
+            if(service.getRegisteredUsers().containsKey(id) && service.getRegisteredUsers().get(id).getState() == StateEnum.CHECK_ANSWER) {
                 sendText(service.getRegisteredUsers().get(id).getChatId(), "Отвечать можно только нажав кнопку с одним из вариантов ответа");
                 return;
             }
             if (!service.getRegisteredUsers().containsKey(id))
-                service.getRegisteredUsers().put(id, new UserInfoDTO(id, msg.getFrom().getUserName()));
+                service.getRegisteredUsers().put(id, new UserInfo(id, msg.getFrom().getUserName()));
 
             parseMessage(msg.getText(), service.getRegisteredUsers().get(id));
 
         }  else if (update.hasMessage() && update.getMessage().getContact() != null) {
-            service.getPhoneNumberHandler(update.getMessage().getContact().getPhoneNumber(),
+            service.getPhoneHandler(update.getMessage().getContact().getPhoneNumber(),
                                     service.getRegisteredUsers().get(update.getMessage().getChatId()));
 
         } else if (update.hasCallbackQuery() && service.getRegisteredUsers().containsKey(update.getCallbackQuery().getFrom().getId())) {
@@ -66,9 +66,9 @@ public class CiaoByBot extends TelegramLongPollingBot {
         return "6167400176:AAGg4892WjlM0mMxUgdmdoQXID2X9UPw4lo";
     }
 
-    private void parseMessage(String textMsg, UserInfoDTO user) {
+    private void parseMessage(String textMsg, UserInfo user) {
         if (textMsg.equals("/start")) {
-            user.setState(States.START);
+            user.setState(StateEnum.START);
             user.clearTest();
         } else if (user.getState() == null) {
             sendText(user.getChatId(), "Нет такой команды");
@@ -76,7 +76,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         }
 
         if (textMsg.equals("Начать тестирование\uD83C\uDFC1")) {
-            user.setState(States.QUESTION_TO_SEND);
+            user.setState(StateEnum.SEND_QUESTION);
             user.clearTest();
         }
 
@@ -84,29 +84,29 @@ public class CiaoByBot extends TelegramLongPollingBot {
             case START:
                 service.startHandler(user);
                 break;
-            case GET_NAME_AND_SURNAME:
-                service.getNameAndSurnameHandler(textMsg, user);
+            case GET_FULL_NAME:
+                service.getFullNameHandler(textMsg, user);
                 break;
-            case GET_PHONE_NUMBER:
-                service.getPhoneNumberHandler(textMsg, user);
+            case GET_PHONE:
+                service.getPhoneHandler(textMsg, user);
                 break;
-            case GET_REVIEW:
-                service.getReviewHandler(textMsg, user);
+            case GET_REFERRAL:
+                service.getReferralHandler(textMsg, user);
                 break;
-            case TEST_TODO:
-                service.testToDoHandler(textMsg, user);
+            case START_TEST:
+                service.startTestHandler(textMsg, user);
                 break;
-            case QUESTION_TO_SEND:
-                service.questionToSendHandler(user);
+            case SEND_QUESTION:
+                service.sendQuestionHandler(user);
                 break;
             case CHECK_ANSWER:
                 service.checkAnswerHandler(textMsg, user);
                 break;
-            case TEST_ENDED:
-                service.testEndedHandler(user);
+            case TEST_FINISHED:
+                service.testFinishedHandler(user);
                 break;
-            case END_ALL:
-                service.testEndAllHandler(user);
+            case INFO_SENT:
+                service.infoSentHandler(user);
                 break;
             default:
                 throw new IllegalStateException();

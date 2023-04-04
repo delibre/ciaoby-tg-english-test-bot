@@ -1,24 +1,24 @@
-package by.ciao.EnglishSchoolBot.dto;
+package by.ciao.EnglishSchoolBot.userinfo;
 
 import by.ciao.EnglishSchoolBot.englishtest.UsersTestState;
-import by.ciao.EnglishSchoolBot.enums.States;
+import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import lombok.Getter;
 import lombok.Setter;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 @Getter
 @Setter
-public class UserInfoDTO {
-    private States state = null;
+public class UserInfo {
+    private StateEnum state = null;
     private Message lastMessage;
     private Long chatId;
-    private String nameAndSurname;
+    private String fullName;
     private String username;
-    private String phoneNumber = "нет";
-    private String review;
+    private String phone = "нет";
+    private String getReferral;
     private UsersTestState testState = new UsersTestState();
 
-    public UserInfoDTO(final Long chatId, final String username) {
+    public UserInfo(final Long chatId, final String username) {
         this.chatId = chatId;
         this.username = username;
     }

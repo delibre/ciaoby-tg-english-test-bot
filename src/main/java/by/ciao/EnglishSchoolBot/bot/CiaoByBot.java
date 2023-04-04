@@ -30,21 +30,22 @@ public class CiaoByBot extends TelegramLongPollingBot {
             var msg = update.getMessage();
             var id = msg.getChatId();
 
-            if(service.contains(id) && service.getUserById(id).getState() == States.CHECK_ANSWER) {
-                sendText(service.getUserById(id).getChatId(), "Отвечать можно только нажав кнопку с одним из вариантов ответа");
+            if(service.getRegisteredUsers().containsKey(id) && service.getRegisteredUsers().get(id).getState() == States.CHECK_ANSWER) {
+                sendText(service.getRegisteredUsers().get(id).getChatId(), "Отвечать можно только нажав кнопку с одним из вариантов ответа");
                 return;
             }
-            if (!service.contains(id))  service.dto.add(new UserInfoDTO(id, msg.getFrom().getUserName()));
+            if (!service.getRegisteredUsers().containsKey(id))
+                service.getRegisteredUsers().put(id, new UserInfoDTO(id, msg.getFrom().getUserName()));
 
-            parseMessage(msg.getText(), service.getUserById(id));
+            parseMessage(msg.getText(), service.getRegisteredUsers().get(id));
 
         }  else if (update.hasMessage() && update.getMessage().getContact() != null) {
             service.getPhoneNumberHandler(update.getMessage().getContact().getPhoneNumber(),
-                                    service.getUserById(update.getMessage().getChatId()));
+                                    service.getRegisteredUsers().get(update.getMessage().getChatId()));
 
-        } else if (update.hasCallbackQuery() && service.contains(update.getCallbackQuery().getFrom().getId())) {
+        } else if (update.hasCallbackQuery() && service.getRegisteredUsers().containsKey(update.getCallbackQuery().getFrom().getId())) {
             var qry = update.getCallbackQuery();
-            parseMessage(qry.getData(), service.getUserById(qry.getFrom().getId()));
+            parseMessage(qry.getData(), service.getRegisteredUsers().get(qry.getFrom().getId()));
 
             try {
                 execute(AnswerCallbackQuery.builder()

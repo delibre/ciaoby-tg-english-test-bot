@@ -4,11 +4,11 @@ import by.ciao.EnglishSchoolBot.dto.UserInfoDTO;
 import by.ciao.EnglishSchoolBot.states.*;
 import by.ciao.EnglishSchoolBot.states.statesservice.State;
 
-import java.util.ArrayList;
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BotService {
-    protected final ArrayList<UserInfoDTO> dto = new ArrayList<>();
+    private final Map<Long, UserInfoDTO> registeredUsers = new HashMap<>();
     private final ServiceCallback serviceCallback;
 
     BotService (ServiceCallback serviceCallback) {
@@ -60,24 +60,7 @@ public class BotService {
         states.apply("", user);
     }
 
-    protected UserInfoDTO getUserById(Long id) {
-        for (var userInfoDTO : dto)
-            if (Objects.equals(userInfoDTO.getChatId(), id))
-                return userInfoDTO;
-
-        throw new RuntimeException("No such user");
+    public Map<Long, UserInfoDTO> getRegisteredUsers() {
+        return registeredUsers;
     }
-
-    protected boolean contains(Long id) {
-        var containsId = false;
-
-        for(var userInfoDTO : dto)
-            if(Objects.equals(userInfoDTO.getChatId(), id)) {
-                containsId = true;
-                break;
-            }
-
-        return containsId;
-    }
-
 }

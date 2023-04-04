@@ -14,7 +14,7 @@ public class TestToDoState extends AbstractState {
     }
 
     @Override
-    public void apply(String textMsg, UserInfoDTO user) {
+    public void apply(final String textMsg, final UserInfoDTO user) {
         if (Objects.equals(textMsg, "Начать тестирование\uD83C\uDFC1")) {
             user.setState(States.QUESTION_TO_SEND);
             user.clearTest();

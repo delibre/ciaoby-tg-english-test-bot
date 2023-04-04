@@ -13,19 +13,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GetNameAndSurnameState extends AbstractState {
-    public GetNameAndSurnameState(ServiceCallback serviceCallback) {
+    public GetNameAndSurnameState(final ServiceCallback serviceCallback) {
         super(serviceCallback, States.GET_NAME_AND_SURNAME);
     }
 
     @Override
-    public void apply(String textMsg, UserInfoDTO user) {
+    public void apply(final String textMsg, final UserInfoDTO user) {
         user.setNameAndSurname(textMsg);
         user.setState(States.GET_PHONE_NUMBER);
 
         sendPhoneButton(user);
     }
 
-    private void sendPhoneButton(UserInfoDTO user) {
+    private void sendPhoneButton(final UserInfoDTO user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
                 .text("Чтобы нам было удобнее с Вами связаться для согласования второго этапа (устного тестирования), " +

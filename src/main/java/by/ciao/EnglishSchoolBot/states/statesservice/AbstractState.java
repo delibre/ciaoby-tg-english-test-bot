@@ -19,7 +19,7 @@ public abstract class AbstractState implements State {
     private final ServiceCallback serviceCallback;
     private final States state;
 
-    public void sendText(Long who, String what){
+    protected void sendText(final Long who, final String what){
         var sm = SendMessage.builder()
                 .chatId(who.toString())
                 .text(what).build();
@@ -27,12 +27,12 @@ public abstract class AbstractState implements State {
         serviceCallback.execute(sm, null, null);
     }
 
-    public void sendStartButton(UserInfoDTO user) {
+    protected void sendStartButton(final UserInfoDTO user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
                 .text("Ну что же, приступим к тесту. Сейчас Вам нужно будет ответить на 30 вопросов.\uD83E\uDDD0 " +
-                        "Ограничений по времени нет.\n" +
-                        "\nНажмите кнопку \"Начать тестирование\", когда будете готовы.").build();
+                        "Ограничений по времени нет.\n\n" +
+                        "Нажмите кнопку \"Начать тестирование\", когда будете готовы.").build();
 
         var keyboard = new ReplyKeyboardMarkup();
         keyboard.setResizeKeyboard(true);

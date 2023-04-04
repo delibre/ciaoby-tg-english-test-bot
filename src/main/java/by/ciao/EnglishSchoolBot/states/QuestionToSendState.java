@@ -14,12 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuestionToSendState extends AbstractState {
-    public QuestionToSendState(ServiceCallback serviceCallback) {
+    public QuestionToSendState(final ServiceCallback serviceCallback) {
         super(serviceCallback, States.QUESTION_TO_SEND);
     }
 
     @Override
-    public void apply(String textMsg, UserInfoDTO user) {
+    public void apply(final String textMsg, final UserInfoDTO user) {
         if (user.getTestState().isFinished()) {
             user.setState(States.TEST_ENDED);
             State state = new TestEndedState(getServiceCallback());
@@ -31,7 +31,7 @@ public class QuestionToSendState extends AbstractState {
         user.setState(States.CHECK_ANSWER);
     }
 
-    private void sendQuestion(UserInfoDTO user) {
+    private void sendQuestion(final UserInfoDTO user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
                 .text(user.getTestState().getCurrentQuestion().getNumberOfQuestion() + ". "

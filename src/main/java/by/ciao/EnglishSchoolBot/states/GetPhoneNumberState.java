@@ -14,14 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GetPhoneNumberState extends AbstractState {
-    public GetPhoneNumberState(ServiceCallback serviceCallback) {
+    public GetPhoneNumberState(final ServiceCallback serviceCallback) {
         super(serviceCallback, States.GET_PHONE_NUMBER);
     }
 
     @Override
-    public void apply(String textMsg, UserInfoDTO user) {
+    public void apply(final String textMsg, final UserInfoDTO user) {
         if (!Regex.checkPhoneNumber(textMsg)) {
-            sendText(user.getChatId());
+            sendText(user.getChatId(), "Неверный формат номера. Попробуйте, пожалуйста, ещё раз");
             return;
         }
 
@@ -32,15 +32,7 @@ public class GetPhoneNumberState extends AbstractState {
         sendOptionsForReview(user);
     }
 
-    private void sendText(Long who){
-        var sm = SendMessage.builder()
-                .chatId(who.toString())
-                .text("Неверный формат номера. Попробуйте, пожалуйста, ещё раз").build();
-
-        getServiceCallback().execute(sm, null, null);
-    }
-
-    private void removeReplyKeyboard(UserInfoDTO user) {
+    private void removeReplyKeyboard(final UserInfoDTO user) {
         String msg = "Спасибо! Можем продолжать\uD83D\uDE0A";
 
         var replyKeyboardRemove = new ReplyKeyboardRemove(true);
@@ -56,7 +48,7 @@ public class GetPhoneNumberState extends AbstractState {
         }
     }
 
-    private void sendOptionsForReview(UserInfoDTO user) {
+    private void sendOptionsForReview(final UserInfoDTO user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
                 .text("Откуда вы о нас узнали?\n" +

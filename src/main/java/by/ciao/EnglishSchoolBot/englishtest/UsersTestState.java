@@ -24,7 +24,7 @@ public class UsersTestState {
         return questions.isEmpty();
     }
 
-    public void registerAnswer(String answer) {
+    public void registerAnswer(final String answer) {
         if (Objects.equals(answer, questions.getFirst().getCorrectAnswer()))
             correctAnswers++;
         questions.removeFirst();

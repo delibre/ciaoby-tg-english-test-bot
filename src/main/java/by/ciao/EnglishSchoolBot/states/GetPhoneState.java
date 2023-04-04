@@ -1,11 +1,11 @@
 package by.ciao.EnglishSchoolBot.states;
 
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
-import by.ciao.EnglishSchoolBot.enums.States;
+import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
 import by.ciao.EnglishSchoolBot.utils.Regex;
-import by.ciao.EnglishSchoolBot.dto.UserInfoDTO;
+import by.ciao.EnglishSchoolBot.userinfo.UserInfo;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
@@ -14,26 +14,26 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetPhoneNumberState extends AbstractState implements UserMessageHandlerState {
-    public GetPhoneNumberState(final ServiceCallback serviceCallback) {
-        super(serviceCallback, States.GET_PHONE_NUMBER);
+public class GetPhoneState extends AbstractState implements UserMessageHandlerState {
+    public GetPhoneState(final ServiceCallback serviceCallback) {
+        super(serviceCallback);
     }
 
     @Override
-    public void apply(final String textMsg, final UserInfoDTO user) {
-        if (!Regex.checkPhoneNumber(textMsg)) {
+    public void apply(final String textMsg, final UserInfo user) {
+        if (!Regex.checkPhone(textMsg)) {
             sendText(user.getChatId(), "Неверный формат номера. Попробуйте, пожалуйста, ещё раз");
             return;
         }
 
-        user.setPhoneNumber(textMsg);
-        user.setState(States.GET_REVIEW);
+        user.setPhone(textMsg);
+        user.setState(StateEnum.GET_REFERRAL);
 
         removeReplyKeyboard(user);
-        sendOptionsForReview(user);
+        sendOptionsForReferral(user);
     }
 
-    private void removeReplyKeyboard(final UserInfoDTO user) {
+    private void removeReplyKeyboard(final UserInfo user) {
         String msg = "Спасибо! Можем продолжать\uD83D\uDE0A";
 
         var replyKeyboardRemove = new ReplyKeyboardRemove(true);
@@ -49,7 +49,7 @@ public class GetPhoneNumberState extends AbstractState implements UserMessageHan
         }
     }
 
-    private void sendOptionsForReview(final UserInfoDTO user) {
+    private void sendOptionsForReferral(final UserInfo user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
                 .text("Откуда вы о нас узнали?\n" +

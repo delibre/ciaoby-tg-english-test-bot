@@ -1,8 +1,8 @@
 package by.ciao.EnglishSchoolBot.states;
 
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
-import by.ciao.EnglishSchoolBot.dto.UserInfoDTO;
-import by.ciao.EnglishSchoolBot.enums.States;
+import by.ciao.EnglishSchoolBot.userinfo.UserInfo;
+import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -13,25 +13,25 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import java.util.ArrayList;
 import java.util.List;
 
-public class QuestionToSendState extends AbstractState implements UserHandlerState {
-    public QuestionToSendState(final ServiceCallback serviceCallback) {
-        super(serviceCallback, States.QUESTION_TO_SEND);
+public class SendQuestionState extends AbstractState implements UserHandlerState {
+    public SendQuestionState(final ServiceCallback serviceCallback) {
+        super(serviceCallback);
     }
 
     @Override
-    public void apply(final UserInfoDTO user) {
+    public void apply(final UserInfo user) {
         if (user.getTestState().isFinished()) {
-            user.setState(States.TEST_ENDED);
-            UserHandlerState state = new TestEndedState(getServiceCallback());
+            user.setState(StateEnum.TEST_FINISHED);
+            UserHandlerState state = new TestFinishedState(getServiceCallback());
             state.apply(user);
             return;
         }
 
         sendQuestion(user);
-        user.setState(States.CHECK_ANSWER);
+        user.setState(StateEnum.CHECK_ANSWER);
     }
 
-    private void sendQuestion(final UserInfoDTO user) {
+    private void sendQuestion(final UserInfo user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
                 .text(user.getTestState().getCurrentQuestion().getNumberOfQuestion() + ". "

@@ -25,15 +25,16 @@ public class UsersTestState {
     }
 
     public void registerAnswer(final String answer) {
-        if (Objects.equals(answer, questions.getFirst().getCorrectAnswer()))
+        if (Objects.equals(answer, questions.getFirst().getCorrectAnswer())) {
             correctAnswers++;
+        }
         questions.removeFirst();
     }
 
     public EnglishLevel getResults() {
-        if (!isFinished()) throw new IllegalStateException();
+        if (!isFinished()) { throw new IllegalStateException(); }
 
-        if (lvl != null) return lvl;
+        if (lvl != null) { return lvl; }
 
         if (correctAnswers > 28) {
             lvl = EnglishLevel.C1;

@@ -76,7 +76,7 @@ public class SendQuestionState extends AbstractState implements UserHandlerState
 
             getServiceCallback().execute(null, null, editMessageText);
         } else {
-            user.setLastMessage(getServiceCallback().execute(sm, null, null));
+            getServiceCallback().execute(sm, null, null).ifPresent(user::setLastMessage);
         }
     }
 }

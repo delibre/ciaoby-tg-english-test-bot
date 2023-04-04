@@ -5,6 +5,8 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
+import java.util.Optional;
+
 public interface ServiceCallback {
-    Message execute(final SendMessage sm, final DeleteMessage dm, final EditMessageText em);
+    Optional<Message> execute(final SendMessage sm, final DeleteMessage dm, final EditMessageText em);
 }

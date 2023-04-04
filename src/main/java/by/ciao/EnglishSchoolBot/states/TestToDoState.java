@@ -3,12 +3,13 @@ package by.ciao.EnglishSchoolBot.states;
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
 import by.ciao.EnglishSchoolBot.dto.UserInfoDTO;
 import by.ciao.EnglishSchoolBot.enums.States;
-import by.ciao.EnglishSchoolBot.states.statesservice.State;
+import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
+import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
 
 import java.util.Objects;
 
-public class TestToDoState extends AbstractState {
+public class TestToDoState extends AbstractState implements UserMessageHandlerState {
     public TestToDoState(ServiceCallback serviceCallback) {
         super(serviceCallback, States.TEST_TODO);
     }
@@ -19,8 +20,8 @@ public class TestToDoState extends AbstractState {
             user.setState(States.QUESTION_TO_SEND);
             user.clearTest();
 
-            State state = new QuestionToSendState(getServiceCallback());
-            state.apply(textMsg, user);
+            UserHandlerState state = new QuestionToSendState(getServiceCallback());
+            state.apply(user);
         }
         else sendStartButton(user);
     }

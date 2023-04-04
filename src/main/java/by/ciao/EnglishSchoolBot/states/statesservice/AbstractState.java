@@ -15,7 +15,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Getter
-public abstract class AbstractState implements State {
+public abstract class AbstractState {
     private final ServiceCallback serviceCallback;
     private final States state;
 

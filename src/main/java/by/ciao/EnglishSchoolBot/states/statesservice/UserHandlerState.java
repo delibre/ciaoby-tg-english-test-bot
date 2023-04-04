@@ -1,7 +1,7 @@
 package by.ciao.EnglishSchoolBot.states.statesservice;
 
-import by.ciao.EnglishSchoolBot.userinfo.UserInfo;
+import by.ciao.EnglishSchoolBot.user.User;
 
 public interface UserHandlerState {
-    void apply(UserInfo user);
+    void apply(User user);
 }

@@ -1,7 +1,7 @@
 package by.ciao.EnglishSchoolBot.states;
 
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
-import by.ciao.EnglishSchoolBot.userinfo.UserInfo;
+import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
@@ -14,7 +14,7 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
     }
 
     @Override
-    public void apply(final UserInfo user) {
+    public void apply(final User user) {
         user.setState(StateEnum.INFO_SENT);
         deleteMessage(user);
         sendText(user.getChatId(), "Вы ответили верно на " + user.getTestState().getCorrectAnswers() + " вопросов.\n" +
@@ -23,7 +23,7 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
         sendDataToAdmin(user);
     }
 
-    private void deleteMessage(final UserInfo user) {
+    private void deleteMessage(final User user) {
         DeleteMessage deleteMessage = new DeleteMessage();
         deleteMessage.setChatId(user.getChatId().toString());
         deleteMessage.setMessageId(user.getLastMessage().getMessageId());
@@ -31,7 +31,7 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
         getServiceCallback().execute(null, deleteMessage, null);
     }
 
-    private void sendDataToAdmin(final UserInfo user) {
+    private void sendDataToAdmin(final User user) {
         getServiceCallback().execute(SendMessage.builder()
                             .chatId("5105539803").
                             text(   "Имя и Фамилия: " + user.getFullName() + "\n" +

@@ -3,7 +3,7 @@ package by.ciao.EnglishSchoolBot.states.statesservice;
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import by.ciao.EnglishSchoolBot.userinfo.UserInfo;
+import by.ciao.EnglishSchoolBot.user.User;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
@@ -25,7 +25,7 @@ public abstract class AbstractState {
         serviceCallback.execute(sm, null, null);
     }
 
-    protected void sendStartButton(final UserInfo user) {
+    protected void sendStartButton(final User user) {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
                 .text("Ну что же, приступим к тесту. Сейчас Вам нужно будет ответить на 30 вопросов.\uD83E\uDDD0 " +

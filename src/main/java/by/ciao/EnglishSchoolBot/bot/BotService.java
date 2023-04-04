@@ -1,67 +1,90 @@
 package by.ciao.EnglishSchoolBot.bot;
 
-import by.ciao.EnglishSchoolBot.userinfo.UserInfo;
+import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.states.*;
-import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
+import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
+import by.ciao.EnglishSchoolBot.user.User;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class BotService {
-    private final Map<Long, UserInfo> registeredUsers = new HashMap<>();
+    private final Map<Long, User> registeredUsers = new HashMap<>();
     private final ServiceCallback serviceCallback;
 
-    protected BotService(final ServiceCallback serviceCallback) {
+    BotService(final ServiceCallback serviceCallback) {
         this.serviceCallback = serviceCallback;
     }
 
-    protected void startHandler(final UserInfo user) {
+    boolean msgHasText(Update update) {
+        return update.hasMessage() && update.getMessage().hasText();
+    }
+
+    boolean isCheckAnswerState(Long id) {
+        return getRegisteredUsers().containsKey(id) && getRegisteredUsers().get(id).getState() == StateEnum.CHECK_ANSWER;
+    }
+
+    boolean hasContact(Update update) {
+        return update.hasMessage() && update.getMessage().getContact() != null;
+    }
+
+    boolean hasCallback(Update update) {
+        return update.hasCallbackQuery() && getRegisteredUsers().containsKey(update.getCallbackQuery().getFrom().getId());
+    }
+
+    void addUserIfAbsent(Long id, Message msg) {
+        getRegisteredUsers().putIfAbsent(id, new User(id, msg.getFrom().getUserName()));
+    }
+
+    void startHandler(final User user) {
         UserHandlerState state = new StartState(serviceCallback);
         state.apply(user);
     }
 
-    protected void getFullNameHandler(final String textMsg, final UserInfo user) {
+    void getFullNameHandler(final String textMsg, final User user) {
         UserMessageHandlerState state = new GetFullNameState(serviceCallback);
         state.apply(textMsg, user);
     }
 
-    protected void getPhoneHandler(final String textMsg, final UserInfo user) {
+    void getPhoneHandler(final String textMsg, final User user) {
         UserMessageHandlerState state = new GetPhoneState(serviceCallback);
         state.apply(textMsg, user);
     }
 
-    protected void getReferralHandler(final String textMsg, final UserInfo user) {
+    void getReferralHandler(final String textMsg, final User user) {
         UserMessageHandlerState state = new GetReferralState(serviceCallback);
         state.apply(textMsg, user);
     }
 
-    protected void startTestHandler(final String textMsg, final UserInfo user) {
+    void startTestHandler(final String textMsg, final User user) {
         UserMessageHandlerState state = new StartTestState(serviceCallback);
         state.apply(textMsg, user);
     }
 
-    protected void sendQuestionHandler(final UserInfo user){
+    void sendQuestionHandler(final User user){
         UserHandlerState state = new SendQuestionState(serviceCallback);
         state.apply(user);
     }
 
-    protected void checkAnswerHandler(final String answer, final UserInfo user) {
+    void checkAnswerHandler(final String answer, final User user) {
         UserMessageHandlerState state = new CheckAnswerState(serviceCallback);
         state.apply(answer, user);
     }
 
-    protected void testFinishedHandler(final UserInfo user) {
+    void testFinishedHandler(final User user) {
         UserHandlerState state = new TestFinishedState(serviceCallback);
         state.apply(user);
     }
 
-    protected void infoSentHandler(final UserInfo user) {
+    void infoSentHandler(final User user) {
         UserHandlerState state = new InfoSentState(serviceCallback);
         state.apply(user);
     }
 
-    protected Map<Long, UserInfo> getRegisteredUsers() {
+    Map<Long, User> getRegisteredUsers() {
         return registeredUsers;
     }
 }

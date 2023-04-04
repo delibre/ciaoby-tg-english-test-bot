@@ -1,6 +1,6 @@
 package by.ciao.EnglishSchoolBot.bot;
 
-import by.ciao.EnglishSchoolBot.userinfo.UserInfo;
+import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
@@ -17,8 +17,8 @@ public class CiaoByBot extends TelegramLongPollingBot {
 
         try {
             if (sm != null) { msg =  Optional.of(execute(sm)); }
-            else if (dm != null) { execute(dm); }
             else if (em != null) { execute(em); }
+            else if (dm != null) { execute(dm); }
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
@@ -28,27 +28,28 @@ public class CiaoByBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (update.hasMessage() && update.getMessage().hasText()){
+        if (service.msgHasText(update)) {
             var msg = update.getMessage();
             var id = msg.getChatId();
 
-            if(service.getRegisteredUsers().containsKey(id) && service.getRegisteredUsers().get(id).getState() == StateEnum.CHECK_ANSWER) {
+            if(service.isCheckAnswerState(id)) {
                 sendText(service.getRegisteredUsers().get(id).getChatId(), "Отвечать можно только нажав кнопку с одним из вариантов ответа");
                 return;
             }
-            if (!service.getRegisteredUsers().containsKey(id)) {
-                service.getRegisteredUsers().put(id, new UserInfo(id, msg.getFrom().getUserName()));
-            }
 
-            parseMessage(msg.getText(), service.getRegisteredUsers().get(id));
+            service.addUserIfAbsent(id, msg);
 
-        }  else if (update.hasMessage() && update.getMessage().getContact() != null) {
+            processMessage(msg.getText(), service.getRegisteredUsers().get(id));
+
+        }  else if (service.hasContact(update)) {
+            var id = update.getMessage().getChatId();
+
             service.getPhoneHandler(update.getMessage().getContact().getPhoneNumber(),
-                                    service.getRegisteredUsers().get(update.getMessage().getChatId()));
+                                    service.getRegisteredUsers().get(id));
 
-        } else if (update.hasCallbackQuery() && service.getRegisteredUsers().containsKey(update.getCallbackQuery().getFrom().getId())) {
+        } else if (service.hasCallback(update)) {
             var qry = update.getCallbackQuery();
-            parseMessage(qry.getData(), service.getRegisteredUsers().get(qry.getFrom().getId()));
+            processMessage(qry.getData(), service.getRegisteredUsers().get(qry.getFrom().getId()));
 
             try {
                 execute(AnswerCallbackQuery.builder()
@@ -69,7 +70,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         return "6167400176:AAGg4892WjlM0mMxUgdmdoQXID2X9UPw4lo";
     }
 
-    private void parseMessage(String textMsg, UserInfo user) {
+    private void processMessage(String textMsg, User user) {
         if (textMsg.equals("/start")) {
             user.setState(StateEnum.START);
             user.clearTest();

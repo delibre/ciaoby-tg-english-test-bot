@@ -17,7 +17,7 @@ import java.util.List;
 public abstract class AbstractState {
     private final ServiceCallback serviceCallback;
 
-    protected void sendText(final Long who, final String what){
+    protected void sendText(final Long who, final String what) {
         var sm = SendMessage.builder()
                 .chatId(who.toString())
                 .text(what).build();

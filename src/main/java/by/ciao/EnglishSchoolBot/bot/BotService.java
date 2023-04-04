@@ -22,23 +22,23 @@ public class BotService {
     }
 
     protected void getFullNameHandler(final String textMsg, final UserInfo user) {
-        UserMessageHandlerState states = new GetFullNameState(serviceCallback);
-        states.apply(textMsg, user);
+        UserMessageHandlerState state = new GetFullNameState(serviceCallback);
+        state.apply(textMsg, user);
     }
 
     protected void getPhoneHandler(final String textMsg, final UserInfo user) {
-        UserMessageHandlerState states = new GetPhoneState(serviceCallback);
-        states.apply(textMsg, user);
+        UserMessageHandlerState state = new GetPhoneState(serviceCallback);
+        state.apply(textMsg, user);
     }
 
     protected void getReferralHandler(final String textMsg, final UserInfo user) {
-        UserMessageHandlerState states = new GetReferralState(serviceCallback);
-        states.apply(textMsg, user);
+        UserMessageHandlerState state = new GetReferralState(serviceCallback);
+        state.apply(textMsg, user);
     }
 
     protected void startTestHandler(final String textMsg, final UserInfo user) {
-        UserMessageHandlerState states = new StartTestState(serviceCallback);
-        states.apply(textMsg, user);
+        UserMessageHandlerState state = new StartTestState(serviceCallback);
+        state.apply(textMsg, user);
     }
 
     protected void sendQuestionHandler(final UserInfo user){
@@ -47,8 +47,8 @@ public class BotService {
     }
 
     protected void checkAnswerHandler(final String answer, final UserInfo user) {
-        UserMessageHandlerState states = new CheckAnswerState(serviceCallback);
-        states.apply(answer, user);
+        UserMessageHandlerState state = new CheckAnswerState(serviceCallback);
+        state.apply(answer, user);
     }
 
     protected void testFinishedHandler(final UserInfo user) {

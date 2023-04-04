@@ -9,14 +9,16 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.Optional;
+
 public class CiaoByBot extends TelegramLongPollingBot {
     private final BotService service = new BotService((sm, dm, em) -> {
-        Message msg = null;
+        Optional<Message> msg = Optional.empty();
 
         try {
-            if (dm == null && em == null) msg = execute(sm);
-            else if (sm == null && em == null) execute(dm);
-            else if (dm == null && sm == null) execute(em);
+            if (sm != null) { msg =  Optional.of(execute(sm)); }
+            else if (dm != null) { execute(dm); }
+            else if (em != null) { execute(em); }
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
@@ -34,8 +36,9 @@ public class CiaoByBot extends TelegramLongPollingBot {
                 sendText(service.getRegisteredUsers().get(id).getChatId(), "Отвечать можно только нажав кнопку с одним из вариантов ответа");
                 return;
             }
-            if (!service.getRegisteredUsers().containsKey(id))
+            if (!service.getRegisteredUsers().containsKey(id)) {
                 service.getRegisteredUsers().put(id, new UserInfo(id, msg.getFrom().getUserName()));
+            }
 
             parseMessage(msg.getText(), service.getRegisteredUsers().get(id));
 

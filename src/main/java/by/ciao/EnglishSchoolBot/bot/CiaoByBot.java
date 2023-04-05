@@ -38,38 +38,17 @@ public class CiaoByBot extends TelegramLongPollingBot {
             }
 
             service.addUserIfAbsent(id, msg);
-
-            try {
-                processMessage(msg.getText(), service.getRegisteredUsers().get(id));
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
+            messageProcessing(msg.getText(), service.getRegisteredUsers().get(id));
 
         }  else if (service.hasContact(update)) {
             var id = update.getMessage().getChatId();
-
-            try {
-                service.getPhoneHandler(update.getMessage().getContact().getPhoneNumber(),
-                                        service.getRegisteredUsers().get(id));
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
+            addingPhone(update, id);
 
         } else if (service.hasCallback(update)) {
             var qry = update.getCallbackQuery();
 
-            try {
-                processMessage(qry.getData(), service.getRegisteredUsers().get(qry.getFrom().getId()));
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                execute(AnswerCallbackQuery.builder()
-                        .callbackQueryId(qry.getId()).build());
-            } catch (TelegramApiException e) {
-                throw new RuntimeException(e);
-            }
+            messageProcessing(qry.getData(), service.getRegisteredUsers().get(qry.getFrom().getId()));
+            closeQuery(qry.getId());
         }
     }
 
@@ -130,7 +109,32 @@ public class CiaoByBot extends TelegramLongPollingBot {
         }
     }
 
-    public void sendText(final Long who, final String what){
+    private void messageProcessing(String textMsg, User user) {
+        try {
+            processMessage(textMsg, user);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addingPhone(Update update, Long id) {
+        try {
+            service.addPhone(update, id);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void closeQuery(String id) {
+        try {
+            execute(AnswerCallbackQuery.builder()
+                    .callbackQueryId(id).build());
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void sendText(final Long who, final String what){
         var sm = SendMessage.builder()
                 .chatId(who.toString())
                 .text(what).build();

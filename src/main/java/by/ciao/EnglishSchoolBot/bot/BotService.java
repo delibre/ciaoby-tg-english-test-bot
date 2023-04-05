@@ -40,6 +40,10 @@ public class BotService {
         getRegisteredUsers().putIfAbsent(id, new User(id, msg.getFrom().getUserName()));
     }
 
+    void addPhone(Update update, Long id) throws TelegramApiException {
+        getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), getRegisteredUsers().get(id));
+    }
+
     void startHandler(final User user) throws TelegramApiException {
         UserHandlerState state = new StartState(serviceCallback);
         state.apply(user);

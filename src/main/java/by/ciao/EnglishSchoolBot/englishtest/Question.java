@@ -11,10 +11,10 @@ public class Question {
     private final int numberOfQuestion;
     private final String question;
     private final String[] answers;
-    private final int correctAnswer;
+    private final int correctAnswerIndex;
 
     public String getCorrectAnswer() {
-        return answers[correctAnswer-1];
+        return answers[correctAnswerIndex -1];
     }
 
     @Override

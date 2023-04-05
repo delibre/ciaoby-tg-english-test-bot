@@ -38,7 +38,7 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
                             text(   "Имя и Фамилия: " + user.getFullName() + "\n" +
                                     "Номер телефона: " + user.getPhone() + "\n" +
                                     "Ник в телеграмм: @" + user.getUsername() + "\n" +
-                                    "Откуда узнали: " + user.getGetReferral() + "\n" +
+                                    "Откуда узнали: " + user.getReferral() + "\n" +
                                     "Отвечено верно на: " + user.getTestState().getCorrectAnswers() + " вопросов.\n" +
                                     "Уровень английского: " + user.getTestState().getLvl()).build(), null, null);
     }

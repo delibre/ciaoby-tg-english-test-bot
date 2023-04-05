@@ -1,6 +1,7 @@
 package by.ciao.EnglishSchoolBot.enums;
 
 public enum StateEnum {
+    NEW_USER,
     START,
     GET_FULL_NAME,
     GET_PHONE,

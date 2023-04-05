@@ -9,18 +9,21 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 @Getter
 @Setter
 public class User {
-    private StateEnum state = null;
+    private StateEnum state;
     private Message lastMessage;
     private Long chatId;
     private String fullName;
     private String username;
-    private String phone = "нет";
-    private String getReferral;
-    private UsersTestState testState = new UsersTestState();
+    private String phone;
+    private String referral;
+    private UsersTestState testState;
 
     public User(final Long chatId, final String username) {
         this.chatId = chatId;
         this.username = username;
+        this.state = StateEnum.NEW_USER;
+        this.phone = "нет";
+        this.testState = new UsersTestState();
     }
 
     public void clearTest() {

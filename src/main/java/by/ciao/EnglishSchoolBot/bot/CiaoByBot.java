@@ -33,7 +33,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
             var id = msg.getChatId();
 
             if(service.isCheckAnswerState(id)) {
-                sendText(service.getRegisteredUsers().get(id).getChatId(), "Отвечать можно только нажав кнопку с одним из вариантов ответа");
+                sendWarning(id);
                 return;
             }
 
@@ -63,20 +63,19 @@ public class CiaoByBot extends TelegramLongPollingBot {
     }
 
     private void processMessage(String textMsg, User user) throws TelegramApiException {
-        if (textMsg.equals("/start")) {
-            user.setState(StateEnum.START);
-            user.clearTest();
-        } else if (user.getState() == null) {
-            sendText(user.getChatId(), "Нет такой команды");
+        if (startBot(textMsg, user)) {
             return;
         }
 
-        if (textMsg.equals("Начать тестирование\uD83C\uDFC1")) {
-            user.setState(StateEnum.SEND_QUESTION);
-            user.clearTest();
-        }
+        startTest(textMsg, user);
 
         switch (user.getState()) {
+            case SEND_QUESTION:
+                service.sendQuestionHandler(user);
+                break;
+            case CHECK_ANSWER:
+                service.checkAnswerHandler(textMsg, user);
+                break;
             case START:
                 service.startHandler(user);
                 break;
@@ -92,12 +91,6 @@ public class CiaoByBot extends TelegramLongPollingBot {
             case START_TEST:
                 service.startTestHandler(textMsg, user);
                 break;
-            case SEND_QUESTION:
-                service.sendQuestionHandler(user);
-                break;
-            case CHECK_ANSWER:
-                service.checkAnswerHandler(textMsg, user);
-                break;
             case TEST_FINISHED:
                 service.testFinishedHandler(user);
                 break;
@@ -106,6 +99,14 @@ public class CiaoByBot extends TelegramLongPollingBot {
                 break;
             default:
                 throw new IllegalStateException();
+        }
+    }
+
+    private void sendWarning(Long id) {
+        try {
+            sendText(service.getRegisteredUsers().get(id).getChatId(), "Отвечать можно только нажав кнопку с одним из вариантов ответа");
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
         }
     }
 
@@ -130,19 +131,38 @@ public class CiaoByBot extends TelegramLongPollingBot {
             execute(AnswerCallbackQuery.builder()
                     .callbackQueryId(id).build());
         } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 
-    private void sendText(final Long who, final String what){
+    private boolean startBot(String textMsg, User user) throws TelegramApiException {
+        if (textMsg.equals("/start")) {
+            user.setState(StateEnum.START);
+            user.clearTest();
+        } else if (user.getState() == null) {
+            sendText(user.getChatId(), "Нет такой команды");
+            return true;
+        }
+
+        return false;
+    }
+
+    private void startTest(String textMsg, User user) {
+        if (textMsg.equals("Начать тестирование\uD83C\uDFC1")) {
+            user.setState(StateEnum.SEND_QUESTION);
+            user.clearTest();
+        }
+    }
+
+    private void sendText(final Long id, final String textMsg) throws TelegramApiException {
         var sm = SendMessage.builder()
-                .chatId(who.toString())
-                .text(what).build();
+                .chatId(id.toString())
+                .text(textMsg).build();
 
         try {
             execute(sm);
         } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
+            throw new TelegramApiException(e);
         }
     }
 }

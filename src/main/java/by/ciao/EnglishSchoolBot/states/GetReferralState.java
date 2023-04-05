@@ -14,7 +14,7 @@ public class GetReferralState extends AbstractState implements UserMessageHandle
 
     @Override
     public void apply(final String textMsg, final User user) throws TelegramApiException {
-        user.setGetReferral(textMsg);
+        user.setReferral(textMsg);
         user.setState(StateEnum.START_TEST);
 
         sendStartButton(user);

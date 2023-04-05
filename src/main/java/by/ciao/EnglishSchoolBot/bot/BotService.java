@@ -36,11 +36,11 @@ public class BotService {
         return update.hasCallbackQuery() && getRegisteredUsers().containsKey(update.getCallbackQuery().getFrom().getId());
     }
 
-    void addUserIfAbsent(Long id, Message msg) {
+    void addUserIfAbsent(Long id, Message msg) throws Exception {
         getRegisteredUsers().putIfAbsent(id, new User(id, msg.getFrom().getUserName()));
     }
 
-    void addPhone(Update update, Long id) throws TelegramApiException {
+    void addPhone(Update update, Long id) throws Exception {
         getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), getRegisteredUsers().get(id));
     }
 
@@ -49,22 +49,22 @@ public class BotService {
         state.apply(user);
     }
 
-    void getFullNameHandler(final String textMsg, final User user) throws TelegramApiException {
+    void getFullNameHandler(final String textMsg, final User user) throws Exception {
         UserMessageHandlerState state = new GetFullNameState(serviceCallback);
         state.apply(textMsg, user);
     }
 
-    void getPhoneHandler(final String textMsg, final User user) throws TelegramApiException {
+    void getPhoneHandler(final String textMsg, final User user) throws Exception {
         UserMessageHandlerState state = new GetPhoneState(serviceCallback);
         state.apply(textMsg, user);
     }
 
-    void getReferralHandler(final String textMsg, final User user) throws TelegramApiException {
+    void getReferralHandler(final String textMsg, final User user) throws Exception {
         UserMessageHandlerState state = new GetReferralState(serviceCallback);
         state.apply(textMsg, user);
     }
 
-    void startTestHandler(final String textMsg, final User user) throws TelegramApiException {
+    void startTestHandler(final String textMsg, final User user) throws Exception {
         UserMessageHandlerState state = new StartTestState(serviceCallback);
         state.apply(textMsg, user);
     }
@@ -74,7 +74,7 @@ public class BotService {
         state.apply(user);
     }
 
-    void checkAnswerHandler(final String answer, final User user) throws TelegramApiException {
+    void checkAnswerHandler(final String answer, final User user) throws Exception {
         UserMessageHandlerState state = new CheckAnswerState(serviceCallback);
         state.apply(answer, user);
     }

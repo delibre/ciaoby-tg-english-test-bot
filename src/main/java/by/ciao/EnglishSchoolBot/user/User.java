@@ -18,15 +18,15 @@ public class User {
     private String referral;
     private UsersTestState testState;
 
-    public User(final Long chatId, final String username) {
+    public User(final Long chatId, final String username) throws Exception {
+        this.state = StateEnum.NEW_USER;
         this.chatId = chatId;
         this.username = username;
-        this.state = StateEnum.NEW_USER;
         this.phone = "нет";
         this.testState = new UsersTestState();
     }
 
-    public void clearTest() {
+    public void clearTest() throws Exception {
         testState = new UsersTestState();
         lastMessage = null;
     }

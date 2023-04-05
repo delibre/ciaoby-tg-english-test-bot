@@ -12,8 +12,8 @@ public class UsersTestState {
     private int correctAnswers = 0;
     private EnglishLevel lvl;
 
-    public UsersTestState() {
-        this.questions.addAll(EnglishTest.questions);
+    public UsersTestState() throws Exception {
+        this.questions.addAll(EnglishTest.getInstance().getQuestions());
     }
 
     public Question getCurrentQuestion() {

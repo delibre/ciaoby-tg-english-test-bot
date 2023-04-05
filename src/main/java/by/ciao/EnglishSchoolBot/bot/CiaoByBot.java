@@ -1,7 +1,7 @@
 package by.ciao.EnglishSchoolBot.bot;
 
-import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.enums.StateEnum;
+import by.ciao.EnglishSchoolBot.user.User;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -37,12 +37,12 @@ public class CiaoByBot extends TelegramLongPollingBot {
                 return;
             }
 
-            service.addUserIfAbsent(id, msg);
+            addUserIfAbsent(id, msg);
             messageProcessing(msg.getText(), service.getRegisteredUsers().get(id));
 
         }  else if (service.hasContact(update)) {
             var id = update.getMessage().getChatId();
-            addingPhone(update, id);
+            addPhone(update, id);
 
         } else if (service.hasCallback(update)) {
             var qry = update.getCallbackQuery();
@@ -62,7 +62,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         return "6167400176:AAGg4892WjlM0mMxUgdmdoQXID2X9UPw4lo";
     }
 
-    private void processMessage(String textMsg, User user) throws TelegramApiException {
+    private void processMessage(String textMsg, User user) throws Exception {
         if (startBot(textMsg, user)) {
             return;
         }
@@ -110,18 +110,26 @@ public class CiaoByBot extends TelegramLongPollingBot {
         }
     }
 
+    private void addUserIfAbsent(Long id, Message msg) {
+        try {
+            service.addUserIfAbsent(id, msg);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void messageProcessing(String textMsg, User user) {
         try {
             processMessage(textMsg, user);
-        } catch (TelegramApiException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void addingPhone(Update update, Long id) {
+    private void addPhone(Update update, Long id) {
         try {
             service.addPhone(update, id);
-        } catch (TelegramApiException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -135,7 +143,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         }
     }
 
-    private boolean startBot(String textMsg, User user) throws TelegramApiException {
+    private boolean startBot(String textMsg, User user) throws Exception {
         if (textMsg.equals("/start")) {
             user.setState(StateEnum.START);
             user.clearTest();
@@ -147,7 +155,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         return false;
     }
 
-    private void startTest(String textMsg, User user) {
+    private void startTest(String textMsg, User user) throws Exception {
         if (textMsg.equals("Начать тестирование\uD83C\uDFC1")) {
             user.setState(StateEnum.SEND_QUESTION);
             user.clearTest();

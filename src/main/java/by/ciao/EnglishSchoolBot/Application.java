@@ -9,7 +9,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 public class Application {
-
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
     public static void main(String[] args) throws TelegramApiException {

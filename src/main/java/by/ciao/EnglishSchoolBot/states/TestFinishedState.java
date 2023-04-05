@@ -7,6 +7,7 @@ import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class TestFinishedState extends AbstractState implements UserHandlerState {
     public TestFinishedState(final ServiceCallback serviceCallback) {
@@ -14,7 +15,7 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
     }
 
     @Override
-    public void apply(final User user) {
+    public void apply(final User user) throws TelegramApiException {
         user.setState(StateEnum.INFO_SENT);
         deleteMessage(user);
         sendText(user.getChatId(), "Вы ответили верно на " + user.getTestState().getCorrectAnswers() + " вопросов.\n" +
@@ -23,7 +24,7 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
         sendDataToAdmin(user);
     }
 
-    private void deleteMessage(final User user) {
+    private void deleteMessage(final User user) throws TelegramApiException {
         DeleteMessage deleteMessage = new DeleteMessage();
         deleteMessage.setChatId(user.getChatId().toString());
         deleteMessage.setMessageId(user.getLastMessage().getMessageId());
@@ -31,7 +32,7 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
         getServiceCallback().execute(null, deleteMessage, null);
     }
 
-    private void sendDataToAdmin(final User user) {
+    private void sendDataToAdmin(final User user) throws TelegramApiException {
         getServiceCallback().execute(SendMessage.builder()
                             .chatId("5105539803").
                             text(   "Имя и Фамилия: " + user.getFullName() + "\n" +

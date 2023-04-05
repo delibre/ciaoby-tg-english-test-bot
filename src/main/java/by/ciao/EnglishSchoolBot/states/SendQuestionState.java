@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ public class SendQuestionState extends AbstractState implements UserHandlerState
     }
 
     @Override
-    public void apply(final User user) {
+    public void apply(final User user) throws TelegramApiException {
         if (user.getTestState().isFinished()) {
             user.setState(StateEnum.TEST_FINISHED);
             UserHandlerState state = new TestFinishedState(getServiceCallback());
@@ -31,7 +32,7 @@ public class SendQuestionState extends AbstractState implements UserHandlerState
         user.setState(StateEnum.CHECK_ANSWER);
     }
 
-    private void sendQuestion(final User user) {
+    private void sendQuestion(final User user) throws TelegramApiException {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
                 .text(user.getTestState().getCurrentQuestion().getNumberOfQuestion() + ". "

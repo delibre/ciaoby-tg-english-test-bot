@@ -20,7 +20,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
             else if (em != null) { execute(em); }
             else if (dm != null) { execute(dm); }
         } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
+            throw new TelegramApiException(e);
         }
 
         return msg;
@@ -39,17 +39,30 @@ public class CiaoByBot extends TelegramLongPollingBot {
 
             service.addUserIfAbsent(id, msg);
 
-            processMessage(msg.getText(), service.getRegisteredUsers().get(id));
+            try {
+                processMessage(msg.getText(), service.getRegisteredUsers().get(id));
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
 
         }  else if (service.hasContact(update)) {
             var id = update.getMessage().getChatId();
 
-            service.getPhoneHandler(update.getMessage().getContact().getPhoneNumber(),
-                                    service.getRegisteredUsers().get(id));
+            try {
+                service.getPhoneHandler(update.getMessage().getContact().getPhoneNumber(),
+                                        service.getRegisteredUsers().get(id));
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
 
         } else if (service.hasCallback(update)) {
             var qry = update.getCallbackQuery();
-            processMessage(qry.getData(), service.getRegisteredUsers().get(qry.getFrom().getId()));
+
+            try {
+                processMessage(qry.getData(), service.getRegisteredUsers().get(qry.getFrom().getId()));
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
 
             try {
                 execute(AnswerCallbackQuery.builder()
@@ -70,7 +83,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         return "6167400176:AAGg4892WjlM0mMxUgdmdoQXID2X9UPw4lo";
     }
 
-    private void processMessage(String textMsg, User user) {
+    private void processMessage(String textMsg, User user) throws TelegramApiException {
         if (textMsg.equals("/start")) {
             user.setState(StateEnum.START);
             user.clearTest();

@@ -5,6 +5,7 @@ import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class StartState extends AbstractState implements UserHandlerState {
     public StartState(final ServiceCallback serviceCallback) {
@@ -12,7 +13,7 @@ public class StartState extends AbstractState implements UserHandlerState {
     }
 
     @Override
-    public void apply(final User user) {
+    public void apply(final User user) throws TelegramApiException {
         user.setState(StateEnum.GET_FULL_NAME);
 
         sendText(user.getChatId(), "Привет!\uD83D\uDC4B\n\n" +

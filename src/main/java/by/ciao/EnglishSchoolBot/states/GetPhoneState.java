@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
     }
 
     @Override
-    public void apply(final String textMsg, final User user) {
+    public void apply(final String textMsg, final User user) throws TelegramApiException {
         if (!Regex.checkPhone(textMsg)) {
             sendText(user.getChatId(), "Неверный формат номера. Попробуйте, пожалуйста, ещё раз");
             return;
@@ -33,7 +34,7 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
         sendOptionsForReferral(user);
     }
 
-    private void removeReplyKeyboard(final User user) {
+    private void removeReplyKeyboard(final User user) throws TelegramApiException {
         String msg = "Спасибо! Можем продолжать\uD83D\uDE0A";
 
         var replyKeyboardRemove = new ReplyKeyboardRemove(true);
@@ -49,7 +50,7 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
         }
     }
 
-    private void sendOptionsForReferral(final User user) {
+    private void sendOptionsForReferral(final User user) throws TelegramApiException {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
                 .text("Откуда вы о нас узнали?\n" +

@@ -6,6 +6,7 @@ import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Objects;
 
@@ -15,7 +16,7 @@ public class StartTestState extends AbstractState implements UserMessageHandlerS
     }
 
     @Override
-    public void apply(final String textMsg, final User user) {
+    public void apply(final String textMsg, final User user) throws TelegramApiException {
         if (Objects.equals(textMsg, "Начать тестирование\uD83C\uDFC1")) {
             user.setState(StateEnum.SEND_QUESTION);
             user.clearTest();

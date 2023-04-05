@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,14 +20,14 @@ public class GetFullNameState extends AbstractState implements UserMessageHandle
     }
 
     @Override
-    public void apply(final String textMsg, final User user) {
+    public void apply(final String textMsg, final User user) throws TelegramApiException {
         user.setFullName(textMsg);
         user.setState(StateEnum.GET_PHONE);
 
         sendPhoneButton(user);
     }
 
-    private void sendPhoneButton(final User user) {
+    private void sendPhoneButton(final User user) throws TelegramApiException {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
                 .text("Чтобы нам было удобнее с Вами связаться для согласования второго этапа (устного тестирования), " +

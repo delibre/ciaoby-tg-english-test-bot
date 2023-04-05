@@ -6,18 +6,18 @@ import lombok.Getter;
 import java.util.LinkedList;
 
 @Getter
-public final class EnglishTest {
-    private static EnglishTest INSTANCE;
+public final class EnglishTestSingleton {
+    private static EnglishTestSingleton INSTANCE;
     private final LinkedList<Question> questions = new LinkedList<>();
 
 
-    private EnglishTest() throws Exception {
+    private EnglishTestSingleton() throws Exception {
         this.questions.addAll(ReadFile.readFile());
     }
 
-    public static EnglishTest getInstance() throws Exception {
+    public static EnglishTestSingleton getInstance() throws Exception {
         if (INSTANCE == null) {
-            INSTANCE = new EnglishTest();
+            INSTANCE = new EnglishTestSingleton();
         }
 
         return INSTANCE;

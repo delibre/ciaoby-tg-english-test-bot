@@ -14,7 +14,7 @@ public class UsersTestState {
 
     public UsersTestState() throws Exception {
         this.questions = new LinkedList<>();
-        this.questions.addAll(EnglishTest.getInstance().getQuestions());
+        this.questions.addAll(EnglishTestSingleton.getInstance().getQuestions());
         this.correctAnswers = 0;
     }
 

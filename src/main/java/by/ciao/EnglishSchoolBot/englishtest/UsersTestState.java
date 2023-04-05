@@ -8,12 +8,14 @@ import java.util.Objects;
 
 @Getter
 public class UsersTestState {
-    private final LinkedList<Question> questions = new LinkedList<>();
-    private int correctAnswers = 0;
+    private final LinkedList<Question> questions;
+    private int correctAnswers;
     private EnglishLevel lvl;
 
     public UsersTestState() throws Exception {
+        this.questions = new LinkedList<>();
         this.questions.addAll(EnglishTest.getInstance().getQuestions());
+        this.correctAnswers = 0;
     }
 
     public Question getCurrentQuestion() {
@@ -31,7 +33,7 @@ public class UsersTestState {
         questions.removeFirst();
     }
 
-    public EnglishLevel getResults() {
+    public EnglishLevel getResult() {
         if (!isFinished()) { throw new IllegalStateException(); }
 
         if (lvl != null) { return lvl; }

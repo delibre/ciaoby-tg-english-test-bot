@@ -4,6 +4,7 @@ import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
 import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
+import by.ciao.EnglishSchoolBot.utils.BotResponses;
 import by.ciao.EnglishSchoolBot.utils.Regex;
 import by.ciao.EnglishSchoolBot.user.User;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -23,7 +24,7 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
     @Override
     public void apply(final String textMsg, final User user) throws TelegramApiException {
         if (!Regex.checkPhone(textMsg)) {
-            sendText(user.getChatId(), "Неверный формат номера. Попробуйте, пожалуйста, ещё раз");
+            sendText(user.getChatId(), BotResponses.phoneWarning());
             return;
         }
 
@@ -35,10 +36,8 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
     }
 
     private void removeReplyKeyboard(final User user) throws TelegramApiException {
-        String msg = "Спасибо! Можем продолжать\uD83D\uDE0A";
-
         var replyKeyboardRemove = new ReplyKeyboardRemove(true);
-        var removeMessage = new SendMessage(user.getChatId().toString(), msg);
+        var removeMessage = new SendMessage(user.getChatId().toString(), BotResponses.replyKeyboardRemoved());
         removeMessage.setReplyMarkup(replyKeyboardRemove);
 
         getServiceCallback().execute(removeMessage, null, null);
@@ -53,8 +52,7 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
     private void sendOptionsForReferral(final User user) throws TelegramApiException {
         var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
-                .text("Откуда вы о нас узнали?\n" +
-                        "Выберете один из вариантов ниже или же впишите свой").build();
+                .text(BotResponses.askReferral()).build();
 
         var markup = new InlineKeyboardMarkup();
 

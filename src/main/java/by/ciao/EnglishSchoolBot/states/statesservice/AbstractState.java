@@ -18,10 +18,10 @@ import java.util.List;
 public abstract class AbstractState {
     private final ServiceCallback serviceCallback;
 
-    protected void sendText(final Long who, final String what) throws TelegramApiException {
+    protected void sendText(final Long id, final String textMsg) throws TelegramApiException {
         var sm = SendMessage.builder()
-                .chatId(who.toString())
-                .text(what).build();
+                .chatId(id.toString())
+                .text(textMsg).build();
 
         serviceCallback.execute(sm, null, null);
     }

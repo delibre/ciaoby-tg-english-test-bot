@@ -1,7 +1,7 @@
 package by.ciao.EnglishSchoolBot.englishtest;
 
-import lombok.Getter;
 import by.ciao.EnglishSchoolBot.enums.EnglishLevel;
+import lombok.Getter;
 
 import java.util.LinkedList;
 import java.util.Objects;
@@ -9,12 +9,14 @@ import java.util.Objects;
 @Getter
 public class UsersTestState {
     private final LinkedList<Question> questions;
+    private final LinkedList<String> userAnswers;
     private int correctAnswers;
     private EnglishLevel lvl;
 
     public UsersTestState() throws Exception {
         this.questions = new LinkedList<>();
         this.questions.addAll(EnglishTestSingleton.getInstance().getQuestions());
+        this.userAnswers = new LinkedList<>();
         this.correctAnswers = 0;
     }
 
@@ -30,7 +32,14 @@ public class UsersTestState {
         if (Objects.equals(answer, questions.getFirst().getCorrectAnswer())) {
             correctAnswers++;
         }
+        userAnswers.add(answer);
         questions.removeFirst();
+    }
+
+    public String getUserAnswer() {
+        String userAnswer = userAnswers.getFirst();
+        userAnswers.removeFirst();
+        return userAnswer;
     }
 
     public EnglishLevel getResult() {

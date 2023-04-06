@@ -17,13 +17,13 @@ public class SendQuestionState extends AbstractState implements UserHandlerState
     }
 
     @Override
-    public void apply(final User user) throws TelegramApiException {
+    public void apply(final User user) throws Exception {
         if (testFinished(user)) { return; }
         sendQuestion(user);
         user.setState(StateEnum.CHECK_ANSWER);
     }
 
-    private boolean testFinished(User user) throws TelegramApiException {
+    private boolean testFinished(User user) throws Exception {
         if (user.getTestState().isFinished()) {
             user.setState(StateEnum.TEST_FINISHED);
             UserHandlerState state = new TestFinishedState(getServiceCallback());

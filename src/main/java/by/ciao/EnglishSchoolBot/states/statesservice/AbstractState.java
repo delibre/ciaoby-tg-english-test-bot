@@ -6,6 +6,7 @@ import by.ciao.EnglishSchoolBot.utils.BotResponses;
 import by.ciao.EnglishSchoolBot.utils.KeyboardCreator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -26,8 +27,19 @@ public abstract class AbstractState {
     }
 
     protected SendMessage createMessage(Long id, String textMsg) {
-        return SendMessage.builder()
+        var sm = SendMessage.builder()
                 .chatId(id.toString())
                 .text(textMsg).build();
+        sm.setParseMode(ParseMode.HTML);
+        return sm;
+    }
+
+    // Made to humanise bot's responses, so it is not sending lots of messages in one second.
+    protected void setDelay(int millis) {
+        try {
+            Thread.sleep(millis); // Delay for 0.5 seconds (500 milliseconds)
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

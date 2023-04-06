@@ -15,10 +15,14 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
     }
 
     @Override
-    public void apply(final User user) throws TelegramApiException {
+    public void apply(final User user) throws Exception {
         user.setState(StateEnum.INFO_SENT);
         deleteLastMessage(user);
+
+        sendText(user.getChatId(), BotResponses.userAnswers(user).toString());
+        setDelay(1000); // Made to humanise bot's responses, so it is not sending lots of messages in one second.
         sendText(user.getChatId(), BotResponses.testFinished(user));
+
         sendDataToAdmin(user);
     }
 

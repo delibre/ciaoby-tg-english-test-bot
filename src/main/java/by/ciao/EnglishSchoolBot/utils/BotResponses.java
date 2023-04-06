@@ -86,7 +86,7 @@ public final class BotResponses {
         for (Question question : EnglishTestSingleton.getInstance().getQuestions()) {
             String userAnswer = user.getTestState().getUserAnswer();
 
-            testWithAnswers.append(isCorrect(question, userAnswer)).append(question.getNumberOfQuestion())
+            testWithAnswers.append(isAnswerCorrect(question, userAnswer)).append(question.getNumberOfQuestion())
                     .append(". ").append(question.getQuestion())
                     .append("\n(Правильный ответ: <b>").append(question.getCorrectAnswer()).append("</b>)\n")
                     .append(getAnswers(question, userAnswer)).append("\n\n");
@@ -95,7 +95,7 @@ public final class BotResponses {
         return testWithAnswers;
     }
 
-    private static String isCorrect(Question question, String userAnswer) {
+    private static String isAnswerCorrect(Question question, String userAnswer) {
         if (userAnswer.equals(question.getCorrectAnswer())) {
             return "✅ ";
         }

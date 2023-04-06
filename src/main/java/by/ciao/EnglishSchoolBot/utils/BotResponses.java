@@ -1,5 +1,7 @@
 package by.ciao.EnglishSchoolBot.utils;
 
+import by.ciao.EnglishSchoolBot.englishtest.EnglishTestSingleton;
+import by.ciao.EnglishSchoolBot.englishtest.Question;
 import by.ciao.EnglishSchoolBot.user.User;
 
 import java.util.ArrayList;
@@ -67,9 +69,7 @@ public final class BotResponses {
     }
 
     public static List<String> optionsForAnswers(User user) {
-        ArrayList<String> answers = new ArrayList<>(Arrays.asList(user.getTestState().getCurrentQuestion().getAnswers()));
-        answers.add("Пропустить");
-        return answers;
+        return new ArrayList<>(user.getTestState().getCurrentQuestion().getAnswers());
     }
 
     public static String startTestButton() {
@@ -78,5 +78,41 @@ public final class BotResponses {
 
     public static String sharePhoneButton() {
         return "Поделиться номером";
+    }
+
+    public static StringBuilder userAnswers(User user) throws Exception {
+        StringBuilder testWithAnswers = new StringBuilder();
+
+        for (Question question : EnglishTestSingleton.getInstance().getQuestions()) {
+            String userAnswer = user.getTestState().getUserAnswer();
+
+            testWithAnswers.append(isCorrect(question, userAnswer)).append(question.getNumberOfQuestion())
+                    .append(". ").append(question.getQuestion())
+                    .append("\n(Правильный ответ: <b>").append(question.getCorrectAnswer()).append("</b>)\n")
+                    .append(getAnswers(question, userAnswer)).append("\n\n");
+        }
+
+        return testWithAnswers;
+    }
+
+    private static String isCorrect(Question question, String userAnswer) {
+        if (userAnswer.equals(question.getCorrectAnswer())) {
+            return "✅ ";
+        }
+        return "❌ ";
+    }
+
+    private static StringBuilder getAnswers(Question question, String userAnswer) {
+        StringBuilder answers = new StringBuilder();
+
+        for (String answer : question.getAnswers()) {
+            if (userAnswer.equals(answer)) {
+                answers.append("\t\t<b>").append(answer).append(" (Ваш ответ)</b>\n");
+                continue;
+            }
+            answers.append("\t\t").append(answer).append("\n");
+        }
+
+        return answers;
     }
 }

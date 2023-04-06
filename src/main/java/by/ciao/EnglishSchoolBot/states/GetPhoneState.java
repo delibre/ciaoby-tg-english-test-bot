@@ -38,15 +38,7 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
 
         getServiceCallback().execute(removeMessage);
 
-        setDelay(); // Made to humanise bot's responses, so it is not sending lots of messages in one second.
-    }
-
-    private void setDelay() {
-        try {
-            Thread.sleep(500); // Delay for 0.5 seconds (500 milliseconds)
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        setDelay(500); // Made to humanise bot's responses, so it is not sending lots of messages in one second.
     }
 
     private void sendOptionsForReferral(final User user) throws TelegramApiException {

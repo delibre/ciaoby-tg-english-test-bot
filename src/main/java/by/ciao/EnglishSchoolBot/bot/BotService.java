@@ -7,7 +7,6 @@ import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
 import by.ciao.EnglishSchoolBot.user.User;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +43,7 @@ public class BotService {
         getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), getRegisteredUsers().get(id));
     }
 
-    void startHandler(final User user) throws TelegramApiException {
+    void startHandler(final User user) throws Exception {
         UserHandlerState state = new StartState(serviceCallback);
         state.apply(user);
     }
@@ -69,7 +68,7 @@ public class BotService {
         state.apply(textMsg, user);
     }
 
-    void sendQuestionHandler(final User user) throws TelegramApiException {
+    void sendQuestionHandler(final User user) throws Exception {
         UserHandlerState state = new SendQuestionState(serviceCallback);
         state.apply(user);
     }
@@ -79,12 +78,12 @@ public class BotService {
         state.apply(answer, user);
     }
 
-    void testFinishedHandler(final User user) throws TelegramApiException {
+    void testFinishedHandler(final User user) throws Exception {
         UserHandlerState state = new TestFinishedState(serviceCallback);
         state.apply(user);
     }
 
-    void infoSentHandler(final User user) throws TelegramApiException {
+    void infoSentHandler(final User user) throws Exception {
         UserHandlerState state = new InfoSentState(serviceCallback);
         state.apply(user);
     }

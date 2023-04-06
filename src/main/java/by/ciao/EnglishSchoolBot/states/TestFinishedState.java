@@ -1,12 +1,11 @@
 package by.ciao.EnglishSchoolBot.states;
 
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
-import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
+import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.utils.BotResponses;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -28,12 +27,10 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
         deleteMessage.setChatId(user.getChatId().toString());
         deleteMessage.setMessageId(user.getLastMessage().getMessageId());
 
-        getServiceCallback().execute(null, deleteMessage, null);
+        getServiceCallback().execute(deleteMessage);
     }
 
     private void sendDataToAdmin(final User user) throws TelegramApiException {
-        getServiceCallback().execute(SendMessage.builder()
-                            .chatId("5105539803").
-                            text(BotResponses.dataForAdmin(user)).build(), null, null);
+        getServiceCallback().execute(createMessage(5105539803L, BotResponses.dataForAdmin(user)));
     }
 }

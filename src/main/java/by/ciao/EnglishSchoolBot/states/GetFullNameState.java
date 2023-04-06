@@ -3,10 +3,9 @@ package by.ciao.EnglishSchoolBot.states;
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
 import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
-import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
+import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.utils.BotResponses;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
@@ -29,11 +28,13 @@ public class GetFullNameState extends AbstractState implements UserMessageHandle
     }
 
     private void sendPhoneButton(final User user) throws TelegramApiException {
-        var sm = SendMessage.builder()
-                .chatId(user.getChatId().toString())
-                .text(BotResponses.askForPhone()).build();
+        var sm = createMessage(user.getChatId(), BotResponses.askForPhone());
+        sm.setReplyMarkup(createKeyboard());
 
+        getServiceCallback().execute(sm);
+    }
 
+    private ReplyKeyboardMarkup createKeyboard() {
         var keyboard = new ReplyKeyboardMarkup();
         keyboard.setResizeKeyboard(true);
         keyboard.setOneTimeKeyboard(false);
@@ -48,8 +49,7 @@ public class GetFullNameState extends AbstractState implements UserMessageHandle
         keyboardRows.add(row1);
 
         keyboard.setKeyboard(keyboardRows);
-        sm.setReplyMarkup(keyboard);
 
-        getServiceCallback().execute(sm, null, null);
+        return keyboard;
     }
 }

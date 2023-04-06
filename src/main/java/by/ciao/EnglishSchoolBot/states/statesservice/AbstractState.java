@@ -1,6 +1,7 @@
 package by.ciao.EnglishSchoolBot.states.statesservice;
 
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
+import by.ciao.EnglishSchoolBot.utils.BotResponses;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import by.ciao.EnglishSchoolBot.user.User;
@@ -19,19 +20,11 @@ public abstract class AbstractState {
     private final ServiceCallback serviceCallback;
 
     protected void sendText(final Long id, final String textMsg) throws TelegramApiException {
-        var sm = SendMessage.builder()
-                .chatId(id.toString())
-                .text(textMsg).build();
-
-        serviceCallback.execute(sm, null, null);
+        serviceCallback.execute(createMessage(id, textMsg));
     }
 
     protected void sendStartButton(final User user) throws TelegramApiException {
-        var sm = SendMessage.builder()
-                .chatId(user.getChatId().toString())
-                .text("Ну что же, приступим к тесту. Сейчас Вам нужно будет ответить на 30 вопросов.\uD83E\uDDD0 " +
-                        "Ограничений по времени нет.\n\n" +
-                        "Нажмите кнопку \"Начать тестирование\", когда будете готовы.").build();
+        var sm = createMessage(user.getChatId(), BotResponses.startTest());
 
         var keyboard = new ReplyKeyboardMarkup();
         keyboard.setResizeKeyboard(true);
@@ -47,6 +40,12 @@ public abstract class AbstractState {
         keyboard.setKeyboard(keyboardRows);
         sm.setReplyMarkup(keyboard);
 
-        serviceCallback.execute(sm, null, null);
+        serviceCallback.execute(sm);
+    }
+
+    protected SendMessage createMessage(Long id, String textMsg) {
+        return SendMessage.builder()
+                .chatId(id.toString())
+                .text(textMsg).build();
     }
 }

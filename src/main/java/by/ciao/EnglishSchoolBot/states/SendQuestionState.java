@@ -20,21 +20,36 @@ public class SendQuestionState extends AbstractState implements UserHandlerState
 
     @Override
     public void apply(final User user) throws TelegramApiException {
+        if (testFinished(user)) { return; }
+        sendQuestion(user);
+        user.setState(StateEnum.CHECK_ANSWER);
+    }
+
+    private boolean testFinished(User user) throws TelegramApiException {
         if (user.getTestState().isFinished()) {
             user.setState(StateEnum.TEST_FINISHED);
             UserHandlerState state = new TestFinishedState(getServiceCallback());
             state.apply(user);
-            return;
+            return true;
         }
-
-        sendQuestion(user);
-        user.setState(StateEnum.CHECK_ANSWER);
+        return false;
     }
 
     private void sendQuestion(final User user) throws TelegramApiException {
         var sm = createMessage(user.getChatId(), user.getTestState().getCurrentQuestion().getNumberOfQuestion()
                 + ". " + user.getTestState().getCurrentQuestion().getQuestion());
 
+        var markup = createKeyboard(user);
+        sm.setReplyMarkup(markup);
+
+        if (user.getLastMessage() != null) {
+            getServiceCallback().execute(editMessage(user, markup));
+        } else {
+            getServiceCallback().execute(sm).ifPresent(user::setLastMessage);
+        }
+    }
+
+    private InlineKeyboardMarkup createKeyboard(User user) {
         var markup = new InlineKeyboardMarkup();
 
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
@@ -61,23 +76,18 @@ public class SendQuestionState extends AbstractState implements UserHandlerState
         keyboard.add(rowInline);
 
         markup.setKeyboard(keyboard);
-        sm.setReplyMarkup(markup);
 
-        if (user.getLastMessage() != null) {
-            var editMessageText = editMessageText(user);
-            editMessageText.setReplyMarkup(markup);
-
-            getServiceCallback().execute(editMessageText);
-        } else {
-            getServiceCallback().execute(sm).ifPresent(user::setLastMessage);
-        }
+        return markup;
     }
 
-    private EditMessageText editMessageText(User user) {
-        return EditMessageText.builder()
+    private EditMessageText editMessage(User user, InlineKeyboardMarkup markup) {
+        var editMessageText = EditMessageText.builder()
                 .chatId(user.getLastMessage().getChatId().toString())
                 .messageId(user.getLastMessage().getMessageId())
                 .text(user.getTestState().getCurrentQuestion().getNumberOfQuestion() + ". "
                         + user.getTestState().getCurrentQuestion().getQuestion()).build();
+        editMessageText.setReplyMarkup(markup);
+
+        return editMessageText;
     }
 }

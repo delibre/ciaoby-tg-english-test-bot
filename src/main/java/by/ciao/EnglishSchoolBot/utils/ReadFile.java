@@ -26,6 +26,4 @@ public class ReadFile {
 
         return questions;
     }
-
-
 }

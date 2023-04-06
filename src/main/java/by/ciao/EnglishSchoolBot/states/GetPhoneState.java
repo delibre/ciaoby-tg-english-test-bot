@@ -4,17 +4,13 @@ import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
 import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
-import by.ciao.EnglishSchoolBot.utils.BotResponses;
-import by.ciao.EnglishSchoolBot.utils.Regex;
 import by.ciao.EnglishSchoolBot.user.User;
+import by.ciao.EnglishSchoolBot.utils.BotResponses;
+import by.ciao.EnglishSchoolBot.utils.KeyboardCreator;
+import by.ciao.EnglishSchoolBot.utils.Regex;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class GetPhoneState extends AbstractState implements UserMessageHandlerState {
     public GetPhoneState(final ServiceCallback serviceCallback) {
@@ -23,8 +19,8 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
 
     @Override
     public void apply(final String textMsg, final User user) throws TelegramApiException {
-        if (!Regex.checkPhone(textMsg)) {
-            sendText(user.getChatId(), BotResponses.phoneWarning());
+        if (!Regex.isCorrectPhoneFormat(textMsg)) {
+            sendText(user.getChatId(), BotResponses.phoneForamtWarning());
             return;
         }
 
@@ -41,7 +37,8 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
         removeMessage.setReplyMarkup(replyKeyboardRemove);
 
         getServiceCallback().execute(removeMessage);
-        setDelay();
+
+        setDelay(); // Made to humanise bot's responses, so it is not sending lots of messages in one second.
     }
 
     private void setDelay() {
@@ -54,60 +51,8 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
 
     private void sendOptionsForReferral(final User user) throws TelegramApiException {
         var sm = createMessage(user.getChatId(), BotResponses.askReferral());
-        sm.setReplyMarkup(createKeyboard());
+        sm.setReplyMarkup(KeyboardCreator.createInlineKeyboard(BotResponses.referralOptions()));
 
         getServiceCallback().execute(sm);
-    }
-
-    private InlineKeyboardMarkup createKeyboard() {
-        var markup = new InlineKeyboardMarkup();
-
-        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
-
-        var button1 = new InlineKeyboardButton();
-        button1.setText("Google");
-        button1.setCallbackData("Google");
-        List<InlineKeyboardButton> row1 = new ArrayList<>();
-        row1.add(button1);
-        keyboard.add(row1);
-
-        var button2 = new InlineKeyboardButton();
-        button2.setText("Яндекс");
-        button2.setCallbackData("Яндекс");
-        List<InlineKeyboardButton> row2 = new ArrayList<>();
-        row2.add(button2);
-        keyboard.add(row2);
-
-        var button3 = new InlineKeyboardButton();
-        button3.setText("Instagram/Facebook/VK/Tik-Tok");
-        button3.setCallbackData("Instagram/Facebook/VK/Tik-Tok");
-        List<InlineKeyboardButton> row3 = new ArrayList<>();
-        row3.add(button3);
-        keyboard.add(row3);
-
-        var button4 = new InlineKeyboardButton();
-        button4.setText("Vse-kursy");
-        button4.setCallbackData("Vse-kursy");
-        List<InlineKeyboardButton> row4 = new ArrayList<>();
-        row4.add(button4);
-        keyboard.add(row4);
-
-        var button5 = new InlineKeyboardButton();
-        button5.setText("Еnguide");
-        button5.setCallbackData("Еnguide");
-        List<InlineKeyboardButton> row5 = new ArrayList<>();
-        row5.add(button5);
-        keyboard.add(row5);
-
-        var button6 = new InlineKeyboardButton();
-        button6.setText("Рекомендация от друзей");
-        button6.setCallbackData("Рекомендация от друзей");
-        List<InlineKeyboardButton> row6 = new ArrayList<>();
-        row6.add(button6);
-        keyboard.add(row6);
-
-        markup.setKeyboard(keyboard);
-
-        return markup;
     }
 }

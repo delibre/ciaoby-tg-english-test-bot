@@ -2,6 +2,10 @@ package by.ciao.EnglishSchoolBot.utils;
 
 import by.ciao.EnglishSchoolBot.user.User;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public final class BotResponses {
     public static String testFinished(User user) {
         return "Вы ответили верно на " + user.getTestState().getCorrectAnswers() + " вопросов.\n" +
@@ -32,7 +36,7 @@ public final class BotResponses {
                 "Если хотите пройти тест заново - нажмите кнопку \"Начать тестирование\"\uD83E\uDD17";
     }
 
-    public static String phoneWarning() {
+    public static String phoneForamtWarning() {
         return "Неверный формат номера. Попробуйте, пожалуйста, ещё раз";
     }
 
@@ -58,4 +62,13 @@ public final class BotResponses {
                 "Нажмите кнопку \"Начать тестирование\", когда будете готовы.";
     }
 
+    public static List<String> referralOptions() {
+        return new ArrayList<>(Arrays.asList("Google", "Яндекс", "Instagram/Facebook/VK/Tik-Tok", "Vse-kursy", "Еnguide", "Рекомендация от друзей"));
+    }
+
+    public static List<String> optionsForAnswers(User user) {
+        ArrayList<String> answers = new ArrayList<>(Arrays.asList(user.getTestState().getCurrentQuestion().getAnswers()));
+        answers.add("Пропустить");
+        return answers;
+    }
 }

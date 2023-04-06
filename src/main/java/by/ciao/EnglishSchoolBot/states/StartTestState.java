@@ -6,6 +6,7 @@ import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
 import by.ciao.EnglishSchoolBot.user.User;
+import by.ciao.EnglishSchoolBot.utils.BotResponses;
 
 import java.util.Objects;
 
@@ -16,7 +17,7 @@ public class StartTestState extends AbstractState implements UserMessageHandlerS
 
     @Override
     public void apply(final String textMsg, final User user) throws Exception {
-        if (Objects.equals(textMsg, "Начать тестирование\uD83C\uDFC1")) {
+        if (Objects.equals(textMsg, BotResponses.startTestButton())) {
             user.setState(StateEnum.SEND_QUESTION);
             user.clearTest();
 

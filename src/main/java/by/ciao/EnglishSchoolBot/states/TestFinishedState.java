@@ -17,12 +17,12 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
     @Override
     public void apply(final User user) throws TelegramApiException {
         user.setState(StateEnum.INFO_SENT);
-        deleteMessage(user);
+        deleteLastMessage(user);
         sendText(user.getChatId(), BotResponses.testFinished(user));
         sendDataToAdmin(user);
     }
 
-    private void deleteMessage(final User user) throws TelegramApiException {
+    private void deleteLastMessage(final User user) throws TelegramApiException {
         DeleteMessage deleteMessage = new DeleteMessage();
         deleteMessage.setChatId(user.getChatId().toString());
         deleteMessage.setMessageId(user.getLastMessage().getMessageId());

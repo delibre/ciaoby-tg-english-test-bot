@@ -10,12 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class KeyboardCreator {
-    public static InlineKeyboardMarkup createInlineKeyboard(List<String> options) {
+    public static InlineKeyboardMarkup createInlineKeyboard(List<String> answerOptions) {
         var markup = new InlineKeyboardMarkup();
 
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
-        for (String option : options) {
+        for (String option : answerOptions) {
             var button = new InlineKeyboardButton();
             button.setText(option);
             button.setCallbackData(option);
@@ -29,19 +29,19 @@ public final class KeyboardCreator {
         return markup;
     }
 
-    public static ReplyKeyboardMarkup sendPhoneReplyKeyboard() {
+    public static ReplyKeyboardMarkup createReplyKeyboard(String buttonText, boolean requestContact) {
         var keyboard = new ReplyKeyboardMarkup();
         keyboard.setResizeKeyboard(true);
         keyboard.setOneTimeKeyboard(false);
 
         List<KeyboardRow> keyboardRows = new ArrayList<>();
 
-        var row1 = new KeyboardRow();
-        var button1 = new KeyboardButton("Поделиться номером");
-        button1.setRequestContact(true);
-        row1.add(button1);
+        var row = new KeyboardRow();
+        var button = new KeyboardButton(buttonText);
+        button.setRequestContact(requestContact);
+        row.add(button);
 
-        keyboardRows.add(row1);
+        keyboardRows.add(row);
 
         keyboard.setKeyboard(keyboardRows);
 

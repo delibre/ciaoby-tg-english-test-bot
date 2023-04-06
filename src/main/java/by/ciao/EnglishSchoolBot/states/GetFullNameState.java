@@ -24,7 +24,7 @@ public class GetFullNameState extends AbstractState implements UserMessageHandle
 
     private void sendPhoneButton(final User user) throws TelegramApiException {
         var sm = createMessage(user.getChatId(), BotResponses.askForPhone());
-        sm.setReplyMarkup(KeyboardCreator.sendPhoneReplyKeyboard());
+        sm.setReplyMarkup(KeyboardCreator.createReplyKeyboard(BotResponses.sharePhoneButton(), true));
 
         getServiceCallback().execute(sm);
     }

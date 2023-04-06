@@ -71,4 +71,12 @@ public final class BotResponses {
         answers.add("Пропустить");
         return answers;
     }
+
+    public static String startTestButton() {
+        return "Начать тестирование\uD83C\uDFC1";
+    }
+
+    public static String sharePhoneButton() {
+        return "Поделиться номером";
+    }
 }

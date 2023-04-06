@@ -1,11 +1,10 @@
 package by.ciao.EnglishSchoolBot.states;
 
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
-import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import by.ciao.EnglishSchoolBot.user.User;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -33,10 +32,8 @@ public class SendQuestionState extends AbstractState implements UserHandlerState
     }
 
     private void sendQuestion(final User user) throws TelegramApiException {
-        var sm = SendMessage.builder()
-                .chatId(user.getChatId().toString())
-                .text(user.getTestState().getCurrentQuestion().getNumberOfQuestion() + ". "
-                        + user.getTestState().getCurrentQuestion().getQuestion()).build();
+        var sm = createMessage(user.getChatId(), user.getTestState().getCurrentQuestion().getNumberOfQuestion()
+                + ". " + user.getTestState().getCurrentQuestion().getQuestion());
 
         var markup = new InlineKeyboardMarkup();
 
@@ -67,17 +64,20 @@ public class SendQuestionState extends AbstractState implements UserHandlerState
         sm.setReplyMarkup(markup);
 
         if (user.getLastMessage() != null) {
-            var editMessageText = EditMessageText.builder()
-                    .chatId(user.getLastMessage().getChatId().toString())
-                    .messageId(user.getLastMessage().getMessageId())
-                    .text(user.getTestState().getCurrentQuestion().getNumberOfQuestion() + ". "
-                            + user.getTestState().getCurrentQuestion().getQuestion()).build();
-
+            var editMessageText = editMessageText(user);
             editMessageText.setReplyMarkup(markup);
 
-            getServiceCallback().execute(null, null, editMessageText);
+            getServiceCallback().execute(editMessageText);
         } else {
-            getServiceCallback().execute(sm, null, null).ifPresent(user::setLastMessage);
+            getServiceCallback().execute(sm).ifPresent(user::setLastMessage);
         }
+    }
+
+    private EditMessageText editMessageText(User user) {
+        return EditMessageText.builder()
+                .chatId(user.getLastMessage().getChatId().toString())
+                .messageId(user.getLastMessage().getMessageId())
+                .text(user.getTestState().getCurrentQuestion().getNumberOfQuestion() + ". "
+                        + user.getTestState().getCurrentQuestion().getQuestion()).build();
     }
 }

@@ -5,6 +5,8 @@ import by.ciao.EnglishSchoolBot.user.User;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -12,13 +14,19 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.Optional;
 
 public class CiaoByBot extends TelegramLongPollingBot {
-    private final BotService service = new BotService((sm, dm, em) -> {
+    private final BotService service = new BotService((obj) -> {
         Optional<Message> msg = Optional.empty();
 
         try {
-            if (sm != null) { msg =  Optional.of(execute(sm)); }
-            else if (em != null) { execute(em); }
-            else if (dm != null) { execute(dm); }
+            if (obj instanceof SendMessage) {
+                msg = Optional.of(execute((SendMessage) obj));
+            } else if (obj instanceof DeleteMessage) {
+                execute((DeleteMessage) obj);
+            } else if (obj instanceof EditMessageText) {
+                execute((EditMessageText) obj);
+            } else {
+                throw new IllegalArgumentException("Object type is not supported");
+            }
         } catch (TelegramApiException e) {
             throw new TelegramApiException(e);
         }

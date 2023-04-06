@@ -41,7 +41,10 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
         removeMessage.setReplyMarkup(replyKeyboardRemove);
 
         getServiceCallback().execute(removeMessage);
+        setDelay();
+    }
 
+    private void setDelay() {
         try {
             Thread.sleep(500); // Delay for 0.5 seconds (500 milliseconds)
         } catch (InterruptedException e) {
@@ -51,6 +54,12 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
 
     private void sendOptionsForReferral(final User user) throws TelegramApiException {
         var sm = createMessage(user.getChatId(), BotResponses.askReferral());
+        sm.setReplyMarkup(createKeyboard());
+
+        getServiceCallback().execute(sm);
+    }
+
+    private InlineKeyboardMarkup createKeyboard() {
         var markup = new InlineKeyboardMarkup();
 
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
@@ -98,8 +107,7 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
         keyboard.add(row6);
 
         markup.setKeyboard(keyboard);
-        sm.setReplyMarkup(markup);
 
-        getServiceCallback().execute(sm);
+        return markup;
     }
 }

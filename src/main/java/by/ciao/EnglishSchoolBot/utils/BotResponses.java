@@ -80,6 +80,14 @@ public final class BotResponses {
         return "Поделиться номером";
     }
 
+    public static String questionAnsweringWarning() {
+        return "Отвечать можно только нажав кнопку с одним из вариантов ответа";
+    }
+
+    public static String noSuchCommand() {
+        return "Нет такой команды";
+    }
+
     public static StringBuilder userAnswers(User user) throws Exception {
         StringBuilder testWithAnswers = new StringBuilder();
 
@@ -88,7 +96,7 @@ public final class BotResponses {
 
             testWithAnswers.append(isAnswerCorrect(question, userAnswer)).append(question.getNumberOfQuestion())
                     .append(". ").append(question.getQuestion())
-                    .append("\n(Правильный ответ: <b>").append(question.getCorrectAnswer()).append("</b>)\n")
+                    .append("\n(Правильный ответ: <b>").append(question.getCorrectAnswer()).append("<b>)\n")
                     .append(getAnswers(question, userAnswer)).append("\n\n");
         }
 

@@ -159,7 +159,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         if (textMsg.equals("/start")) {
             user.setState(StateEnum.START);
             user.clearTest();
-        } else if (user.getState() == null) {
+        } else if (user.getState() == StateEnum.NEW_USER) {
             sendText(user.getChatId(), BotResponses.noSuchCommand());
             return true;
         }

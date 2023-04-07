@@ -1,6 +1,7 @@
 package by.ciao.EnglishSchoolBot;
 
 import by.ciao.EnglishSchoolBot.bot.CiaoByBot;
+import by.ciao.EnglishSchoolBot.utils.AppBanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -12,6 +13,8 @@ public class Application {
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
     public static void main(String[] args) throws TelegramApiException {
+        AppBanner.printBanner();
+
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
         try {
             log.info("Registering bot...");

@@ -2,7 +2,7 @@ package by.ciao.EnglishSchoolBot.utils;
 
 import java.util.regex.Pattern;
 
-public class Regex {
+public final class Regex {
     public static boolean isCorrectPhoneFormat(final String phone) {
         String patterns
                 = "^(\\+?\\d{1,3}( )?)?((\\(\\d{3}\\))|\\d{3})[- .]?\\d{3}[- .]?\\d{4}$"

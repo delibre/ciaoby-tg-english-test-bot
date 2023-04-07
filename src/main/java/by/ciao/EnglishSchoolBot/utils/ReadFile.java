@@ -6,7 +6,7 @@ import by.ciao.EnglishSchoolBot.englishtest.Question;
 import java.io.InputStream;
 import java.util.LinkedList;
 
-public class ReadFile {
+public final class ReadFile {
 
     public static LinkedList<Question> readFile() throws Exception {
         InputStream inputStream = ReadFile.class.getResourceAsStream("/questions30.ods");

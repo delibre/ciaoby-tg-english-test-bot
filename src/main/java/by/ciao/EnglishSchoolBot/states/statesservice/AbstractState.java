@@ -3,12 +3,15 @@ package by.ciao.EnglishSchoolBot.states.statesservice;
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
 import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.utils.BotResponses;
+import by.ciao.EnglishSchoolBot.utils.ExceptionLogger;
 import by.ciao.EnglishSchoolBot.utils.KeyboardCreator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.util.logging.Level;
 
 @AllArgsConstructor
 @Getter
@@ -39,7 +42,7 @@ public abstract class AbstractState {
         try {
             Thread.sleep(millis); // Delay for 0.5 seconds (500 milliseconds)
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            ExceptionLogger.logException(Level.SEVERE, e.toString(), e);
         }
     }
 }

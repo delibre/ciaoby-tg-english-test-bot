@@ -5,18 +5,22 @@ import by.ciao.EnglishSchoolBot.states.*;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
 import by.ciao.EnglishSchoolBot.user.User;
+import lombok.Getter;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public class BotService {
-    private final Map<Long, User> registeredUsers = new HashMap<>();
+
+    private final Map<Long, User> registeredUsers;
     private final ServiceCallback serviceCallback;
 
     BotService(final ServiceCallback serviceCallback) {
         this.serviceCallback = serviceCallback;
+        this.registeredUsers = new HashMap<>();
     }
 
     boolean msgHasText(Update update) {

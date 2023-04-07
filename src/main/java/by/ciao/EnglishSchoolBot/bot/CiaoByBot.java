@@ -2,7 +2,9 @@ package by.ciao.EnglishSchoolBot.bot;
 
 import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.user.User;
+import by.ciao.EnglishSchoolBot.utils.BotResponses;
 import by.ciao.EnglishSchoolBot.utils.ExceptionLogger;
+import by.ciao.EnglishSchoolBot.utils.ExceptionMessages;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -27,10 +29,10 @@ public class CiaoByBot extends TelegramLongPollingBot {
             } else if (obj instanceof EditMessageText) {
                 execute((EditMessageText) obj);
             } else {
-                ExceptionLogger.logException(Level.SEVERE, "Initializing of BotService class in CiaByBot class: Object type is not supported", new IllegalArgumentException());
+                ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.argumentExceptionInServiceVar(), new IllegalArgumentException());
             }
         } catch (TelegramApiException e) {
-            ExceptionLogger.logException(Level.SEVERE, e.toString(), e);
+            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.tgApiExceptionInServiceVar(), e);
         }
 
         return msg;
@@ -108,15 +110,15 @@ public class CiaoByBot extends TelegramLongPollingBot {
                 service.infoSentHandler(user);
                 break;
             default:
-                ExceptionLogger.logException(Level.SEVERE, "processMessage() IIllegalStateException", new IllegalStateException());
+                ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.processMessageException(), new IllegalStateException());
         }
     }
 
     private void sendWarning(Long id) {
         try {
-            sendText(service.getRegisteredUsers().get(id).getChatId(), "Отвечать можно только нажав кнопку с одним из вариантов ответа");
+            sendText(service.getRegisteredUsers().get(id).getChatId(), BotResponses.questionAnsweringWarning());
         } catch (TelegramApiException e) {
-            ExceptionLogger.logException(Level.SEVERE, e.toString(), e);
+            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.sendWarningException(), e);
         }
     }
 
@@ -124,7 +126,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         try {
             service.addUserIfAbsent(id, msg);
         } catch (Exception e) {
-            ExceptionLogger.logException(Level.SEVERE, "addUserIfAbsent() method", new RuntimeException(e));
+            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.addUserIfAbsentException(), new RuntimeException(e));
         }
     }
 
@@ -132,7 +134,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         try {
             processMessage(textMsg, user);
         } catch (Exception e) {
-            ExceptionLogger.logException(Level.SEVERE, e.toString(), e);
+            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.messageProcessingException(), e);
         }
     }
 
@@ -140,7 +142,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         try {
             service.addPhone(update, id);
         } catch (Exception e) {
-            ExceptionLogger.logException(Level.SEVERE, e.toString(), e);
+            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.addPhoneException(), e);
         }
     }
 
@@ -149,7 +151,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
             execute(AnswerCallbackQuery.builder()
                     .callbackQueryId(id).build());
         } catch (TelegramApiException e) {
-            ExceptionLogger.logException(Level.SEVERE, e.toString(), e);
+            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.closeQueryException(), e);
         }
     }
 
@@ -158,7 +160,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
             user.setState(StateEnum.START);
             user.clearTest();
         } else if (user.getState() == null) {
-            sendText(user.getChatId(), "Нет такой команды");
+            sendText(user.getChatId(), BotResponses.noSuchCommand());
             return true;
         }
 
@@ -180,7 +182,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         try {
             execute(sm);
         } catch (TelegramApiException e) {
-            ExceptionLogger.logException(Level.SEVERE, e.toString(), e);
+            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.sendTextException(), e);
         }
     }
 }

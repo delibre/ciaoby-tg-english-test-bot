@@ -5,12 +5,19 @@ import by.ciao.EnglishSchoolBot.states.*;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
 import by.ciao.EnglishSchoolBot.user.User;
+import by.ciao.EnglishSchoolBot.utils.BotResponses;
+import by.ciao.EnglishSchoolBot.utils.ExceptionLogger;
+import by.ciao.EnglishSchoolBot.utils.ExceptionMessages;
 import lombok.Getter;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 @Getter
 public class BotService {
@@ -41,12 +48,68 @@ public class BotService {
                 registeredUsers.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.CHECK_ANSWER);
     }
 
-    void addUserIfAbsent(Long id, Message msg) throws Exception {
-        getRegisteredUsers().putIfAbsent(id, new User(id, msg.getFrom().getUserName()));
+    void sendWarning(Long id) {
+        try {
+            sendText(getRegisteredUsers().get(id).getChatId(), BotResponses.questionAnsweringWarning());
+        } catch (TelegramApiException e) {
+            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.sendWarningException(), e);
+        }
     }
 
-    void addPhone(Update update, Long id) throws Exception {
-        getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), getRegisteredUsers().get(id));
+    void addUserIfAbsent(Long id, Message msg) {
+        try {
+            getRegisteredUsers().putIfAbsent(id, new User(id, msg.getFrom().getUserName()));
+        } catch (Exception e) {
+            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.addUserIfAbsentException(), new RuntimeException(e));
+        }
+    }
+
+    void addPhone(Update update, Long id) {
+        try {
+            getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), getRegisteredUsers().get(id));
+        } catch (Exception e) {
+            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.addPhoneException(), e);
+        }
+    }
+
+    void closeQuery(String id) {
+        try {
+            serviceCallback.execute(AnswerCallbackQuery.builder()
+                    .callbackQueryId(id).build());
+        } catch (TelegramApiException e) {
+            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.closeQueryException(), e);
+        }
+    }
+
+    boolean startBot(String textMsg, User user) throws Exception {
+        if (textMsg.equals("/start")) {
+            user.setState(StateEnum.START);
+            user.clearTest();
+        } else if (user.getState() == StateEnum.NEW_USER) {
+            sendText(user.getChatId(), BotResponses.noSuchCommand());
+            return true;
+        }
+
+        return false;
+    }
+
+    void startTest(String textMsg, User user) throws Exception {
+        if (textMsg.equals("Начать тестирование\uD83C\uDFC1") && user.isUserDataCollected()) {
+            user.setState(StateEnum.SEND_QUESTION);
+            user.clearTest();
+        }
+    }
+
+    private void sendText(final Long id, final String textMsg) throws TelegramApiException {
+        var sm = SendMessage.builder()
+                .chatId(id.toString())
+                .text(textMsg).build();
+
+        try {
+            serviceCallback.execute(sm);
+        } catch (TelegramApiException e) {
+            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.sendTextException(), e);
+        }
     }
 
     void startHandler(final User user) throws Exception {

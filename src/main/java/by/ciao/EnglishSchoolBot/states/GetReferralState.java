@@ -22,7 +22,7 @@ public class GetReferralState extends AbstractState implements UserMessageHandle
         getServiceCallback().execute(editMessage(user, null, BotResponses.askReferral() + textMsg));
         user.setLastMessage(new Message());  // made for future question edition
 
-        setDelay(1000);  // Made to humanise bot's responses, so it is not sending lots of messages in one second.
+        setDelay(500);  // Made to humanise bot's responses, so it is not sending lots of messages in one second.
         sendStartButton(user);
     }
 }

@@ -7,8 +7,6 @@ import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
 import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.utils.BotResponses;
 import by.ciao.EnglishSchoolBot.utils.KeyboardCreator;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class SendQuestionState extends AbstractState implements UserHandlerState {
@@ -41,20 +39,9 @@ public class SendQuestionState extends AbstractState implements UserHandlerState
         sm.setReplyMarkup(markup);
 
         if (user.getLastMessage() != null) {
-            getServiceCallback().execute(editMessage(user, markup));
+            getServiceCallback().execute(editMessage(user, markup, BotResponses.getQuestion(user)));
         } else {
             getServiceCallback().execute(sm).ifPresent(user::setLastMessage);
         }
-    }
-
-    private EditMessageText editMessage(User user, InlineKeyboardMarkup markup) {
-        var editMessageText = EditMessageText.builder()
-                .chatId(user.getLastMessage().getChatId().toString())
-                .messageId(user.getLastMessage().getMessageId())
-                .text(user.getTestState().getCurrentQuestion().getNumberOfQuestion() + ". "
-                        + user.getTestState().getCurrentQuestion().getQuestion()).build();
-        editMessageText.setReplyMarkup(markup);
-
-        return editMessageText;
     }
 }

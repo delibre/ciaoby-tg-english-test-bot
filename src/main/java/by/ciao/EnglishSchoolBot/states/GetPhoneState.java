@@ -45,6 +45,6 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
         var sm = createMessage(user.getChatId(), BotResponses.askReferral());
         sm.setReplyMarkup(KeyboardCreator.createInlineKeyboard(BotResponses.referralOptions()));
 
-        getServiceCallback().execute(sm);
+        getServiceCallback().execute(sm).ifPresent(user::setLastMessage);
     }
 }

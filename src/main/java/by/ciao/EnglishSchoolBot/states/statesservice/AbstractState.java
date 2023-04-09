@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.logging.Level;
@@ -41,9 +43,19 @@ public abstract class AbstractState {
     // Made to humanise bot's responses, so it is not sending lots of messages in one second.
     protected void setDelay(int millis) {
         try {
-            Thread.sleep(millis); // Delay for 0.5 seconds (500 milliseconds)
+            Thread.sleep(millis);
         } catch (InterruptedException e) {
             ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.setDelayException(), e);
         }
+    }
+
+    protected EditMessageText editMessage(User user, InlineKeyboardMarkup markup, String text) {
+        var editMessageText = EditMessageText.builder()
+                .chatId(user.getChatId().toString())
+                .messageId(user.getLastMessage().getMessageId())
+                .text(text).build();
+        editMessageText.setReplyMarkup(markup);
+
+        return editMessageText;
     }
 }

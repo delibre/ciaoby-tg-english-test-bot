@@ -35,8 +35,10 @@ public class BotService {
         return update.hasMessage() && update.getMessage().getContact() != null;
     }
 
-    boolean hasCallback(Update update) {
-        return update.hasCallbackQuery() && getRegisteredUsers().containsKey(update.getCallbackQuery().getFrom().getId());
+    boolean hasCallbackAndCorrectState(Update update) {
+        return update.hasCallbackQuery() && getRegisteredUsers().containsKey(update.getCallbackQuery().getFrom().getId())
+                && (registeredUsers.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.GET_REFERRAL ||
+                registeredUsers.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.CHECK_ANSWER);
     }
 
     void addUserIfAbsent(Long id, Message msg) throws Exception {

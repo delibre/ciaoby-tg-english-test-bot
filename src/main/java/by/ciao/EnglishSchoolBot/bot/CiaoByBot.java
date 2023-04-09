@@ -9,6 +9,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -28,6 +29,8 @@ public class CiaoByBot extends TelegramLongPollingBot {
                 execute((DeleteMessage) obj);
             } else if (obj instanceof EditMessageText) {
                 execute((EditMessageText) obj);
+            } else if (obj instanceof EditMessageReplyMarkup) {
+                execute((EditMessageReplyMarkup) obj);
             } else {
                 ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.argumentExceptionInServiceVar(), new IllegalArgumentException());
             }
@@ -56,7 +59,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
             var id = update.getMessage().getChatId();
             addPhone(update, id);
 
-        } else if (service.hasCallback(update)) {
+        } else if (service.hasCallbackAndCorrectState(update)) {
             var qry = update.getCallbackQuery();
 
             messageProcessing(qry.getData(), service.getRegisteredUsers().get(qry.getFrom().getId()));

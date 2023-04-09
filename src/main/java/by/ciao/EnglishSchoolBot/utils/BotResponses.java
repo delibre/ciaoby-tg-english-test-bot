@@ -48,7 +48,7 @@ public final class BotResponses {
 
     public static String askReferral() {
         return "Откуда вы о нас узнали?\n" +
-                "Выберете один из вариантов ниже или же впишите свой";
+                "Выберете один из вариантов ниже или же впишите свой\n\n";
     }
 
     public static String askForPhone() {
@@ -62,6 +62,11 @@ public final class BotResponses {
         return "Ну что же, приступим к тесту. Сейчас Вам нужно будет ответить на 30 вопросов.\uD83E\uDDD0 " +
                 "Ограничений по времени нет.\n\n" +
                 "Нажмите кнопку \"Начать тестирование\", когда будете готовы.";
+    }
+
+    public static String getQuestion(User user) {
+        return user.getTestState().getCurrentQuestion().getNumberOfQuestion() + ". "
+                + user.getTestState().getCurrentQuestion().getQuestion();
     }
 
     public static List<String> referralOptions() {

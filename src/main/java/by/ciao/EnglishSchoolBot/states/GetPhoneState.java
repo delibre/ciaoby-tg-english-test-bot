@@ -20,7 +20,7 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
     @Override
     public void apply(final String textMsg, final User user) throws TelegramApiException {
         if (!Regex.isCorrectPhoneFormat(textMsg)) {
-            sendText(user.getChatId(), BotResponses.phoneForamtWarning());
+            sendText(user.getChatId(), BotResponses.phoneFormatWarning());
             return;
         }
 

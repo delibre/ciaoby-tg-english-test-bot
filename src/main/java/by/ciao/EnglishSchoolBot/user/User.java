@@ -30,4 +30,8 @@ public class User {
         testState = new UsersTestState();
         lastMessage = null;
     }
+
+    public boolean isUserDataCollected() {
+        return fullName != null && phone != null && referral != null;
+    }
 }

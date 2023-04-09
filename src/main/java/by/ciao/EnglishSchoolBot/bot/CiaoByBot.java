@@ -171,7 +171,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
     }
 
     private void startTest(String textMsg, User user) throws Exception {
-        if (textMsg.equals("Начать тестирование\uD83C\uDFC1")) {
+        if (textMsg.equals("Начать тестирование\uD83C\uDFC1") && user.isUserDataCollected()) {
             user.setState(StateEnum.SEND_QUESTION);
             user.clearTest();
         }

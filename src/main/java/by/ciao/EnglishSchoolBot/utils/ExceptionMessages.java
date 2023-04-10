@@ -17,10 +17,6 @@ public final class ExceptionMessages {
         return "addUserIfAbsent() method in CiaoByBot class\n";
     }
 
-    public static String sendWarningException() {
-        return "sendWarning() method in CiaoByBot class\n";
-    }
-
     public static String messageProcessingException() {
         return "messageProcessing() method in CiaoByBot class\n";
     }
@@ -38,6 +34,6 @@ public final class ExceptionMessages {
     }
 
     public static String sendTextException() {
-        return "sendText() method in CiaoByBot class\n";
+        return "sendText() method in BotService class\n";
     }
 }

@@ -89,10 +89,9 @@ public class BotService {
         return false;
     }
 
-    void startTest(String textMsg, User user) throws Exception {
+    void startTest(String textMsg, User user) {
         if (textMsg.equals("Начать тестирование\uD83C\uDFC1") && user.isUserDataCollected()) {
-            user.setState(StateEnum.SEND_QUESTION);
-            user.clearTest();
+            user.setState(StateEnum.START_TEST);
         }
     }
 

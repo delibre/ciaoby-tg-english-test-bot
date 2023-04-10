@@ -20,9 +20,6 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
         deleteLastMessage(user);
 
         sendText(user.getChatId(), BotResponses.userAnswers(user).toString());
-        setDelay(1000); // Made to humanise bot's responses, so it is not sending lots of messages in one second.
-        sendText(user.getChatId(), BotResponses.testFinished(user));
-
         sendDataToAdmin(user);
     }
 

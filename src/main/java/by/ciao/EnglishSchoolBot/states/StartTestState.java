@@ -21,6 +21,7 @@ public class StartTestState extends AbstractState implements UserMessageHandlerS
         if (Objects.equals(textMsg, BotResponses.startTestButton())) {
             user.setState(StateEnum.SEND_QUESTION);
             user.clearTest();
+            setTimer(user);
             user.getTestState().setStartTime(LocalTime.now());
 
             UserHandlerState state = new SendQuestionState(getServiceCallback());

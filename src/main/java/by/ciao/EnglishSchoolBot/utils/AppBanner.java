@@ -17,7 +17,7 @@ public final class AppBanner {
                 System.out.println(line);
             }
         } catch (IOException e) {
-            ExceptionLogger.logException(Level.SEVERE, "Exception in printBanner() method, AppBanner class", e);
+            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.printBannerException(), e);
         }
     }
 }

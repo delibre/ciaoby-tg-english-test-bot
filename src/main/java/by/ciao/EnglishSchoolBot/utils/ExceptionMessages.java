@@ -36,4 +36,12 @@ public final class ExceptionMessages {
     public static String sendTextException() {
         return "sendText() method in BotService class\n";
     }
+
+    public static String setTimerException() {
+        return "setTimer() in AbstractState class\n";
+    }
+
+    public static String printBannerException(){
+        return "Exception in printBanner() method, AppBanner class";
+    }
 }

@@ -93,6 +93,10 @@ public final class BotResponses {
         return "Нет такой команды";
     }
 
+    public static String notificationReceivedBy(int counter) {
+        return "Уведомление получили " + counter + "пользователей";
+    }
+
     public static StringBuilder userAnswers(User user) throws Exception {
         StringBuilder testWithAnswers = new StringBuilder();
 

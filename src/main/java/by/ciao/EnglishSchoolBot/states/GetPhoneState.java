@@ -38,7 +38,7 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
 
         getServiceCallback().execute(removeMessage);
 
-        setDelay(500); // Made to humanise bot's responses, so it is not sending lots of messages in one second.
+        setDelay(); // Made to humanise bot's responses, so it is not sending lots of messages in one second.
     }
 
     private void sendOptionsForReferral(final User user) throws TelegramApiException {

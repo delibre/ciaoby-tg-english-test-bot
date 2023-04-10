@@ -59,8 +59,7 @@ public final class BotResponses {
     }
 
     public static String startTest() {
-        return "Ну что же, приступим к тесту. Сейчас Вам нужно будет ответить на 30 вопросов.\uD83E\uDDD0 " +
-                "Ограничений по времени нет.\n\n" +
+        return "Ну что же, приступим к тесту. Сейчас Вам нужно будет ответить на 30 вопросов за Х минут.\uD83E\uDDD0\n\n" +
                 "Нажмите кнопку \"Начать тестирование\", когда будете готовы.";
     }
 
@@ -112,6 +111,8 @@ public final class BotResponses {
                     .append("\n(Правильный ответ: <b>").append(question.getCorrectAnswer()).append("</b>)\n")
                     .append(getAnswers(question, userAnswer)).append("\n\n");
         }
+
+        testWithAnswers.append(testFinished(user));
 
         return testWithAnswers;
     }

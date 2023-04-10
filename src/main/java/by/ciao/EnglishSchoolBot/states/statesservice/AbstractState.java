@@ -16,6 +16,7 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.TimerTask;
 import java.util.logging.Level;
 
 @AllArgsConstructor
@@ -43,9 +44,9 @@ public abstract class AbstractState {
     }
 
     // Made to humanise bot's responses, so it is not sending lots of messages in one second.
-    protected void setDelay(int millis) {
+    protected void setDelay() {
         try {
-            Thread.sleep(millis);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.setDelayException(), e);
         }
@@ -63,11 +64,37 @@ public abstract class AbstractState {
 
     protected boolean testFinished(User user) throws Exception {
         if (user.getTestState().isFinished() || user.getTestState().isTimeOver()) {
-            user.setState(StateEnum.TEST_FINISHED);
-            UserHandlerState state = new TestFinishedState(getServiceCallback());
-            state.apply(user);
+            isTimeOver(user);
+            changeStateToTestFinished(user);
             return true;
         }
         return false;
+    }
+
+    private void changeStateToTestFinished(User user) throws Exception {
+        user.setState(StateEnum.TEST_FINISHED);
+        UserHandlerState state = new TestFinishedState(getServiceCallback());
+        state.apply(user);
+    }
+
+    private void isTimeOver(User user) {
+        if (!user.getTestState().isTimeOver()) {
+            user.getTestState().getTimer().cancel();
+        }
+    }
+
+    protected void setTimer(User user) {
+        TimerTask task = new TimerTask() {
+            public void run() {
+                try {
+                    sendText(user.getChatId(), "Время вышло. Результаты вашего теста ниже");
+                    changeStateToTestFinished(user);
+                } catch (Exception e) {
+                    ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.setTimerException(), e);
+                }
+                user.getTestState().getTimer().cancel();
+            }
+        };
+        user.getTestState().getTimer().schedule(task, 10 * 1000);
     }
 }

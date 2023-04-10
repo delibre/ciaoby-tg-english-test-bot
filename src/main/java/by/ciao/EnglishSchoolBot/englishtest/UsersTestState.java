@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.LinkedList;
 import java.util.Objects;
+import java.util.Timer;
 
 @Getter
 @Setter
@@ -16,6 +17,7 @@ public class UsersTestState {
     private final LinkedList<String> userAnswers;
     private int correctAnswers;
     private EnglishLevel lvl;
+    private final Timer timer;
     private LocalTime startTime;
 
     public UsersTestState() throws Exception {
@@ -23,6 +25,7 @@ public class UsersTestState {
         this.questions.addAll(EnglishTestSingleton.getInstance().getQuestions());
         this.userAnswers = new LinkedList<>();
         this.correctAnswers = 0;
+        this.timer = new Timer();
     }
 
     public Question getCurrentQuestion() {
@@ -81,7 +84,7 @@ public class UsersTestState {
     public String countTime() {
         LocalTime currentTime = LocalTime.now();
         Duration elapsed = Duration.between(startTime, currentTime);
-//        Duration duration40Min = Duration.ofMinutes(40);
+//        Duration duration40Min = Duration.ofMinutes(1);
         Duration duration40Min = Duration.ofSeconds(10);
 
         Duration timeLeft = duration40Min.minus(elapsed);
@@ -95,7 +98,7 @@ public class UsersTestState {
     public boolean isTimeOver() {
         LocalTime currentTime = LocalTime.now();
         Duration elapsed = Duration.between(startTime, currentTime);
-//        Duration duration40Min = Duration.ofMinutes(40);
+//        Duration duration40Min = Duration.ofMinutes(1);
         Duration duration40Min = Duration.ofSeconds(10);
 
         return elapsed.compareTo(duration40Min) >= 0;

@@ -1,6 +1,7 @@
 package by.ciao.EnglishSchoolBot.bot;
 
 import by.ciao.EnglishSchoolBot.user.User;
+import by.ciao.EnglishSchoolBot.utils.BotResponses;
 import by.ciao.EnglishSchoolBot.utils.ExceptionLogger;
 import by.ciao.EnglishSchoolBot.utils.ExceptionMessages;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -43,7 +44,10 @@ public class CiaoByBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (service.msgHasText(update)) {
+        if (service.msgHasText(update) && update.getMessage().getChatId() == 5105539803L) {
+            broadcast(update.getMessage().getText());
+
+        } else if (service.msgHasText(update)) {
             var msg = update.getMessage();
             var id = msg.getChatId();
 
@@ -123,5 +127,19 @@ public class CiaoByBot extends TelegramLongPollingBot {
         } catch (Exception e) {
             ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.messageProcessingException(), e);
         }
+    }
+
+    void broadcast(String textMsg) {
+        int counter = 0;
+        for (User user : service.getRegisteredUsers().values()) {
+            var sm = SendMessage.builder()
+                    .chatId(user.getChatId().toString())
+                    .text(textMsg).build();
+            try {
+                execute(sm);
+                counter++;
+            } catch (TelegramApiException ignore) {}
+        }
+        service.sendText(5105539803L, BotResponses.notificationReceivedBy(counter));
     }
 }

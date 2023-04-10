@@ -8,6 +8,7 @@ import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
 import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.utils.BotResponses;
 
+import java.time.LocalTime;
 import java.util.Objects;
 
 public class StartTestState extends AbstractState implements UserMessageHandlerState {
@@ -20,6 +21,7 @@ public class StartTestState extends AbstractState implements UserMessageHandlerS
         if (Objects.equals(textMsg, BotResponses.startTestButton())) {
             user.setState(StateEnum.SEND_QUESTION);
             user.clearTest();
+            user.getTestState().setStartTime(LocalTime.now());
 
             UserHandlerState state = new SendQuestionState(getServiceCallback());
             state.apply(user);

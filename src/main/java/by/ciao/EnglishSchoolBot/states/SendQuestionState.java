@@ -21,19 +21,8 @@ public class SendQuestionState extends AbstractState implements UserHandlerState
         user.setState(StateEnum.CHECK_ANSWER);
     }
 
-    private boolean testFinished(User user) throws Exception {
-        if (user.getTestState().isFinished()) {
-            user.setState(StateEnum.TEST_FINISHED);
-            UserHandlerState state = new TestFinishedState(getServiceCallback());
-            state.apply(user);
-            return true;
-        }
-        return false;
-    }
-
     private void sendQuestion(final User user) throws TelegramApiException {
-        var sm = createMessage(user.getChatId(), user.getTestState().getCurrentQuestion().getNumberOfQuestion()
-                + ". " + user.getTestState().getCurrentQuestion().getQuestion());
+        var sm = createMessage(user.getChatId(), BotResponses.getQuestion(user));
 
         var markup = KeyboardCreator.createInlineKeyboard(BotResponses.optionsForAnswers(user));
         sm.setReplyMarkup(markup);

@@ -1,6 +1,8 @@
 package by.ciao.EnglishSchoolBot.states.statesservice;
 
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
+import by.ciao.EnglishSchoolBot.enums.StateEnum;
+import by.ciao.EnglishSchoolBot.states.TestFinishedState;
 import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.utils.BotResponses;
 import by.ciao.EnglishSchoolBot.utils.ExceptionLogger;
@@ -57,5 +59,15 @@ public abstract class AbstractState {
         editMessageText.setReplyMarkup(markup);
 
         return editMessageText;
+    }
+
+    protected boolean testFinished(User user) throws Exception {
+        if (user.getTestState().isFinished() || user.getTestState().isTimeOver()) {
+            user.setState(StateEnum.TEST_FINISHED);
+            UserHandlerState state = new TestFinishedState(getServiceCallback());
+            state.apply(user);
+            return true;
+        }
+        return false;
     }
 }

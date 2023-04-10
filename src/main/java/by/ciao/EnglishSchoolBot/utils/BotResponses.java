@@ -65,7 +65,8 @@ public final class BotResponses {
     }
 
     public static String getQuestion(User user) {
-        return user.getTestState().getCurrentQuestion().getNumberOfQuestion() + ". "
+        return "Времени осталось: " + user.getTestState().countTime() + "\n\n" +
+                user.getTestState().getCurrentQuestion().getNumberOfQuestion() + ". "
                 + user.getTestState().getCurrentQuestion().getQuestion();
     }
 
@@ -102,6 +103,9 @@ public final class BotResponses {
 
         for (Question question : EnglishTestSingleton.getInstance().getQuestions()) {
             String userAnswer = user.getTestState().getUserAnswer();
+            if (userAnswer == null) {
+                break;
+            }
 
             testWithAnswers.append(isAnswerCorrect(question, userAnswer)).append(question.getNumberOfQuestion())
                     .append(". ").append(question.getQuestion())

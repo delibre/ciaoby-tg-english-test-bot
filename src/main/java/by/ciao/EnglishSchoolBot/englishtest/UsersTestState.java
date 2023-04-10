@@ -1,19 +1,22 @@
 package by.ciao.EnglishSchoolBot.englishtest;
 
 import by.ciao.EnglishSchoolBot.enums.EnglishLevel;
-import by.ciao.EnglishSchoolBot.utils.ExceptionLogger;
 import lombok.Getter;
+import lombok.Setter;
 
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.LinkedList;
 import java.util.Objects;
-import java.util.logging.Level;
 
 @Getter
+@Setter
 public class UsersTestState {
     private final LinkedList<Question> questions;
     private final LinkedList<String> userAnswers;
     private int correctAnswers;
     private EnglishLevel lvl;
+    private LocalTime startTime;
 
     public UsersTestState() throws Exception {
         this.questions = new LinkedList<>();
@@ -39,16 +42,15 @@ public class UsersTestState {
     }
 
     public String getUserAnswer() {
+        if (userAnswers.isEmpty()) {
+            return null;
+        }
         String userAnswer = userAnswers.getFirst();
         userAnswers.removeFirst();
         return userAnswer;
     }
 
     public EnglishLevel getResult() {
-        if (!isFinished()) {
-            ExceptionLogger.logException(Level.SEVERE, "User doesn't finished the test yet", new IllegalStateException());
-        }
-
         if (lvl != null) { return lvl; }
 
         if (correctAnswers > 28) {
@@ -74,5 +76,28 @@ public class UsersTestState {
 
         lvl = EnglishLevel.A0;
         return lvl;
+    }
+
+    public String countTime() {
+        LocalTime currentTime = LocalTime.now();
+        Duration elapsed = Duration.between(startTime, currentTime);
+//        Duration duration40Min = Duration.ofMinutes(40);
+        Duration duration40Min = Duration.ofSeconds(10);
+
+        Duration timeLeft = duration40Min.minus(elapsed);
+
+        long MM = timeLeft.toMinutesPart();
+        long SS = timeLeft.toSecondsPart();
+
+        return String.format("%02d:%02d", MM, SS);
+    }
+
+    public boolean isTimeOver() {
+        LocalTime currentTime = LocalTime.now();
+        Duration elapsed = Duration.between(startTime, currentTime);
+//        Duration duration40Min = Duration.ofMinutes(40);
+        Duration duration40Min = Duration.ofSeconds(10);
+
+        return elapsed.compareTo(duration40Min) >= 0;
     }
 }

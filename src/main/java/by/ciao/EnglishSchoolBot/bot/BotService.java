@@ -49,11 +49,7 @@ public class BotService {
     }
 
     void sendWarning(Long id) {
-        try {
-            sendText(getRegisteredUsers().get(id).getChatId(), BotResponses.questionAnsweringWarning());
-        } catch (TelegramApiException e) {
-            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.sendWarningException(), e);
-        }
+        sendText(getRegisteredUsers().get(id).getChatId(), BotResponses.questionAnsweringWarning());
     }
 
     void addUserIfAbsent(Long id, Message msg) {
@@ -100,7 +96,7 @@ public class BotService {
         }
     }
 
-    private void sendText(final Long id, final String textMsg) throws TelegramApiException {
+    void sendText(final Long id, final String textMsg) {
         var sm = SendMessage.builder()
                 .chatId(id.toString())
                 .text(textMsg).build();

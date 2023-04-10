@@ -129,7 +129,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         }
     }
 
-    void broadcast(String textMsg) {
+    private void broadcast(String textMsg) {
         int counter = 0;
         for (User user : service.getRegisteredUsers().values()) {
             var sm = SendMessage.builder()

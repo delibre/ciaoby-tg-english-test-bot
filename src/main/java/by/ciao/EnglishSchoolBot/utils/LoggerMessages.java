@@ -37,7 +37,7 @@ public final class LoggerMessages {
         return "sendText() method in BotService class\n";
     }
 
-    public static String unexpectedCase(){
-        return "Unexpected case in onUpdateReceived() method in CiaoByBot class";
+    public static String unexpectedCase(String update){
+        return "Unexpected case in onUpdateReceived() method in CiaoByBot class\n" + update + "\n";
     }
 }

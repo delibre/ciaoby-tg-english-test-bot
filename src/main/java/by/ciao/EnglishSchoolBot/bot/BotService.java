@@ -6,8 +6,8 @@ import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
 import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.utils.BotResponses;
-import by.ciao.EnglishSchoolBot.utils.ExceptionLogger;
-import by.ciao.EnglishSchoolBot.utils.ExceptionMessages;
+import by.ciao.EnglishSchoolBot.utils.LoggerMessages;
+import by.ciao.EnglishSchoolBot.utils.LoggerService;
 import lombok.Getter;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -43,28 +43,28 @@ public class BotService {
     }
 
     boolean hasCallbackAndCorrectState(final Update update) {
-        return update.hasCallbackQuery() && getRegisteredUsers().containsKey(update.getCallbackQuery().getFrom().getId())
+        return update.hasCallbackQuery() && getRegisteredUsersMap().containsKey(update.getCallbackQuery().getFrom().getId())
                 && (registeredUsersMap.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.GET_REFERRAL ||
                 registeredUsersMap.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.CHECK_ANSWER);
     }
 
     void sendWarning(Long id) {
-        sendText(getRegisteredUsers().get(id).getChatId(), BotResponses.questionAnsweringWarning());
+        sendText(getRegisteredUsersMap().get(id).getChatId(), BotResponses.questionAnsweringWarning());
     }
 
     void addUserIfAbsent(final Long id, final Message msg) {
         try {
-            getRegisteredUsers().putIfAbsent(id, new User(id, msg.getFrom().getUserName()));
+            getRegisteredUsersMap().putIfAbsent(id, new User(id, msg.getFrom().getUserName()));
         } catch (Exception e) {
-            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.addUserIfAbsentException(), new RuntimeException(e));
+            LoggerService.logInfo(Level.SEVERE, LoggerMessages.addUserIfAbsentException(), new RuntimeException(e));
         }
     }
 
     void addPhone(final Update update, final Long id) {
         try {
-            getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), getRegisteredUsers().get(id));
+            getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), getRegisteredUsersMap().get(id));
         } catch (Exception e) {
-            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.addPhoneException(), e);
+            LoggerService.logInfo(Level.SEVERE, LoggerMessages.addPhoneException(), e);
         }
     }
 
@@ -73,7 +73,7 @@ public class BotService {
             serviceCallback.execute(AnswerCallbackQuery.builder()
                     .callbackQueryId(id).build());
         } catch (TelegramApiException e) {
-            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.closeQueryException(), e);
+            LoggerService.logInfo(Level.SEVERE, LoggerMessages.closeQueryException(), e);
         }
     }
 
@@ -89,7 +89,7 @@ public class BotService {
         return false;
     }
 
-    void startTest(final String textMsg, final User user) throws Exception {
+    void startTestIfStartButtonIsPressed(final String textMsg, final User user) throws Exception {
         if (textMsg.equals("Начать тестирование\uD83C\uDFC1") && user.isUserDataCollected()) {
             user.setState(StateEnum.SEND_QUESTION);
             user.clearTest();
@@ -104,7 +104,7 @@ public class BotService {
         try {
             serviceCallback.execute(sm);
         } catch (TelegramApiException e) {
-            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.sendTextException(), e);
+            LoggerService.logInfo(Level.SEVERE, LoggerMessages.sendTextException(), e);
         }
     }
 

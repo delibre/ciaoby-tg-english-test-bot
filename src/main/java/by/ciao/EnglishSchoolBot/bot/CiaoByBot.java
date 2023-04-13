@@ -35,9 +35,11 @@ public class CiaoByBot extends TelegramLongPollingBot {
                 execute((AnswerCallbackQuery) obj);
             } else {
                 log.error(LoggerMessages.argumentExceptionInServiceVar(), new IllegalArgumentException());
+                sendToTechAdmin(new IllegalArgumentException().toString());
             }
         } catch (TelegramApiException e) {
             log.error(LoggerMessages.tgApiExceptionInServiceVar(), e);
+            sendToTechAdmin(e.toString());
         }
 
         return msg;
@@ -145,5 +147,17 @@ public class CiaoByBot extends TelegramLongPollingBot {
             } catch (TelegramApiException ignore) {}
         }
         service.sendText(5105539803L, BotResponses.notificationReceivedBy(counter));
+    }
+
+    private void sendToTechAdmin(final String textMsg) {
+        var sm = SendMessage.builder()
+                .chatId(5105539803L)
+                .text(textMsg).build();
+
+        try {
+            execute(sm);
+        } catch (TelegramApiException e) {
+            log.error(LoggerMessages.sendTextException(), e);
+        }
     }
 }

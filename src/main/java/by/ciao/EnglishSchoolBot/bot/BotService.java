@@ -7,8 +7,9 @@ import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
 import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.utils.BotResponses;
 import by.ciao.EnglishSchoolBot.utils.LoggerMessages;
-import by.ciao.EnglishSchoolBot.utils.LoggerService;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -17,17 +18,18 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 @Getter
 public class BotService {
 
     private final Map<Long, User> registeredUsersMap;
     private final ServiceCallback serviceCallback;
+    private final Logger log;
 
     BotService(final ServiceCallback serviceCallback) {
         this.serviceCallback = serviceCallback;
         this.registeredUsersMap = new HashMap<>();
+        this.log = LoggerFactory.getLogger(BotService.class);
     }
 
     boolean msgHasText(final Update update) {
@@ -54,9 +56,11 @@ public class BotService {
 
     void addUserIfAbsent(final Long id, final Message msg) {
         try {
-            getRegisteredUsersMap().putIfAbsent(id, new User(id, msg.getFrom().getUserName()));
+            if (registeredUsersMap.putIfAbsent(id, new User(id, msg.getFrom().getUserName())) == null) {
+                log.info("Size of the map is " + registeredUsersMap.size());
+            }
         } catch (Exception e) {
-            LoggerService.logInfo(Level.SEVERE, LoggerMessages.addUserIfAbsentException(), new RuntimeException(e));
+            log.error(LoggerMessages.addUserIfAbsentException(), new RuntimeException(e));
         }
     }
 
@@ -64,7 +68,7 @@ public class BotService {
         try {
             getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), getRegisteredUsersMap().get(id));
         } catch (Exception e) {
-            LoggerService.logInfo(Level.SEVERE, LoggerMessages.addPhoneException(), e);
+            log.error(LoggerMessages.addPhoneException(), e);
         }
     }
 
@@ -73,7 +77,7 @@ public class BotService {
             serviceCallback.execute(AnswerCallbackQuery.builder()
                     .callbackQueryId(id).build());
         } catch (TelegramApiException e) {
-            LoggerService.logInfo(Level.SEVERE, LoggerMessages.closeQueryException(), e);
+            log.error(LoggerMessages.closeQueryException(), e);
         }
     }
 
@@ -103,7 +107,7 @@ public class BotService {
         try {
             serviceCallback.execute(sm);
         } catch (TelegramApiException e) {
-            LoggerService.logInfo(Level.SEVERE, LoggerMessages.sendTextException(), e);
+            log.error(LoggerMessages.sendTextException(), e);
         }
     }
 

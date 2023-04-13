@@ -46,7 +46,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
             }
 
             addUserIfAbsent(id, msg);
-            messageProcessing(msg.getText(), service.getRegisteredUsers().get(id));
+            catchMessageProcessingException(msg.getText(), service.getRegisteredUsersMap().get(id));
 
         }  else if (service.hasContact(update)) {
             var id = update.getMessage().getChatId();
@@ -54,8 +54,9 @@ public class CiaoByBot extends TelegramLongPollingBot {
 
         } else if (service.hasCallback(update)) {
             var qry = update.getCallbackQuery();
+            var user = service.getRegisteredUsersMap().get(qry.getFrom().getId());
 
-            messageProcessing(qry.getData(), service.getRegisteredUsers().get(qry.getFrom().getId()));
+            catchMessageProcessingException(qry.getData(), user);
             closeQuery(qry.getId());
         }
     }
@@ -75,7 +76,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
             return;
         }
 
-        startTest(textMsg, user);
+        startTestIfStartButtonIsPressed(textMsg, user);
 
         switch (user.getState()) {
             case SEND_QUESTION:
@@ -110,15 +111,15 @@ public class CiaoByBot extends TelegramLongPollingBot {
         }
     }
 
-    private void sendWarning(Long id) {
+    private void sendWarning(final Long id) {
         try {
-            sendText(service.getRegisteredUsers().get(id).getChatId(), "Отвечать можно только нажав кнопку с одним из вариантов ответа");
+            sendText(service.getRegisteredUsersMap().get(id).getChatId(), "Отвечать можно только нажав кнопку с одним из вариантов ответа");
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
     }
 
-    private void addUserIfAbsent(Long id, Message msg) {
+    private void addUserIfAbsent(final Long id, final Message msg) {
         try {
             service.addUserIfAbsent(id, msg);
         } catch (Exception e) {
@@ -126,7 +127,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         }
     }
 
-    private void messageProcessing(String textMsg, User user) {
+    private void catchMessageProcessingException(final String textMsg, final User user) {
         try {
             processMessage(textMsg, user);
         } catch (Exception e) {
@@ -134,7 +135,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         }
     }
 
-    private void addPhone(Update update, Long id) {
+    private void addPhone(final Update update, final Long id) {
         try {
             service.addPhone(update, id);
         } catch (Exception e) {
@@ -142,7 +143,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         }
     }
 
-    private void closeQuery(String id) {
+    private void closeQuery(final String id) {
         try {
             execute(AnswerCallbackQuery.builder()
                     .callbackQueryId(id).build());
@@ -151,7 +152,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         }
     }
 
-    private boolean startBot(String textMsg, User user) throws Exception {
+    private boolean startBot(final String textMsg, final User user) throws Exception {
         if (textMsg.equals("/start")) {
             user.setState(StateEnum.START);
             user.clearTest();
@@ -163,10 +164,10 @@ public class CiaoByBot extends TelegramLongPollingBot {
         return false;
     }
 
-    private void startTest(String textMsg, User user) throws Exception {
+    private void startTestIfStartButtonIsPressed(final String textMsg, final User user) throws Exception {
         if (textMsg.equals("Начать тестирование\uD83C\uDFC1")) {
-            user.setState(StateEnum.SEND_QUESTION);
             user.clearTest();
+            user.setState(StateEnum.SEND_QUESTION);
         }
     }
 

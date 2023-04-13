@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class KeyboardCreator {
-    public static InlineKeyboardMarkup createInlineKeyboard(List<String> answerOptions) {
+    public static InlineKeyboardMarkup createInlineKeyboard(final List<String> answerOptions) {
         var markup = new InlineKeyboardMarkup();
 
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
@@ -29,7 +29,7 @@ public final class KeyboardCreator {
         return markup;
     }
 
-    public static ReplyKeyboardMarkup createReplyKeyboard(String buttonText, boolean requestContact) {
+    public static ReplyKeyboardMarkup createReplyKeyboard(final String buttonText, final boolean requestContact) {
         var keyboard = new ReplyKeyboardMarkup();
         keyboard.setResizeKeyboard(true);
         keyboard.setOneTimeKeyboard(false);

@@ -7,13 +7,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class BotResponses {
-    public static String testFinished(User user) {
+    public static String testFinished(final User user) {
         return "Вы ответили верно на " + user.getTestState().getCorrectAnswers() + " вопросов.\n" +
                 "Ваш уровень английского " + user.getTestState().getResult() + ".\n" +
                 "Вы молодец, Вам осталось совсем немного, и скоро мы свяжемся с Вами для прохождения устного тестирования\uD83D\uDE0A";
     }
 
-    public static String dataForAdmin(User user) {
+    public static String dataForAdmin(final User user) {
         return  "Имя и Фамилия: " + user.getFullName() + "\n" +
                 "Номер телефона: " + user.getPhone() + "\n" +
                 "Ник в телеграмм: @" + user.getUsername() + "\n" +
@@ -66,7 +66,7 @@ public final class BotResponses {
         return new ArrayList<>(Arrays.asList("Google", "Яндекс", "Instagram/Facebook/VK/Tik-Tok", "Vse-kursy", "Еnguide", "Рекомендация от друзей"));
     }
 
-    public static List<String> optionsForAnswers(User user) {
+    public static List<String> optionsForAnswers(final User user) {
         ArrayList<String> answers = new ArrayList<>(Arrays.asList(user.getTestState().getCurrentQuestion().getAnswers()));
         answers.add("Пропустить");
         return answers;

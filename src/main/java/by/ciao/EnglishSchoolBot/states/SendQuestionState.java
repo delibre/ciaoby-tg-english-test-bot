@@ -17,13 +17,13 @@ public class SendQuestionState extends AbstractState implements UserHandlerState
     }
 
     @Override
-    public void apply(final User user) throws TelegramApiException {
+    public void apply(final User user) throws Exception {
         if (testFinished(user)) { return; }
         sendQuestion(user);
         user.setState(StateEnum.CHECK_ANSWER);
     }
 
-    private boolean testFinished(User user) throws TelegramApiException {
+    private boolean testFinished(final User user) throws Exception {
         if (user.getTestState().isFinished()) {
             user.setState(StateEnum.TEST_FINISHED);
             UserHandlerState state = new TestFinishedState(getServiceCallback());
@@ -47,7 +47,7 @@ public class SendQuestionState extends AbstractState implements UserHandlerState
         }
     }
 
-    private EditMessageText editMessage(User user, InlineKeyboardMarkup markup) {
+    private EditMessageText editMessage(final User user, final InlineKeyboardMarkup markup) {
         var editMessageText = EditMessageText.builder()
                 .chatId(user.getLastMessage().getChatId().toString())
                 .messageId(user.getLastMessage().getMessageId())

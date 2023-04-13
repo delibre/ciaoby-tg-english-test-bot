@@ -5,11 +5,12 @@ import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.states.TestFinishedState;
 import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.utils.BotResponses;
-import by.ciao.EnglishSchoolBot.utils.LoggerService;
-import by.ciao.EnglishSchoolBot.utils.LoggerMessages;
 import by.ciao.EnglishSchoolBot.utils.KeyboardCreator;
+import by.ciao.EnglishSchoolBot.utils.LoggerMessages;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -23,6 +24,7 @@ import java.util.logging.Level;
 @Getter
 public abstract class AbstractState {
     private final ServiceCallback serviceCallback;
+    private final Logger log = LoggerFactory.getLogger(AbstractState.class);
 
     protected void sendText(final Long id, final String textMsg) throws TelegramApiException {
         serviceCallback.execute(createMessage(id, textMsg));
@@ -48,7 +50,7 @@ public abstract class AbstractState {
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
-            LoggerService.logInfo(Level.SEVERE, LoggerMessages.setDelayException(), e);
+            log.error(LoggerMessages.setDelayException(), e);
         }
     }
 
@@ -90,7 +92,7 @@ public abstract class AbstractState {
                     sendText(user.getChatId(), "Время вышло. Результаты вашего теста ниже");
                     changeStateToTestFinished(user);
                 } catch (Exception e) {
-                    LoggerService.logInfo(Level.SEVERE, LoggerMessages.setTimerException(), e);
+                    log.error(LoggerMessages.setTimerException(), e);
                 }
                 user.getTestState().getTimer().cancel();
             }

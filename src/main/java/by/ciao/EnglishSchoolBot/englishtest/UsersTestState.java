@@ -1,6 +1,7 @@
 package by.ciao.EnglishSchoolBot.englishtest;
 
 import by.ciao.EnglishSchoolBot.enums.EnglishLevel;
+import by.ciao.EnglishSchoolBot.utils.LoggerService;
 import lombok.Getter;
 import lombok.Setter;
 

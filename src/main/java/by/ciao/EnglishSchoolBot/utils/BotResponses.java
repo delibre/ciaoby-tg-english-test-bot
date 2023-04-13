@@ -15,7 +15,7 @@ public final class BotResponses {
                 "Вы молодец, Вам осталось совсем немного, и скоро мы свяжемся с Вами для прохождения устного тестирования\uD83D\uDE0A";
     }
 
-    public static String dataForAdmin(User user) {
+    public static String dataForAdmin(final User user) {
         return  "Имя и Фамилия: " + user.getFullName() + "\n" +
                 "Номер телефона: " + user.getPhone() + "\n" +
                 "Ник в телеграмм: @" + user.getUsername() + "\n" +
@@ -73,7 +73,7 @@ public final class BotResponses {
         return new ArrayList<>(Arrays.asList("Google", "Яндекс", "Instagram/Facebook/VK/Tik-Tok", "Vse-kursy", "Еnguide", "Рекомендация от друзей"));
     }
 
-    public static List<String> optionsForAnswers(User user) {
+    public static List<String> optionsForAnswers(final User user) {
         return new ArrayList<>(user.getTestState().getCurrentQuestion().getAnswers());
     }
 

@@ -1,9 +1,11 @@
 package by.ciao.EnglishSchoolBot.englishtest;
 
 import by.ciao.EnglishSchoolBot.enums.EnglishLevel;
-import by.ciao.EnglishSchoolBot.utils.LoggerService;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -20,6 +22,7 @@ public class UsersTestState {
     private EnglishLevel lvl;
     private final Timer timer;
     private LocalTime startTime;
+    private final Logger log;
 
     public UsersTestState() throws Exception {
         this.questions = new LinkedList<>();
@@ -27,6 +30,7 @@ public class UsersTestState {
         this.userAnswers = new LinkedList<>();
         this.correctAnswers = 0;
         this.timer = new Timer();
+        this.log = LoggerFactory.getLogger(UsersTestState.class);
     }
 
     public Question getCurrentQuestion() {

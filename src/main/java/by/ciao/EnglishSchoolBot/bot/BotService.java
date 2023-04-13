@@ -8,6 +8,8 @@ import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.utils.BotResponses;
 import by.ciao.EnglishSchoolBot.utils.LoggerMessages;
 import lombok.Getter;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
@@ -25,8 +27,9 @@ public class BotService {
     private final Map<Long, User> registeredUsersMap;
     private final ServiceCallback serviceCallback;
     private final Logger log;
+    private final PropertiesConfiguration config = new PropertiesConfiguration("application.properties");
 
-    BotService(final ServiceCallback serviceCallback) {
+    BotService(final ServiceCallback serviceCallback) throws ConfigurationException {
         this.serviceCallback = serviceCallback;
         this.registeredUsersMap = new HashMap<>();
         this.log = LoggerFactory.getLogger(BotService.class);
@@ -61,7 +64,7 @@ public class BotService {
             }
         } catch (Exception e) {
             log.error(LoggerMessages.addUserIfAbsentException(), new RuntimeException(e));
-            sendText(5105539803L, e.toString());
+            sendText(config.getLong("admin_id"), e.toString());
         }
     }
 
@@ -70,7 +73,7 @@ public class BotService {
             getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), registeredUsersMap.get(id));
         } catch (Exception e) {
             log.error(LoggerMessages.addPhoneException(), e);
-            sendText(5105539803L, e.toString());
+            sendText(config.getLong("admin_id"), e.toString());
         }
     }
 
@@ -80,7 +83,7 @@ public class BotService {
                     .callbackQueryId(id).build());
         } catch (TelegramApiException e) {
             log.error(LoggerMessages.closeQueryException(), e);
-            sendText(5105539803L, e.toString());
+            sendText(config.getLong("admin_id"), e.toString());
         }
     }
 
@@ -111,7 +114,7 @@ public class BotService {
             serviceCallback.execute(sm);
         } catch (TelegramApiException e) {
             log.error(LoggerMessages.sendTextException(), e);
-            sendText(5105539803L, e.toString());
+            sendText(config.getLong("admin_id"), e.toString());
         }
     }
 

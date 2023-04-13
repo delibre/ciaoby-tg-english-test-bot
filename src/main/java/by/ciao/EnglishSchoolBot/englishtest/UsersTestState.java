@@ -1,12 +1,12 @@
 package by.ciao.EnglishSchoolBot.englishtest;
 
 import by.ciao.EnglishSchoolBot.enums.EnglishLevel;
-import by.ciao.EnglishSchoolBot.utils.LoggerService;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.Objects;
-import java.util.logging.Level;
 
 @Getter
 public class UsersTestState {
@@ -14,12 +14,14 @@ public class UsersTestState {
     private final LinkedList<String> userAnswers;
     private int correctAnswers;
     private EnglishLevel lvl;
+    private final Logger log;
 
     public UsersTestState() throws Exception {
         this.questions = new LinkedList<>();
         this.questions.addAll(EnglishTestSingleton.getInstance().getQuestions());
         this.userAnswers = new LinkedList<>();
         this.correctAnswers = 0;
+        this.log = LoggerFactory.getLogger(UsersTestState.class);
     }
 
     public Question getCurrentQuestion() {
@@ -46,7 +48,7 @@ public class UsersTestState {
 
     public EnglishLevel getResult() {
         if (!isFinished()) {
-            LoggerService.logInfo(Level.SEVERE, "User doesn't finished the test yet", new IllegalStateException());
+            log.error("User doesn't finished the test yet", new IllegalStateException());
         }
 
         if (lvl != null) { return lvl; }

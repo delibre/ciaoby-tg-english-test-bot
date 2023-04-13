@@ -3,21 +3,21 @@ package by.ciao.EnglishSchoolBot.states.statesservice;
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
 import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.utils.BotResponses;
-import by.ciao.EnglishSchoolBot.utils.LoggerService;
-import by.ciao.EnglishSchoolBot.utils.LoggerMessages;
 import by.ciao.EnglishSchoolBot.utils.KeyboardCreator;
+import by.ciao.EnglishSchoolBot.utils.LoggerMessages;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
-import java.util.logging.Level;
 
 @AllArgsConstructor
 @Getter
 public abstract class AbstractState {
     private final ServiceCallback serviceCallback;
+    private final Logger log = LoggerFactory.getLogger(AbstractState.class);
 
     protected void sendText(final Long id, final String textMsg) throws TelegramApiException {
         serviceCallback.execute(createMessage(id, textMsg));
@@ -43,7 +43,7 @@ public abstract class AbstractState {
         try {
             Thread.sleep(millis); // Delay for 0.5 seconds (500 milliseconds)
         } catch (InterruptedException e) {
-            LoggerService.logInfo(Level.SEVERE, LoggerMessages.setDelayException(), e);
+            log.error(LoggerMessages.setDelayException(), e);
         }
     }
 }

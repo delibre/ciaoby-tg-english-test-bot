@@ -2,8 +2,8 @@ package by.ciao.EnglishSchoolBot.bot;
 
 import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.utils.BotResponses;
-import by.ciao.EnglishSchoolBot.utils.ExceptionLogger;
-import by.ciao.EnglishSchoolBot.utils.ExceptionMessages;
+import by.ciao.EnglishSchoolBot.utils.LoggerService;
+import by.ciao.EnglishSchoolBot.utils.LoggerMessages;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -33,10 +33,10 @@ public class CiaoByBot extends TelegramLongPollingBot {
             } else if (obj instanceof AnswerCallbackQuery) {
                 execute((AnswerCallbackQuery) obj);
             } else {
-                ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.argumentExceptionInServiceVar(), new IllegalArgumentException());
+                LoggerService.logInfo(Level.SEVERE, LoggerMessages.argumentExceptionInServiceVar(), new IllegalArgumentException());
             }
         } catch (TelegramApiException e) {
-            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.tgApiExceptionInServiceVar(), e);
+            LoggerService.logInfo(Level.SEVERE, LoggerMessages.tgApiExceptionInServiceVar(), e);
         }
 
         return msg;
@@ -57,7 +57,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
             }
 
             service.addUserIfAbsent(id, msg);
-            messageProcessing(msg.getText(), service.getRegisteredUsers().get(id));
+            messageProcessing(msg.getText(), service.getRegisteredUsersMap().get(id));
 
         }  else if (service.hasContact(update)) {
             var id = update.getMessage().getChatId();
@@ -65,9 +65,12 @@ public class CiaoByBot extends TelegramLongPollingBot {
 
         } else if (service.hasCallbackAndCorrectState(update)) {
             var qry = update.getCallbackQuery();
+            var user = service.getRegisteredUsersMap().get(qry.getFrom().getId());
 
-            messageProcessing(qry.getData(), service.getRegisteredUsers().get(qry.getFrom().getId()));
-            service.closeQuery(qry.getId());
+            catchMessageProcessingException(qry.getData(), user);
+            closeQuery(qry.getId());
+        } else {
+            LoggerService.logInfo(Level.INFO, LoggerMessages.unexpectedCase(), new IllegalStateException());
         }
     }
 
@@ -86,7 +89,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
             return;
         }
 
-        service.startTest(textMsg, user);
+        service.startTestIfStartButtonIsPressed(textMsg, user);
 
         switch (user.getState()) {
             case SEND_QUESTION:
@@ -117,15 +120,15 @@ public class CiaoByBot extends TelegramLongPollingBot {
                 service.infoSentHandler(user);
                 break;
             default:
-                ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.processMessageException(), new IllegalStateException());
+                LoggerService.logInfo(Level.SEVERE, LoggerMessages.processMessageException(), new IllegalStateException());
         }
     }
 
-    private void messageProcessing(String textMsg, User user) {
+    private void catchMessageProcessingException(String textMsg, User user) {
         try {
             processMessage(textMsg, user);
         } catch (Exception e) {
-            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.messageProcessingException(), e);
+            LoggerService.logInfo(Level.SEVERE, LoggerMessages.messageProcessingException(), e);
         }
     }
 

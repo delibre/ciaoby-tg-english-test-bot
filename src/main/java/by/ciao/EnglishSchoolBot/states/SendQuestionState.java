@@ -21,7 +21,7 @@ public class SendQuestionState extends AbstractState implements UserHandlerState
         user.setState(StateEnum.CHECK_ANSWER);
     }
 
-    private boolean testFinished(User user) throws Exception {
+    private boolean testFinished(final User user) throws Exception {
         if (user.getTestState().isFinished()) {
             user.setState(StateEnum.TEST_FINISHED);
             UserHandlerState state = new TestFinishedState(getServiceCallback());

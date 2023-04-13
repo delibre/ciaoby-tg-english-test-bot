@@ -37,7 +37,7 @@ public class BotService {
     }
 
     boolean isCheckAnswerState(final Long id) {
-        return getRegisteredUsersMap().containsKey(id) && getRegisteredUsersMap().get(id).getState() == StateEnum.CHECK_ANSWER;
+        return registeredUsersMap.containsKey(id) && registeredUsersMap.get(id).getState() == StateEnum.CHECK_ANSWER;
     }
 
     boolean hasContact(final Update update) {
@@ -45,19 +45,19 @@ public class BotService {
     }
 
     boolean hasCallbackAndCorrectState(final Update update) {
-        return update.hasCallbackQuery() && getRegisteredUsersMap().containsKey(update.getCallbackQuery().getFrom().getId())
+        return update.hasCallbackQuery() && registeredUsersMap.containsKey(update.getCallbackQuery().getFrom().getId())
                 && (registeredUsersMap.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.GET_REFERRAL ||
                 registeredUsersMap.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.CHECK_ANSWER);
     }
 
     void sendWarning(Long id) {
-        sendText(getRegisteredUsersMap().get(id).getChatId(), BotResponses.questionAnsweringWarning());
+        sendText(registeredUsersMap.get(id).getChatId(), BotResponses.questionAnsweringWarning());
     }
 
     void addUserIfAbsent(final Long id, final Message msg) {
         try {
             if (registeredUsersMap.putIfAbsent(id, new User(id, msg.getFrom().getUserName())) == null) {
-                log.info("Size of the map is " + registeredUsersMap.size());
+                log.info(LoggerMessages.mapSize(registeredUsersMap.size()));
             }
         } catch (Exception e) {
             log.error(LoggerMessages.addUserIfAbsentException(), new RuntimeException(e));
@@ -66,7 +66,7 @@ public class BotService {
 
     void addPhone(final Update update, final Long id) {
         try {
-            getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), getRegisteredUsersMap().get(id));
+            getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), registeredUsersMap.get(id));
         } catch (Exception e) {
             log.error(LoggerMessages.addPhoneException(), e);
         }

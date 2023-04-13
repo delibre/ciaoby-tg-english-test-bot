@@ -48,4 +48,8 @@ public final class LoggerMessages {
     public static String unexpectedCase(String update){
         return "Unexpected case in onUpdateReceived() method in CiaoByBot class\n" + update + "\n";
     }
+
+    public static String mapSize(int size) {
+        return "Size of the map is " + size;
+    }
 }

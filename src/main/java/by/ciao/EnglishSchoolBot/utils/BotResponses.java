@@ -96,7 +96,7 @@ public final class BotResponses {
 
             testWithAnswers.append(isAnswerCorrect(question, userAnswer)).append(question.getNumberOfQuestion())
                     .append(". ").append(question.getQuestion())
-                    .append("\n(Правильный ответ: <b>").append(question.getCorrectAnswer()).append("<b>)\n")
+                    .append("\n(Правильный ответ: <b>").append(question.getCorrectAnswer()).append("</b>)\n")
                     .append(getAnswers(question, userAnswer)).append("\n\n");
         }
 

@@ -3,8 +3,8 @@ package by.ciao.EnglishSchoolBot.states.statesservice;
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
 import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.utils.BotResponses;
-import by.ciao.EnglishSchoolBot.utils.ExceptionLogger;
-import by.ciao.EnglishSchoolBot.utils.ExceptionMessages;
+import by.ciao.EnglishSchoolBot.utils.LoggerService;
+import by.ciao.EnglishSchoolBot.utils.LoggerMessages;
 import by.ciao.EnglishSchoolBot.utils.KeyboardCreator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -43,7 +43,7 @@ public abstract class AbstractState {
         try {
             Thread.sleep(millis); // Delay for 0.5 seconds (500 milliseconds)
         } catch (InterruptedException e) {
-            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.setDelayException(), e);
+            LoggerService.logInfo(Level.SEVERE, LoggerMessages.setDelayException(), e);
         }
     }
 }

@@ -1,7 +1,7 @@
 package by.ciao.EnglishSchoolBot.englishtest;
 
 import by.ciao.EnglishSchoolBot.enums.EnglishLevel;
-import by.ciao.EnglishSchoolBot.utils.ExceptionLogger;
+import by.ciao.EnglishSchoolBot.utils.LoggerService;
 import lombok.Getter;
 
 import java.util.LinkedList;
@@ -46,7 +46,7 @@ public class UsersTestState {
 
     public EnglishLevel getResult() {
         if (!isFinished()) {
-            ExceptionLogger.logException(Level.SEVERE, "User doesn't finished the test yet", new IllegalStateException());
+            LoggerService.logInfo(Level.SEVERE, "User doesn't finished the test yet", new IllegalStateException());
         }
 
         if (lvl != null) { return lvl; }

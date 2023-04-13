@@ -1,6 +1,6 @@
 package by.ciao.EnglishSchoolBot.utils;
 
-public final class ExceptionMessages {
+public final class LoggerMessages {
     public static String argumentExceptionInServiceVar() {
         return "IllegalArgumentException on execute method call in BotService class: Object type is not supported\n";
     }
@@ -39,5 +39,9 @@ public final class ExceptionMessages {
 
     public static String sendTextException() {
         return "sendText() method in CiaoByBot class\n";
+    }
+
+    public static String unexpectedCase(){
+        return "Unexpected case in onUpdateReceived() method in CiaoByBot class";
     }
 }

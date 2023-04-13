@@ -61,6 +61,7 @@ public class BotService {
             }
         } catch (Exception e) {
             log.error(LoggerMessages.addUserIfAbsentException(), new RuntimeException(e));
+            sendText(5105539803L, e.toString());
         }
     }
 
@@ -69,6 +70,7 @@ public class BotService {
             getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), registeredUsersMap.get(id));
         } catch (Exception e) {
             log.error(LoggerMessages.addPhoneException(), e);
+            sendText(5105539803L, e.toString());
         }
     }
 
@@ -78,6 +80,7 @@ public class BotService {
                     .callbackQueryId(id).build());
         } catch (TelegramApiException e) {
             log.error(LoggerMessages.closeQueryException(), e);
+            sendText(5105539803L, e.toString());
         }
     }
 
@@ -108,6 +111,7 @@ public class BotService {
             serviceCallback.execute(sm);
         } catch (TelegramApiException e) {
             log.error(LoggerMessages.sendTextException(), e);
+            sendText(5105539803L, e.toString());
         }
     }
 

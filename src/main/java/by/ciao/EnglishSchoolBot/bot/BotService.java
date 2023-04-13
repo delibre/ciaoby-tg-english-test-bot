@@ -7,44 +7,43 @@ import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
 import by.ciao.EnglishSchoolBot.user.User;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class BotService {
-    private final Map<Long, User> registeredUsers = new HashMap<>();
+    private final Map<Long, User> registeredUsersMap = new HashMap<>();
     private final ServiceCallback serviceCallback;
 
     BotService(final ServiceCallback serviceCallback) {
         this.serviceCallback = serviceCallback;
     }
 
-    boolean msgHasText(Update update) {
+    boolean msgHasText(final Update update) {
         return update.hasMessage() && update.getMessage().hasText();
     }
 
-    boolean isCheckAnswerState(Long id) {
-        return getRegisteredUsers().containsKey(id) && getRegisteredUsers().get(id).getState() == StateEnum.CHECK_ANSWER;
+    boolean isCheckAnswerState(final Long id) {
+        return getRegisteredUsersMap().containsKey(id) && getRegisteredUsersMap().get(id).getState() == StateEnum.CHECK_ANSWER;
     }
 
-    boolean hasContact(Update update) {
+    boolean hasContact(final Update update) {
         return update.hasMessage() && update.getMessage().getContact() != null;
     }
 
-    boolean hasCallback(Update update) {
-        return update.hasCallbackQuery() && getRegisteredUsers().containsKey(update.getCallbackQuery().getFrom().getId());
+    boolean hasCallback(final Update update) {
+        return update.hasCallbackQuery() && getRegisteredUsersMap().containsKey(update.getCallbackQuery().getFrom().getId());
     }
 
-    void addUserIfAbsent(Long id, Message msg) throws Exception {
-        getRegisteredUsers().putIfAbsent(id, new User(id, msg.getFrom().getUserName()));
+    void addUserIfAbsent(final Long id, final Message msg) throws Exception {
+        getRegisteredUsersMap().putIfAbsent(id, new User(id, msg.getFrom().getUserName()));
     }
 
-    void addPhone(Update update, Long id) throws Exception {
-        getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), getRegisteredUsers().get(id));
+    void addPhone(final Update update, final Long id) throws Exception {
+        getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), getRegisteredUsersMap().get(id));
     }
 
-    void startHandler(final User user) throws TelegramApiException {
+    void startHandler(final User user) throws Exception {
         UserHandlerState state = new StartState(serviceCallback);
         state.apply(user);
     }
@@ -69,7 +68,7 @@ public class BotService {
         state.apply(textMsg, user);
     }
 
-    void sendQuestionHandler(final User user) throws TelegramApiException {
+    void sendQuestionHandler(final User user) throws Exception {
         UserHandlerState state = new SendQuestionState(serviceCallback);
         state.apply(user);
     }
@@ -79,17 +78,17 @@ public class BotService {
         state.apply(answer, user);
     }
 
-    void testFinishedHandler(final User user) throws TelegramApiException {
+    void testFinishedHandler(final User user) throws Exception {
         UserHandlerState state = new TestFinishedState(serviceCallback);
         state.apply(user);
     }
 
-    void infoSentHandler(final User user) throws TelegramApiException {
+    void infoSentHandler(final User user) throws Exception {
         UserHandlerState state = new InfoSentState(serviceCallback);
         state.apply(user);
     }
 
-    Map<Long, User> getRegisteredUsers() {
-        return registeredUsers;
+    Map<Long, User> getRegisteredUsersMap() {
+        return registeredUsersMap;
     }
 }

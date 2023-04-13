@@ -24,6 +24,8 @@ public class StartTestState extends AbstractState implements UserMessageHandlerS
             UserHandlerState state = new SendQuestionState(getServiceCallback());
             state.apply(user);
         }
-        else sendStartButton(user);
+        else {
+            sendStartButton(user);
+        }
     }
 }

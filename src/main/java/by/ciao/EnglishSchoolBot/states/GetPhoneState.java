@@ -43,7 +43,7 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
 
     private void setDelay() {
         try {
-            Thread.sleep(500); // Delay for 0.5 seconds (500 milliseconds)
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

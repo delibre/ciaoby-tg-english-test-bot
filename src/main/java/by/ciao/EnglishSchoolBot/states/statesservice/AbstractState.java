@@ -30,7 +30,7 @@ public abstract class AbstractState {
         serviceCallback.execute(sm);
     }
 
-    protected SendMessage createMessage(Long id, String textMsg) {
+    protected SendMessage createMessage(final Long id, final String textMsg) {
         var sm = SendMessage.builder()
                 .chatId(id.toString())
                 .text(textMsg).build();

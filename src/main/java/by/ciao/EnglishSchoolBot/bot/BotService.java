@@ -23,27 +23,27 @@ public class BotService {
         this.registeredUsers = new HashMap<>();
     }
 
-    boolean msgHasText(Update update) {
+    boolean msgHasText(final Update update) {
         return update.hasMessage() && update.getMessage().hasText();
     }
 
-    boolean isCheckAnswerState(Long id) {
+    boolean isCheckAnswerState(final Long id) {
         return getRegisteredUsers().containsKey(id) && getRegisteredUsers().get(id).getState() == StateEnum.CHECK_ANSWER;
     }
 
-    boolean hasContact(Update update) {
+    boolean hasContact(final Update update) {
         return update.hasMessage() && update.getMessage().getContact() != null;
     }
 
-    boolean hasCallback(Update update) {
+    boolean hasCallback(final Update update) {
         return update.hasCallbackQuery() && getRegisteredUsers().containsKey(update.getCallbackQuery().getFrom().getId());
     }
 
-    void addUserIfAbsent(Long id, Message msg) throws Exception {
+    void addUserIfAbsent(final Long id, final Message msg) throws Exception {
         getRegisteredUsers().putIfAbsent(id, new User(id, msg.getFrom().getUserName()));
     }
 
-    void addPhone(Update update, Long id) throws Exception {
+    void addPhone(final Update update, final Long id) throws Exception {
         getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), getRegisteredUsers().get(id));
     }
 

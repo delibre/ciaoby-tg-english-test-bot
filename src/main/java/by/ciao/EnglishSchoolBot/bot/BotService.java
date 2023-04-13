@@ -15,36 +15,36 @@ import java.util.Map;
 @Getter
 public class BotService {
 
-    private final Map<Long, User> registeredUsers;
+    private final Map<Long, User> registeredUsersMap;
     private final ServiceCallback serviceCallback;
 
     BotService(final ServiceCallback serviceCallback) {
         this.serviceCallback = serviceCallback;
-        this.registeredUsers = new HashMap<>();
+        this.registeredUsersMap = new HashMap<>();
     }
 
-    boolean msgHasText(Update update) {
+    boolean msgHasText(final Update update) {
         return update.hasMessage() && update.getMessage().hasText();
     }
 
-    boolean isCheckAnswerState(Long id) {
-        return getRegisteredUsers().containsKey(id) && getRegisteredUsers().get(id).getState() == StateEnum.CHECK_ANSWER;
+    boolean isCheckAnswerState(final Long id) {
+        return getRegisteredUsersMap().containsKey(id) && getRegisteredUsersMap().get(id).getState() == StateEnum.CHECK_ANSWER;
     }
 
-    boolean hasContact(Update update) {
+    boolean hasContact(final Update update) {
         return update.hasMessage() && update.getMessage().getContact() != null;
     }
 
-    boolean hasCallback(Update update) {
-        return update.hasCallbackQuery() && getRegisteredUsers().containsKey(update.getCallbackQuery().getFrom().getId());
+    boolean hasCallback(final Update update) {
+        return update.hasCallbackQuery() && getRegisteredUsersMap().containsKey(update.getCallbackQuery().getFrom().getId());
     }
 
-    void addUserIfAbsent(Long id, Message msg) throws Exception {
-        getRegisteredUsers().putIfAbsent(id, new User(id, msg.getFrom().getUserName()));
+    void addUserIfAbsent(final Long id, final Message msg) throws Exception {
+        getRegisteredUsersMap().putIfAbsent(id, new User(id, msg.getFrom().getUserName()));
     }
 
-    void addPhone(Update update, Long id) throws Exception {
-        getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), getRegisteredUsers().get(id));
+    void addPhone(final Update update, final Long id) throws Exception {
+        getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), getRegisteredUsersMap().get(id));
     }
 
     void startHandler(final User user) throws Exception {
@@ -92,7 +92,7 @@ public class BotService {
         state.apply(user);
     }
 
-    Map<Long, User> getRegisteredUsers() {
-        return registeredUsers;
+    Map<Long, User> getRegisteredUsersMap() {
+        return registeredUsersMap;
     }
 }

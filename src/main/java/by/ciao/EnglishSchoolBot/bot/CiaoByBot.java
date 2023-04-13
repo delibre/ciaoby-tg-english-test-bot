@@ -2,8 +2,8 @@ package by.ciao.EnglishSchoolBot.bot;
 
 import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.utils.BotResponses;
-import by.ciao.EnglishSchoolBot.utils.LoggerService;
 import by.ciao.EnglishSchoolBot.utils.LoggerMessages;
+import by.ciao.EnglishSchoolBot.utils.LoggerService;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -57,7 +57,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
             }
 
             service.addUserIfAbsent(id, msg);
-            messageProcessing(msg.getText(), service.getRegisteredUsersMap().get(id));
+            catchMessageProcessingException(msg.getText(), service.getRegisteredUsersMap().get(id));
 
         }  else if (service.hasContact(update)) {
             var id = update.getMessage().getChatId();
@@ -68,9 +68,9 @@ public class CiaoByBot extends TelegramLongPollingBot {
             var user = service.getRegisteredUsersMap().get(qry.getFrom().getId());
 
             catchMessageProcessingException(qry.getData(), user);
-            closeQuery(qry.getId());
+            service.closeQuery(qry.getId());
         } else {
-            LoggerService.logInfo(Level.INFO, LoggerMessages.unexpectedCase(), new IllegalStateException());
+            LoggerService.logInfo(Level.INFO, LoggerMessages.unexpectedCase(update.toString()), new IllegalStateException());
         }
     }
 
@@ -134,7 +134,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
 
     private void broadcast(String textMsg) {
         int counter = 0;
-        for (User user : service.getRegisteredUsers().values()) {
+        for (User user : service.getRegisteredUsersMap().values()) {
             var sm = SendMessage.builder()
                     .chatId(user.getChatId().toString())
                     .text(textMsg).build();

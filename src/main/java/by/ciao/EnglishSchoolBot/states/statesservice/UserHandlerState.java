@@ -3,5 +3,5 @@ package by.ciao.EnglishSchoolBot.states.statesservice;
 import by.ciao.EnglishSchoolBot.user.User;
 
 public interface UserHandlerState {
-    void apply(User user) throws Exception;
+    void apply(final User user) throws Exception;
 }

@@ -22,37 +22,37 @@ import java.util.logging.Level;
 @Getter
 public class BotService {
 
-    private final Map<Long, User> registeredUsers;
+    private final Map<Long, User> registeredUsersMap;
     private final ServiceCallback serviceCallback;
 
     BotService(final ServiceCallback serviceCallback) {
         this.serviceCallback = serviceCallback;
-        this.registeredUsers = new HashMap<>();
+        this.registeredUsersMap = new HashMap<>();
     }
 
-    boolean msgHasText(Update update) {
+    boolean msgHasText(final Update update) {
         return update.hasMessage() && update.getMessage().hasText();
     }
 
-    boolean isCheckAnswerState(Long id) {
-        return getRegisteredUsers().containsKey(id) && getRegisteredUsers().get(id).getState() == StateEnum.CHECK_ANSWER;
+    boolean isCheckAnswerState(final Long id) {
+        return getRegisteredUsersMap().containsKey(id) && getRegisteredUsersMap().get(id).getState() == StateEnum.CHECK_ANSWER;
     }
 
-    boolean hasContact(Update update) {
+    boolean hasContact(final Update update) {
         return update.hasMessage() && update.getMessage().getContact() != null;
     }
 
-    boolean hasCallbackAndCorrectState(Update update) {
+    boolean hasCallbackAndCorrectState(final Update update) {
         return update.hasCallbackQuery() && getRegisteredUsers().containsKey(update.getCallbackQuery().getFrom().getId())
-                && (registeredUsers.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.GET_REFERRAL ||
-                registeredUsers.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.CHECK_ANSWER);
+                && (registeredUsersMap.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.GET_REFERRAL ||
+                registeredUsersMap.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.CHECK_ANSWER);
     }
 
     void sendWarning(Long id) {
         sendText(getRegisteredUsers().get(id).getChatId(), BotResponses.questionAnsweringWarning());
     }
 
-    void addUserIfAbsent(Long id, Message msg) {
+    void addUserIfAbsent(final Long id, final Message msg) {
         try {
             getRegisteredUsers().putIfAbsent(id, new User(id, msg.getFrom().getUserName()));
         } catch (Exception e) {
@@ -60,7 +60,7 @@ public class BotService {
         }
     }
 
-    void addPhone(Update update, Long id) {
+    void addPhone(final Update update, final Long id) {
         try {
             getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), getRegisteredUsers().get(id));
         } catch (Exception e) {
@@ -68,7 +68,7 @@ public class BotService {
         }
     }
 
-    void closeQuery(String id) {
+    void closeQuery(final String id) {
         try {
             serviceCallback.execute(AnswerCallbackQuery.builder()
                     .callbackQueryId(id).build());
@@ -77,7 +77,7 @@ public class BotService {
         }
     }
 
-    boolean startBot(String textMsg, User user) throws Exception {
+    boolean startBot(final String textMsg, final User user) throws Exception {
         if (textMsg.equals("/start")) {
             user.setState(StateEnum.START);
             user.clearTest();
@@ -89,7 +89,7 @@ public class BotService {
         return false;
     }
 
-    void startTest(String textMsg, User user) throws Exception {
+    void startTest(final String textMsg, final User user) throws Exception {
         if (textMsg.equals("Начать тестирование\uD83C\uDFC1") && user.isUserDataCollected()) {
             user.setState(StateEnum.SEND_QUESTION);
             user.clearTest();
@@ -153,7 +153,7 @@ public class BotService {
         state.apply(user);
     }
 
-    Map<Long, User> getRegisteredUsers() {
-        return registeredUsers;
+    Map<Long, User> getRegisteredUsersMap() {
+        return registeredUsersMap;
     }
 }

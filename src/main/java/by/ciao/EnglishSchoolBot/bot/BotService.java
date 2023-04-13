@@ -6,8 +6,8 @@ import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
 import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.utils.BotResponses;
-import by.ciao.EnglishSchoolBot.utils.ExceptionLogger;
-import by.ciao.EnglishSchoolBot.utils.ExceptionMessages;
+import by.ciao.EnglishSchoolBot.utils.LoggerMessages;
+import by.ciao.EnglishSchoolBot.utils.LoggerService;
 import lombok.Getter;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -22,62 +22,62 @@ import java.util.logging.Level;
 @Getter
 public class BotService {
 
-    private final Map<Long, User> registeredUsers;
+    private final Map<Long, User> registeredUsersMap;
     private final ServiceCallback serviceCallback;
 
     BotService(final ServiceCallback serviceCallback) {
         this.serviceCallback = serviceCallback;
-        this.registeredUsers = new HashMap<>();
+        this.registeredUsersMap = new HashMap<>();
     }
 
-    boolean msgHasText(Update update) {
+    boolean msgHasText(final Update update) {
         return update.hasMessage() && update.getMessage().hasText();
     }
 
-    boolean isCheckAnswerState(Long id) {
-        return getRegisteredUsers().containsKey(id) && getRegisteredUsers().get(id).getState() == StateEnum.CHECK_ANSWER;
+    boolean isCheckAnswerState(final Long id) {
+        return getRegisteredUsersMap().containsKey(id) && getRegisteredUsersMap().get(id).getState() == StateEnum.CHECK_ANSWER;
     }
 
-    boolean hasContact(Update update) {
+    boolean hasContact(final Update update) {
         return update.hasMessage() && update.getMessage().getContact() != null;
     }
 
-    boolean hasCallbackAndCorrectState(Update update) {
-        return update.hasCallbackQuery() && getRegisteredUsers().containsKey(update.getCallbackQuery().getFrom().getId())
-                && (registeredUsers.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.GET_REFERRAL ||
-                registeredUsers.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.CHECK_ANSWER);
+    boolean hasCallbackAndCorrectState(final Update update) {
+        return update.hasCallbackQuery() && getRegisteredUsersMap().containsKey(update.getCallbackQuery().getFrom().getId())
+                && (registeredUsersMap.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.GET_REFERRAL ||
+                registeredUsersMap.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.CHECK_ANSWER);
     }
 
     void sendWarning(Long id) {
-        sendText(getRegisteredUsers().get(id).getChatId(), BotResponses.questionAnsweringWarning());
+        sendText(getRegisteredUsersMap().get(id).getChatId(), BotResponses.questionAnsweringWarning());
     }
 
-    void addUserIfAbsent(Long id, Message msg) {
+    void addUserIfAbsent(final Long id, final Message msg) {
         try {
-            getRegisteredUsers().putIfAbsent(id, new User(id, msg.getFrom().getUserName()));
+            getRegisteredUsersMap().putIfAbsent(id, new User(id, msg.getFrom().getUserName()));
         } catch (Exception e) {
-            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.addUserIfAbsentException(), new RuntimeException(e));
+            LoggerService.logInfo(Level.SEVERE, LoggerMessages.addUserIfAbsentException(), new RuntimeException(e));
         }
     }
 
-    void addPhone(Update update, Long id) {
+    void addPhone(final Update update, final Long id) {
         try {
-            getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), getRegisteredUsers().get(id));
+            getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), getRegisteredUsersMap().get(id));
         } catch (Exception e) {
-            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.addPhoneException(), e);
+            LoggerService.logInfo(Level.SEVERE, LoggerMessages.addPhoneException(), e);
         }
     }
 
-    void closeQuery(String id) {
+    void closeQuery(final String id) {
         try {
             serviceCallback.execute(AnswerCallbackQuery.builder()
                     .callbackQueryId(id).build());
         } catch (TelegramApiException e) {
-            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.closeQueryException(), e);
+            LoggerService.logInfo(Level.SEVERE, LoggerMessages.closeQueryException(), e);
         }
     }
 
-    boolean startBot(String textMsg, User user) throws Exception {
+    boolean startBot(final String textMsg, final User user) throws Exception {
         if (textMsg.equals("/start")) {
             user.setState(StateEnum.START);
             user.clearTest();
@@ -89,7 +89,7 @@ public class BotService {
         return false;
     }
 
-    void startTest(String textMsg, User user) {
+    void startTestIfStartButtonIsPressed(final String textMsg, final User user) {
         if (textMsg.equals("Начать тестирование\uD83C\uDFC1") && user.isUserDataCollected()) {
             user.setState(StateEnum.START_TEST);
         }
@@ -103,7 +103,7 @@ public class BotService {
         try {
             serviceCallback.execute(sm);
         } catch (TelegramApiException e) {
-            ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.sendTextException(), e);
+            LoggerService.logInfo(Level.SEVERE, LoggerMessages.sendTextException(), e);
         }
     }
 
@@ -152,7 +152,7 @@ public class BotService {
         state.apply(user);
     }
 
-    Map<Long, User> getRegisteredUsers() {
-        return registeredUsers;
+    Map<Long, User> getRegisteredUsersMap() {
+        return registeredUsersMap;
     }
 }

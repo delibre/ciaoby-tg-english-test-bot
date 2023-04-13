@@ -3,6 +3,8 @@ package by.ciao.EnglishSchoolBot.bot;
 import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.utils.BotResponses;
 import by.ciao.EnglishSchoolBot.utils.LoggerMessages;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -18,6 +20,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.Optional;
 
 public class CiaoByBot extends TelegramLongPollingBot {
+    private final PropertiesConfiguration config = new PropertiesConfiguration("application.properties");
     private final Logger log = LoggerFactory.getLogger(CiaoByBot.class);
     private final BotService service = new BotService((obj) -> {
         Optional<Message> msg = Optional.empty();
@@ -45,9 +48,12 @@ public class CiaoByBot extends TelegramLongPollingBot {
         return msg;
     });
 
+    public CiaoByBot() throws ConfigurationException {
+    }
+
     @Override
     public void onUpdateReceived(Update update) {
-        if (service.msgHasText(update) && update.getMessage().getChatId() == 5105539803L) {
+        if (service.msgHasText(update) && update.getMessage().getChatId() == config.getLong("admin_id")) {
             broadcast(update.getMessage().getText());
 
         } else if (service.msgHasText(update)) {
@@ -79,12 +85,12 @@ public class CiaoByBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "testForProd_bot";
+        return config.getString("bot_username");
     }
 
     @Override
     public String getBotToken() {
-        return "6167400176:AAGg4892WjlM0mMxUgdmdoQXID2X9UPw4lo";
+        return config.getString("bot_token");
     }
 
     private void processMessage(String textMsg, User user) throws Exception {
@@ -146,12 +152,12 @@ public class CiaoByBot extends TelegramLongPollingBot {
                 counter++;
             } catch (TelegramApiException ignore) {}
         }
-        service.sendText(5105539803L, BotResponses.notificationReceivedBy(counter));
+        service.sendText(config.getLong("admin_id"), BotResponses.notificationReceivedBy(counter));
     }
 
     private void sendToTechAdmin(final String textMsg) {
         var sm = SendMessage.builder()
-                .chatId(5105539803L)
+                .chatId(config.getLong("tech_admin_id"))
                 .text(textMsg).build();
 
         try {

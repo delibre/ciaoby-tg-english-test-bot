@@ -3,8 +3,9 @@ package by.ciao.EnglishSchoolBot.bot;
 import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.utils.BotResponses;
-import by.ciao.EnglishSchoolBot.utils.LoggerService;
 import by.ciao.EnglishSchoolBot.utils.LoggerMessages;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -15,9 +16,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Optional;
-import java.util.logging.Level;
 
 public class CiaoByBot extends TelegramLongPollingBot {
+    private final Logger log = LoggerFactory.getLogger(CiaoByBot.class);
     private final BotService service = new BotService((obj) -> {
         Optional<Message> msg = Optional.empty();
 
@@ -29,10 +30,10 @@ public class CiaoByBot extends TelegramLongPollingBot {
             } else if (obj instanceof EditMessageText) {
                 execute((EditMessageText) obj);
             } else {
-                LoggerService.logInfo(Level.SEVERE, LoggerMessages.argumentExceptionInServiceVar(), new IllegalArgumentException());
+                log.error(LoggerMessages.argumentExceptionInServiceVar(), new IllegalArgumentException());
             }
         } catch (TelegramApiException e) {
-            LoggerService.logInfo(Level.SEVERE, LoggerMessages.tgApiExceptionInServiceVar(), e);
+            log.error(LoggerMessages.tgApiExceptionInServiceVar(), e);
         }
 
         return msg;
@@ -63,7 +64,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
             catchMessageProcessingException(qry.getData(), user);
             closeQuery(qry.getId());
         } else {
-            LoggerService.logInfo(Level.INFO, LoggerMessages.unexpectedCase(), new IllegalStateException());
+            log.info(LoggerMessages.unexpectedCase());
         }
     }
 
@@ -113,7 +114,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
                 service.infoSentHandler(user);
                 break;
             default:
-                LoggerService.logInfo(Level.SEVERE, LoggerMessages.processMessageException(), new IllegalStateException());
+                log.error(LoggerMessages.processMessageException(), new IllegalStateException());
         }
     }
 
@@ -121,7 +122,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         try {
             sendText(service.getRegisteredUsersMap().get(id).getChatId(), BotResponses.questionAnsweringWarning());
         } catch (TelegramApiException e) {
-            LoggerService.logInfo(Level.SEVERE, LoggerMessages.sendWarningException(), e);
+            log.error(LoggerMessages.sendWarningException(), e);
         }
     }
 
@@ -129,7 +130,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         try {
             service.addUserIfAbsent(id, msg);
         } catch (Exception e) {
-            LoggerService.logInfo(Level.SEVERE, LoggerMessages.addUserIfAbsentException(), new RuntimeException(e));
+            log.error(LoggerMessages.addUserIfAbsentException(), new RuntimeException(e));
         }
     }
 
@@ -137,7 +138,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         try {
             processMessage(textMsg, user);
         } catch (Exception e) {
-            LoggerService.logInfo(Level.SEVERE, LoggerMessages.messageProcessingException(), e);
+            log.error(LoggerMessages.messageProcessingException(), e);
         }
     }
 
@@ -145,7 +146,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         try {
             service.addPhone(update, id);
         } catch (Exception e) {
-            LoggerService.logInfo(Level.SEVERE, LoggerMessages.addPhoneException(), e);
+            log.error(LoggerMessages.addPhoneException(), e);
         }
     }
 
@@ -154,7 +155,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
             execute(AnswerCallbackQuery.builder()
                     .callbackQueryId(id).build());
         } catch (TelegramApiException e) {
-            LoggerService.logInfo(Level.SEVERE, LoggerMessages.closeQueryException(), e);
+            log.error(LoggerMessages.closeQueryException(), e);
         }
     }
 
@@ -185,7 +186,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         try {
             execute(sm);
         } catch (TelegramApiException e) {
-            LoggerService.logInfo(Level.SEVERE, LoggerMessages.sendTextException(), e);
+            log.error(LoggerMessages.sendTextException(), e);
         }
     }
 }

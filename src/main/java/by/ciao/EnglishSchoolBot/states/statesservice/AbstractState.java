@@ -90,7 +90,7 @@ public abstract class AbstractState {
                     sendText(user.getChatId(), "Время вышло. Результаты вашего теста ниже");
                     changeStateToTestFinished(user);
                 } catch (Exception e) {
-                    ExceptionLogger.logException(Level.SEVERE, ExceptionMessages.setTimerException(), e);
+                    LoggerService.logInfo(Level.SEVERE, LoggerMessages.setTimerException(), e);
                 }
                 user.getTestState().getTimer().cancel();
             }

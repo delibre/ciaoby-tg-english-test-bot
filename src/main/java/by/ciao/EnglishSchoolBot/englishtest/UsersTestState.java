@@ -3,9 +3,7 @@ package by.ciao.EnglishSchoolBot.englishtest;
 import by.ciao.EnglishSchoolBot.enums.EnglishLevel;
 import lombok.Getter;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.apache.commons.configuration.PropertiesConfiguration;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -22,7 +20,7 @@ public class UsersTestState {
     private EnglishLevel lvl;
     private final Timer timer;
     private LocalTime startTime;
-    private final Logger log;
+    private final PropertiesConfiguration config = new PropertiesConfiguration("application.properties");
 
     public UsersTestState() throws Exception {
         this.questions = new LinkedList<>();
@@ -30,7 +28,6 @@ public class UsersTestState {
         this.userAnswers = new LinkedList<>();
         this.correctAnswers = 0;
         this.timer = new Timer();
-        this.log = LoggerFactory.getLogger(UsersTestState.class);
     }
 
     public Question getCurrentQuestion() {
@@ -89,10 +86,10 @@ public class UsersTestState {
     public String countTime() {
         LocalTime currentTime = LocalTime.now();
         Duration elapsed = Duration.between(startTime, currentTime);
-//        Duration duration40Min = Duration.ofMinutes(1);
-        Duration duration40Min = Duration.ofSeconds(10);
+//        Duration duration = Duration.ofMinutes(config.getInt("test_duration"));
+        Duration duration = Duration.ofSeconds(config.getInt("test_duration"));
 
-        Duration timeLeft = duration40Min.minus(elapsed);
+        Duration timeLeft = duration.minus(elapsed);
 
         long MM = timeLeft.toMinutesPart();
         long SS = timeLeft.toSecondsPart();
@@ -103,9 +100,9 @@ public class UsersTestState {
     public boolean isTimeOver() {
         LocalTime currentTime = LocalTime.now();
         Duration elapsed = Duration.between(startTime, currentTime);
-//        Duration duration40Min = Duration.ofMinutes(1);
-        Duration duration40Min = Duration.ofSeconds(10);
+//        Duration duration = Duration.ofMinutes(config.getInt("test_duration"));
+        Duration duration = Duration.ofSeconds(config.getInt("test_duration"));
 
-        return elapsed.compareTo(duration40Min) >= 0;
+        return elapsed.compareTo(duration) >= 0;
     }
 }

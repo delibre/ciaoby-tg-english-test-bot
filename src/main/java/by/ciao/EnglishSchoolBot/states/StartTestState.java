@@ -7,12 +7,21 @@ import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
 import by.ciao.EnglishSchoolBot.user.User;
 import by.ciao.EnglishSchoolBot.utils.BotResponses;
+import by.ciao.EnglishSchoolBot.utils.LoggerMessages;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalTime;
 import java.util.Objects;
+import java.util.TimerTask;
 
 public class StartTestState extends AbstractState implements UserMessageHandlerState {
-    public StartTestState(ServiceCallback serviceCallback) {
+    private final PropertiesConfiguration config = new PropertiesConfiguration("application.properties");
+    private final Logger log = LoggerFactory.getLogger(StartTestState.class);
+
+    public StartTestState(ServiceCallback serviceCallback) throws ConfigurationException {
         super(serviceCallback);
     }
 
@@ -30,5 +39,20 @@ public class StartTestState extends AbstractState implements UserMessageHandlerS
         else {
             sendStartButton(user);
         }
+    }
+
+    private void setTimer(User user) {
+        TimerTask task = new TimerTask() {
+            public void run() {
+                try {
+                    sendText(user.getChatId(), "Время вышло. Результаты вашего теста ниже");
+                    changeStateToTestFinished(user);
+                } catch (Exception e) {
+                    log.error(LoggerMessages.setTimerException(), e);
+                }
+                user.getTestState().getTimer().cancel();
+            }
+        };
+        user.getTestState().getTimer().schedule(task, config.getLong("test_duration") * 1000);
     }
 }

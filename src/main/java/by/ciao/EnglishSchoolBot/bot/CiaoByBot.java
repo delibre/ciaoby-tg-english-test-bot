@@ -21,7 +21,7 @@ import java.util.Optional;
 
 public class CiaoByBot extends TelegramLongPollingBot {
     private final PropertiesConfiguration config = new PropertiesConfiguration("application.properties");
-    private final Logger log = LoggerFactory.getLogger(CiaoByBot.class);
+    private static final Logger log = LoggerFactory.getLogger(CiaoByBot.class);
     private final BotService service = new BotService((obj) -> {
         Optional<Message> msg = Optional.empty();
 
@@ -53,7 +53,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (service.msgHasText(update) && update.getMessage().getChatId() == config.getLong("admin_id")) {
+        if (service.isMsgFromAdmin(update)) {
             broadcast(update.getMessage().getText());
 
         } else if (service.msgHasText(update)) {

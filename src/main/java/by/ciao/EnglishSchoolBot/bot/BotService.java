@@ -61,6 +61,7 @@ public class BotService {
         try {
             if (registeredUsersMap.putIfAbsent(id, new User(id, msg.getFrom().getUserName())) == null) {
                 log.info(LoggerMessages.mapSize(registeredUsersMap.size()));
+                sendText(config.getLong("admin_id"), LoggerMessages.mapSize(registeredUsersMap.size()));
             }
         } catch (Exception e) {
             log.error(LoggerMessages.addUserIfAbsentException(), new RuntimeException(e));

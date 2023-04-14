@@ -27,13 +27,12 @@ public class BotService {
 
     private final Map<Long, User> registeredUsersMap;
     private final ServiceCallback serviceCallback;
-    private final Logger log;
+    private static final Logger log = LoggerFactory.getLogger(BotService.class);
     private final PropertiesConfiguration config = new PropertiesConfiguration("application.properties");
 
     BotService(final ServiceCallback serviceCallback) throws ConfigurationException {
         this.serviceCallback = serviceCallback;
         this.registeredUsersMap = new HashMap<>();
-        this.log = LoggerFactory.getLogger(BotService.class);
     }
 
     boolean msgHasText(final Update update) {
@@ -49,9 +48,12 @@ public class BotService {
     }
 
     boolean hasCallbackAndCorrectState(final Update update) {
-        return update.hasCallbackQuery() && registeredUsersMap.containsKey(update.getCallbackQuery().getFrom().getId())
-                && (registeredUsersMap.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.GET_REFERRAL ||
-                registeredUsersMap.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.CHECK_ANSWER);
+        var updateHasCallbackQuery = update.hasCallbackQuery();
+        var userExists = registeredUsersMap.containsKey(update.getCallbackQuery().getFrom().getId());
+        var userStateIsGetReferral = registeredUsersMap.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.GET_REFERRAL;
+        var userStateIsCheckAnswer = registeredUsersMap.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.CHECK_ANSWER;
+
+        return updateHasCallbackQuery && userExists && (userStateIsGetReferral || userStateIsCheckAnswer);
     }
 
     void sendWarning(Long id) {
@@ -97,6 +99,10 @@ public class BotService {
             log.error(LoggerMessages.addPhoneException(), e);
             sendText(config.getLong("tech_admin_id"), e.toString());
         }
+    }
+
+    boolean isMsgFromAdmin(Update update) {
+        return msgHasText(update) && update.getMessage().getChatId() == config.getLong("admin_id");
     }
 
     void closeQuery(final String id) {

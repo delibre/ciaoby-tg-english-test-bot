@@ -17,8 +17,6 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.TimerTask;
-
 @AllArgsConstructor
 @Getter
 public abstract class AbstractState {
@@ -72,7 +70,7 @@ public abstract class AbstractState {
         return false;
     }
 
-    private void changeStateToTestFinished(User user) throws Exception {
+    protected void changeStateToTestFinished(User user) throws Exception {
         user.setState(StateEnum.TEST_FINISHED);
         UserHandlerState state = new TestFinishedState(getServiceCallback());
         state.apply(user);
@@ -82,20 +80,5 @@ public abstract class AbstractState {
         if (!user.getTestState().isTimeOver()) {
             user.getTestState().getTimer().cancel();
         }
-    }
-
-    protected void setTimer(User user) {
-        TimerTask task = new TimerTask() {
-            public void run() {
-                try {
-                    sendText(user.getChatId(), "Время вышло. Результаты вашего теста ниже");
-                    changeStateToTestFinished(user);
-                } catch (Exception e) {
-                    log.error(LoggerMessages.setTimerException(), e);
-                }
-                user.getTestState().getTimer().cancel();
-            }
-        };
-        user.getTestState().getTimer().schedule(task, 10 * 1000);
     }
 }

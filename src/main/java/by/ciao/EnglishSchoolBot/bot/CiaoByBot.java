@@ -80,6 +80,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
             service.closeQuery(qry.getId());
         } else {
             log.info(LoggerMessages.unexpectedCase(update.toString()));
+            sendToTechAdmin(LoggerMessages.unexpectedCase(update.toString()));
         }
     }
 
@@ -130,6 +131,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
                 break;
             default:
                 log.error(LoggerMessages.processMessageException(), new IllegalStateException());
+                sendToTechAdmin(LoggerMessages.processMessageException());
         }
     }
 
@@ -138,6 +140,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
             processMessage(textMsg, user);
         } catch (Exception e) {
             log.error(LoggerMessages.messageProcessingException(), e);
+            sendToTechAdmin(e.toString());
         }
     }
 

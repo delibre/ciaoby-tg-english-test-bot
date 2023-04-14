@@ -18,6 +18,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,12 +62,32 @@ public class BotService {
         try {
             if (registeredUsersMap.putIfAbsent(id, new User(id, msg.getFrom().getUserName())) == null) {
                 log.info(LoggerMessages.mapSize(registeredUsersMap.size()));
-                sendText(config.getLong("admin_id"), LoggerMessages.mapSize(registeredUsersMap.size()));
+                // sending data to tech admin
+                sendText(config.getLong("tech_admin_id"), LoggerMessages.mapSize(registeredUsersMap.size()));
+                sendText(config.getLong("tech_admin_id"), getAppLoad().toString());
             }
         } catch (Exception e) {
             log.error(LoggerMessages.addUserIfAbsentException(), new RuntimeException(e));
-            sendText(config.getLong("admin_id"), e.toString());
+            sendText(config.getLong("tech_admin_id"), e.toString());
         }
+    }
+
+    StringBuilder getAppLoad() {
+        Runtime runtime = Runtime.getRuntime();
+
+        NumberFormat format = NumberFormat.getInstance();
+
+        StringBuilder sb = new StringBuilder();
+        long maxMemory = runtime.maxMemory();
+        long allocatedMemory = runtime.totalMemory();
+        long freeMemory = runtime.freeMemory();
+
+        sb.append("free memory: ").append(format.format(freeMemory / 1024)).append("\n\n");
+        sb.append("allocated memory: ").append(format.format(allocatedMemory / 1024)).append("\n\n");
+        sb.append("max memory: ").append(format.format(maxMemory / 1024)).append("\n\n");
+        sb.append("total free memory: ").append(format.format((freeMemory + (maxMemory - allocatedMemory)) / 1024)).append("\n\n");
+
+        return sb;
     }
 
     void addPhone(final Update update, final Long id) {
@@ -74,7 +95,7 @@ public class BotService {
             getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), registeredUsersMap.get(id));
         } catch (Exception e) {
             log.error(LoggerMessages.addPhoneException(), e);
-            sendText(config.getLong("admin_id"), e.toString());
+            sendText(config.getLong("tech_admin_id"), e.toString());
         }
     }
 
@@ -84,7 +105,7 @@ public class BotService {
                     .callbackQueryId(id).build());
         } catch (TelegramApiException e) {
             log.error(LoggerMessages.closeQueryException(), e);
-            sendText(config.getLong("admin_id"), e.toString());
+            sendText(config.getLong("tech_admin_id"), e.toString());
         }
     }
 
@@ -115,7 +136,7 @@ public class BotService {
             serviceCallback.execute(sm);
         } catch (TelegramApiException e) {
             log.error(LoggerMessages.sendTextException(), e);
-            sendText(config.getLong("admin_id"), e.toString());
+            sendText(config.getLong("tech_admin_id"), e.toString());
         }
     }
 

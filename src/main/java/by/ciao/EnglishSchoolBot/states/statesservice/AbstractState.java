@@ -21,7 +21,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Getter
 public abstract class AbstractState {
     private final ServiceCallback serviceCallback;
-    private final Logger log = LoggerFactory.getLogger(AbstractState.class);
+    private static final Logger log = LoggerFactory.getLogger(AbstractState.class);
 
     protected void sendText(final Long id, final String textMsg) throws TelegramApiException {
         serviceCallback.execute(createMessage(id, textMsg));

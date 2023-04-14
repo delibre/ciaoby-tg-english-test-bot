@@ -19,7 +19,7 @@ import java.util.TimerTask;
 
 public class StartTestState extends AbstractState implements UserMessageHandlerState {
     private final PropertiesConfiguration config = new PropertiesConfiguration("application.properties");
-    private final Logger log = LoggerFactory.getLogger(StartTestState.class);
+    private static final Logger log = LoggerFactory.getLogger(StartTestState.class);
 
     public StartTestState(ServiceCallback serviceCallback) throws ConfigurationException {
         super(serviceCallback);

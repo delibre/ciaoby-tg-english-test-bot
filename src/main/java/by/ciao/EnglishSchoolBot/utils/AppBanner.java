@@ -10,9 +10,9 @@ import java.io.InputStreamReader;
 import java.util.Objects;
 
 public final class AppBanner {
+    private static final Logger log = LoggerFactory.getLogger(AppBanner.class);
 
     public static void printBanner() {
-        Logger log = LoggerFactory.getLogger(AppBanner.class);
 
         try {
             InputStream inputStream = Objects.requireNonNull(ReadFile.class.getResourceAsStream("/banner.txt"));

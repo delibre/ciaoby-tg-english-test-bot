@@ -43,7 +43,7 @@ public class StartTestState extends AbstractState implements UserMessageHandlerS
         TimerTask task = new TimerTask() {
             public void run() {
                 try {
-                    sendText(user.getChatId().toString(), "Время вышло. Результаты вашего теста ниже");
+                    sendText(user.getChatId(), "Время вышло. Результаты вашего теста ниже");
                     changeStateToTestFinished(user);
                 } catch (Exception e) {
                     log.error(LoggerMessages.setTimerException(), e);

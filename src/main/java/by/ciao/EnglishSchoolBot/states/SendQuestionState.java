@@ -22,7 +22,7 @@ public class SendQuestionState extends AbstractState implements UserHandlerState
     }
 
     private void sendQuestion(final User user) throws TelegramApiException {
-        var sm = createMessage(user.getChatId(), BotResponses.getQuestion(user));
+        var sm = createMessage(user.getChatId().toString(), BotResponses.getQuestion(user));
 
         var markup = KeyboardCreator.createInlineKeyboard(BotResponses.optionsForAnswers(user));
         sm.setReplyMarkup(markup);

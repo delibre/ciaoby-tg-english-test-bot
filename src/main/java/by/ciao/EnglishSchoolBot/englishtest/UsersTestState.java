@@ -1,9 +1,9 @@
 package by.ciao.EnglishSchoolBot.englishtest;
 
 import by.ciao.EnglishSchoolBot.enums.EnglishLevel;
+import by.ciao.EnglishSchoolBot.utils.AppConfig;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.configuration.PropertiesConfiguration;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -20,7 +20,6 @@ public class UsersTestState {
     private EnglishLevel lvl;
     private final Timer timer;
     private LocalTime startTime;
-    private final PropertiesConfiguration config = new PropertiesConfiguration("application.properties");
 
     public UsersTestState() throws Exception {
         this.questions = new LinkedList<>();
@@ -87,7 +86,7 @@ public class UsersTestState {
         LocalTime currentTime = LocalTime.now();
         Duration elapsed = Duration.between(startTime, currentTime);
 //        Duration duration = Duration.ofMinutes(config.getInt("test_duration"));
-        Duration duration = Duration.ofSeconds(config.getInt("test_duration"));
+        Duration duration = Duration.ofSeconds(Long.parseLong(AppConfig.getProperty("test_duration")));
 
         Duration timeLeft = duration.minus(elapsed);
 
@@ -101,7 +100,7 @@ public class UsersTestState {
         LocalTime currentTime = LocalTime.now();
         Duration elapsed = Duration.between(startTime, currentTime);
 //        Duration duration = Duration.ofMinutes(config.getInt("test_duration"));
-        Duration duration = Duration.ofSeconds(config.getInt("test_duration"));
+        Duration duration = Duration.ofSeconds(Long.parseLong(AppConfig.getProperty("test_duration")));
 
         return elapsed.compareTo(duration) >= 0;
     }

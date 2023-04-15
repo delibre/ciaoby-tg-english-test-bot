@@ -55,7 +55,7 @@ public class BotService {
     }
 
     void sendWarning(Long id) {
-        sendText(registeredUsersMap.get(id).getChatId().toString(), BotResponses.questionAnsweringWarning());
+        sendText(registeredUsersMap.get(id).getChatId(), BotResponses.questionAnsweringWarning());
     }
 
     void addUserIfAbsent(final Long id, final Message msg) {
@@ -63,12 +63,12 @@ public class BotService {
             if (registeredUsersMap.putIfAbsent(id, new User(id, msg.getFrom().getUserName())) == null) {
                 log.info(LoggerMessages.mapSize(registeredUsersMap.size()));
                 // sending data to tech admin
-                sendText(AppConfig.getProperty("tech_admin_id"), LoggerMessages.mapSize(registeredUsersMap.size()));
-                sendText(AppConfig.getProperty("tech_admin_id"), getAppLoad().toString());
+                sendText(Long.parseLong(AppConfig.getProperty("tech_admin_id")), LoggerMessages.mapSize(registeredUsersMap.size()));
+                sendText(Long.parseLong(AppConfig.getProperty("tech_admin_id")), getAppLoad().toString());
             }
         } catch (Exception e) {
             log.error(LoggerMessages.addUserIfAbsentException(), new RuntimeException(e));
-            sendText(AppConfig.getProperty("tech_admin_id"), e.toString());
+            sendText(Long.parseLong(AppConfig.getProperty("tech_admin_id")), e.toString());
         }
     }
 
@@ -95,7 +95,7 @@ public class BotService {
             getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), registeredUsersMap.get(id));
         } catch (Exception e) {
             log.error(LoggerMessages.addPhoneException(), e);
-            sendText(AppConfig.getProperty("tech_admin_id"), e.toString());
+            sendText(Long.parseLong(AppConfig.getProperty("tech_admin_id")), e.toString());
         }
     }
 
@@ -109,7 +109,7 @@ public class BotService {
                     .callbackQueryId(id).build());
         } catch (TelegramApiException e) {
             log.error(LoggerMessages.closeQueryException(), e);
-            sendText(AppConfig.getProperty("tech_admin_id"), e.toString());
+            sendText(Long.parseLong(AppConfig.getProperty("tech_admin_id")), e.toString());
         }
     }
 
@@ -118,7 +118,7 @@ public class BotService {
             user.setState(StateEnum.START);
             user.clearTest();
         } else if (user.getState() == StateEnum.NEW_USER) {
-            sendText(user.getChatId().toString(), BotResponses.noSuchCommand());
+            sendText(user.getChatId(), BotResponses.noSuchCommand());
             return true;
         }
 
@@ -131,7 +131,7 @@ public class BotService {
         }
     }
 
-    void sendText(final String id, final String textMsg) {
+    void sendText(final Long id, final String textMsg) {
         var sm = SendMessage.builder()
                 .chatId(id)
                 .text(textMsg).build();
@@ -140,7 +140,7 @@ public class BotService {
             serviceCallback.execute(sm);
         } catch (TelegramApiException e) {
             log.error(LoggerMessages.sendTextException(), e);
-            sendText(AppConfig.getProperty("tech_admin_id"), e.toString());
+            sendText(Long.parseLong(AppConfig.getProperty("tech_admin_id")), e.toString());
         }
     }
 

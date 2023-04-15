@@ -23,18 +23,18 @@ public abstract class AbstractState {
     private final ServiceCallback serviceCallback;
     private static final Logger log = LoggerFactory.getLogger(AbstractState.class);
 
-    protected void sendText(final String id, final String textMsg) throws TelegramApiException {
+    protected void sendText(final Long id, final String textMsg) throws TelegramApiException {
         serviceCallback.execute(createMessage(id, textMsg));
     }
 
     protected void sendStartButton(final User user) throws TelegramApiException {
-        var sm = createMessage(user.getChatId().toString(), BotResponses.startTest());
+        var sm = createMessage(user.getChatId(), BotResponses.startTest());
         sm.setReplyMarkup(KeyboardCreator.createReplyKeyboard(BotResponses.startTestButton(), false));
 
         serviceCallback.execute(sm);
     }
 
-    protected SendMessage createMessage(final String id, final String textMsg) {
+    protected SendMessage createMessage(final Long id, final String textMsg) {
         var sm = SendMessage.builder()
                 .chatId(id)
                 .text(textMsg).build();

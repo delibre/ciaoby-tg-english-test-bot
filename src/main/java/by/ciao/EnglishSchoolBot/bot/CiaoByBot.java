@@ -150,7 +150,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
                 counter++;
             } catch (TelegramApiException ignore) {}
         }
-        service.sendText(AppConfig.getProperty("admin_id"), BotResponses.notificationReceivedBy(counter));
+        service.sendText(Long.parseLong(AppConfig.getProperty("admin_id")), BotResponses.notificationReceivedBy(counter));
     }
 
     private void sendToTechAdmin(final String textMsg) {

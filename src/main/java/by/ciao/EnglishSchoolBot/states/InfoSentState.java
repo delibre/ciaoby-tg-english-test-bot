@@ -14,6 +14,6 @@ public class InfoSentState extends AbstractState implements UserHandlerState {
 
     @Override
     public void apply(final User user) throws TelegramApiException {
-        sendText(user.getChatId().toString(), BotResponses.infoSent());
+        sendText(user.getChatId(), BotResponses.infoSent());
     }
 }

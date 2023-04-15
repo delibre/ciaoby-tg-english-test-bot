@@ -15,20 +15,6 @@ public final class AppConfig {
     private static Properties props = new Properties();
     private static final Logger log = LoggerFactory.getLogger(AppBanner.class);
 
-//    static {
-//        String profile = System.getenv(ENV_VAR_NAME);
-//        if (profile == null) {
-//            profile = DEFAULT_PROFILE;
-//        }
-//
-//        String filename = String.format("application-%s.properties", profile);
-//        try (InputStream input = AppConfig.class.getClassLoader().getResourceAsStream(filename)) {
-//            props.load(input);
-//        } catch (IOException ex) {
-//            log.error(LoggerMessages.propertiesException(filename), ex);
-//        }
-//    }
-
     static {
         String profile = System.getenv(ENV_VAR_NAME);
         if (profile == null) {

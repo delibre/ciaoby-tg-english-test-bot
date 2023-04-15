@@ -1,21 +1,32 @@
 package by.ciao.EnglishSchoolBot.englishtest;
 
-import lombok.Getter;
 import by.ciao.EnglishSchoolBot.enums.EnglishLevel;
+import by.ciao.EnglishSchoolBot.utils.AppConfig;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.LinkedList;
 import java.util.Objects;
+import java.util.Timer;
 
 @Getter
+@Setter
 public class UsersTestState {
     private final LinkedList<Question> questions;
+    private final LinkedList<String> userAnswers;
     private int correctAnswers;
     private EnglishLevel lvl;
+    private final Timer timer;
+    private LocalTime startTime;
 
     public UsersTestState() throws Exception {
         this.questions = new LinkedList<>();
         this.questions.addAll(EnglishTestSingleton.getInstance().getQuestions());
+        this.userAnswers = new LinkedList<>();
         this.correctAnswers = 0;
+        this.timer = new Timer();
     }
 
     public Question getCurrentQuestion() {
@@ -30,12 +41,20 @@ public class UsersTestState {
         if (Objects.equals(answer, questions.getFirst().getCorrectAnswer())) {
             correctAnswers++;
         }
+        userAnswers.add(answer);
         questions.removeFirst();
     }
 
-    public EnglishLevel getResult() {
-        if (!isFinished()) { throw new IllegalStateException(); }
+    public String getUserAnswer() {
+        if (userAnswers.isEmpty()) {
+            return null;
+        }
+        String userAnswer = userAnswers.getFirst();
+        userAnswers.removeFirst();
+        return userAnswer;
+    }
 
+    public EnglishLevel getResult() {
         if (lvl != null) { return lvl; }
 
         if (correctAnswers > 28) {
@@ -61,5 +80,28 @@ public class UsersTestState {
 
         lvl = EnglishLevel.A0;
         return lvl;
+    }
+
+    public String countTime() {
+        LocalTime currentTime = LocalTime.now();
+        Duration elapsed = Duration.between(startTime, currentTime);
+//        Duration duration = Duration.ofMinutes(config.getInt("test_duration"));
+        Duration duration = Duration.ofSeconds(Long.parseLong(AppConfig.getProperty("test_duration")));
+
+        Duration timeLeft = duration.minus(elapsed);
+
+        long MM = timeLeft.toMinutesPart();
+        long SS = timeLeft.toSecondsPart();
+
+        return String.format("%02d:%02d", MM, SS);
+    }
+
+    public boolean isTimeOver() {
+        LocalTime currentTime = LocalTime.now();
+        Duration elapsed = Duration.between(startTime, currentTime);
+//        Duration duration = Duration.ofMinutes(config.getInt("test_duration"));
+        Duration duration = Duration.ofSeconds(Long.parseLong(AppConfig.getProperty("test_duration")));
+
+        return elapsed.compareTo(duration) >= 0;
     }
 }

@@ -1,11 +1,16 @@
 package by.ciao.EnglishSchoolBot.bot;
 
-import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.user.User;
+import by.ciao.EnglishSchoolBot.utils.AppConfig;
+import by.ciao.EnglishSchoolBot.utils.BotResponses;
+import by.ciao.EnglishSchoolBot.utils.LoggerMessages;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -14,6 +19,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.Optional;
 
 public class CiaoByBot extends TelegramLongPollingBot {
+    private static final Logger log = LoggerFactory.getLogger(CiaoByBot.class);
     private final BotService service = new BotService((obj) -> {
         Optional<Message> msg = Optional.empty();
 
@@ -24,11 +30,17 @@ public class CiaoByBot extends TelegramLongPollingBot {
                 execute((DeleteMessage) obj);
             } else if (obj instanceof EditMessageText) {
                 execute((EditMessageText) obj);
+            } else if (obj instanceof EditMessageReplyMarkup) {
+                execute((EditMessageReplyMarkup) obj);
+            } else if (obj instanceof AnswerCallbackQuery) {
+                execute((AnswerCallbackQuery) obj);
             } else {
-                throw new IllegalArgumentException("Object type is not supported");
+                log.error(LoggerMessages.argumentExceptionInServiceVar(), new IllegalArgumentException());
+                sendToTechAdmin(new IllegalArgumentException().toString());
             }
         } catch (TelegramApiException e) {
-            throw new TelegramApiException(e);
+            log.error(LoggerMessages.tgApiExceptionInServiceVar(), e);
+            sendToTechAdmin(e.toString());
         }
 
         return msg;
@@ -36,47 +48,53 @@ public class CiaoByBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (service.msgHasText(update)) {
+        if (service.isMsgFromAdmin(update)) {
+            broadcast(update.getMessage().getText());
+
+        } else if (service.msgHasText(update)) {
             var msg = update.getMessage();
             var id = msg.getChatId();
 
             if(service.isCheckAnswerState(id)) {
-                sendWarning(id);
+                service.sendWarning(id);
                 return;
             }
 
-            addUserIfAbsent(id, msg);
+            service.addUserIfAbsent(id, msg);
             catchMessageProcessingException(msg.getText(), service.getRegisteredUsersMap().get(id));
 
         }  else if (service.hasContact(update)) {
             var id = update.getMessage().getChatId();
-            addPhone(update, id);
+            service.addPhone(update, id);
 
-        } else if (service.hasCallback(update)) {
+        } else if (service.hasCallbackAndCorrectState(update)) {
             var qry = update.getCallbackQuery();
             var user = service.getRegisteredUsersMap().get(qry.getFrom().getId());
 
             catchMessageProcessingException(qry.getData(), user);
-            closeQuery(qry.getId());
+            service.closeQuery(qry.getId());
+        } else {
+            log.info(LoggerMessages.unexpectedCase(update.toString()));
+            sendToTechAdmin(LoggerMessages.unexpectedCase(update.toString()));
         }
     }
 
     @Override
     public String getBotUsername() {
-        return "testForProd_bot";
+        return AppConfig.getProperty("bot_username");
     }
 
     @Override
     public String getBotToken() {
-        return "6167400176:AAGg4892WjlM0mMxUgdmdoQXID2X9UPw4lo";
+        return AppConfig.getProperty("bot_token");
     }
 
     private void processMessage(String textMsg, User user) throws Exception {
-        if (startBot(textMsg, user)) {
+        if (service.startBot(textMsg, user)) {
             return;
         }
 
-        startTestIfStartButtonIsPressed(textMsg, user);
+        service.startTestIfStartButtonIsPressed(textMsg, user);
 
         switch (user.getState()) {
             case SEND_QUESTION:
@@ -107,23 +125,8 @@ public class CiaoByBot extends TelegramLongPollingBot {
                 service.infoSentHandler(user);
                 break;
             default:
-                throw new IllegalStateException();
-        }
-    }
-
-    private void sendWarning(final Long id) {
-        try {
-            sendText(service.getRegisteredUsersMap().get(id).getChatId(), "Отвечать можно только нажав кнопку с одним из вариантов ответа");
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void addUserIfAbsent(final Long id, final Message msg) {
-        try {
-            service.addUserIfAbsent(id, msg);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+                log.error(LoggerMessages.processMessageException(), new IllegalStateException());
+                sendToTechAdmin(LoggerMessages.processMessageException());
         }
     }
 
@@ -131,55 +134,34 @@ public class CiaoByBot extends TelegramLongPollingBot {
         try {
             processMessage(textMsg, user);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(LoggerMessages.messageProcessingException(), e);
+            sendToTechAdmin(e.toString());
         }
     }
 
-    private void addPhone(final Update update, final Long id) {
-        try {
-            service.addPhone(update, id);
-        } catch (Exception e) {
-            e.printStackTrace();
+    private void broadcast(String textMsg) {
+        int counter = 0;
+        for (User user : service.getRegisteredUsersMap().values()) {
+            var sm = SendMessage.builder()
+                    .chatId(user.getChatId().toString())
+                    .text(textMsg).build();
+            try {
+                execute(sm);
+                counter++;
+            } catch (TelegramApiException ignore) {}
         }
+        service.sendText(Long.parseLong(AppConfig.getProperty("admin_id")), BotResponses.notificationReceivedBy(counter));
     }
 
-    private void closeQuery(final String id) {
-        try {
-            execute(AnswerCallbackQuery.builder()
-                    .callbackQueryId(id).build());
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private boolean startBot(final String textMsg, final User user) throws Exception {
-        if (textMsg.equals("/start")) {
-            user.setState(StateEnum.START);
-            user.clearTest();
-        } else if (user.getState() == null) {
-            sendText(user.getChatId(), "Нет такой команды");
-            return true;
-        }
-
-        return false;
-    }
-
-    private void startTestIfStartButtonIsPressed(final String textMsg, final User user) throws Exception {
-        if (textMsg.equals("Начать тестирование\uD83C\uDFC1")) {
-            user.clearTest();
-            user.setState(StateEnum.SEND_QUESTION);
-        }
-    }
-
-    private void sendText(final Long id, final String textMsg) throws TelegramApiException {
+    private void sendToTechAdmin(final String textMsg) {
         var sm = SendMessage.builder()
-                .chatId(id.toString())
+                .chatId(AppConfig.getProperty("tech_admin_id"))
                 .text(textMsg).build();
 
         try {
             execute(sm);
         } catch (TelegramApiException e) {
-            throw new TelegramApiException(e);
+            log.error(LoggerMessages.sendTextException(), e);
         }
     }
 }

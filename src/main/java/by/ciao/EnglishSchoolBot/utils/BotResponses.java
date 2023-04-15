@@ -1,5 +1,7 @@
 package by.ciao.EnglishSchoolBot.utils;
 
+import by.ciao.EnglishSchoolBot.englishtest.EnglishTestSingleton;
+import by.ciao.EnglishSchoolBot.englishtest.Question;
 import by.ciao.EnglishSchoolBot.user.User;
 
 import java.util.ArrayList;
@@ -7,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class BotResponses {
-    public static String testFinished(final User user) {
+    public static String testFinished(User user) {
         return "Вы ответили верно на " + user.getTestState().getCorrectAnswers() + " вопросов.\n" +
                 "Ваш уровень английского " + user.getTestState().getResult() + ".\n" +
                 "Вы молодец, Вам осталось совсем немного, и скоро мы свяжемся с Вами для прохождения устного тестирования\uD83D\uDE0A";
@@ -36,7 +38,7 @@ public final class BotResponses {
                 "Если хотите пройти тест заново - нажмите кнопку \"Начать тестирование\"\uD83E\uDD17";
     }
 
-    public static String phoneForamtWarning() {
+    public static String phoneFormatWarning() {
         return "Неверный формат номера. Попробуйте, пожалуйста, ещё раз";
     }
 
@@ -46,20 +48,25 @@ public final class BotResponses {
 
     public static String askReferral() {
         return "Откуда вы о нас узнали?\n" +
-                "Выберете один из вариантов ниже или же впишите свой";
+                "Выберете один из вариантов ниже или же впишите свой\n\n";
     }
 
     public static String askForPhone() {
         return "Чтобы нам было удобнее с Вами связаться для согласования второго этапа (устного тестирования), " +
                 "укажите, пожалуйста, Ваш номер телефона\uD83D\uDE0A\n\n" +
                 "Вы можете нажать на кнопку \"Поделиться номером\" и указать номер, к которому привязан Ваш телеграм, " +
-                "либо же указать другой, вписав его в формате +12345678900.\uD83D\uDE0A\n\n";
+                "либо же указать другой, вписав его в формате +1234567890.\uD83D\uDE0A\n\n";
     }
 
     public static String startTest() {
-        return "Ну что же, приступим к тесту. Сейчас Вам нужно будет ответить на 30 вопросов.\uD83E\uDDD0 " +
-                "Ограничений по времени нет.\n\n" +
+        return "Ну что же, приступим к тесту. Сейчас Вам нужно будет ответить на 30 вопросов за Х минут.\uD83E\uDDD0\n\n" +
                 "Нажмите кнопку \"Начать тестирование\", когда будете готовы.";
+    }
+
+    public static String getQuestion(User user) {
+        return "Времени осталось: " + user.getTestState().countTime() + "\n\n" +
+                user.getTestState().getCurrentQuestion().getNumberOfQuestion() + ". "
+                + user.getTestState().getCurrentQuestion().getQuestion();
     }
 
     public static List<String> referralOptions() {
@@ -67,9 +74,7 @@ public final class BotResponses {
     }
 
     public static List<String> optionsForAnswers(final User user) {
-        ArrayList<String> answers = new ArrayList<>(Arrays.asList(user.getTestState().getCurrentQuestion().getAnswers()));
-        answers.add("Пропустить");
-        return answers;
+        return new ArrayList<>(user.getTestState().getCurrentQuestion().getAnswers());
     }
 
     public static String startTestButton() {
@@ -78,5 +83,58 @@ public final class BotResponses {
 
     public static String sharePhoneButton() {
         return "Поделиться номером";
+    }
+
+    public static String questionAnsweringWarning() {
+        return "Отвечать можно только нажав кнопку с одним из вариантов ответа";
+    }
+
+    public static String noSuchCommand() {
+        return "Нет такой команды";
+    }
+
+    public static String notificationReceivedBy(int counter) {
+        return "Уведомление получили " + counter + " пользователей";
+    }
+
+    public static StringBuilder userAnswers(User user) throws Exception {
+        StringBuilder testWithAnswers = new StringBuilder();
+
+        for (Question question : EnglishTestSingleton.getInstance().getQuestions()) {
+            String userAnswer = user.getTestState().getUserAnswer();
+            if (userAnswer == null) {
+                break;
+            }
+
+            testWithAnswers.append(isAnswerCorrect(question, userAnswer)).append(question.getNumberOfQuestion())
+                    .append(". ").append(question.getQuestion())
+                    .append("\n(Правильный ответ: <b>").append(question.getCorrectAnswer()).append("</b>)\n")
+                    .append(getAnswers(question, userAnswer)).append("\n\n");
+        }
+
+        testWithAnswers.append(testFinished(user));
+
+        return testWithAnswers;
+    }
+
+    private static String isAnswerCorrect(Question question, String userAnswer) {
+        if (userAnswer.equals(question.getCorrectAnswer())) {
+            return "✅ ";
+        }
+        return "❌ ";
+    }
+
+    private static StringBuilder getAnswers(Question question, String userAnswer) {
+        StringBuilder answers = new StringBuilder();
+
+        for (String answer : question.getAnswers()) {
+            if (userAnswer.equals(answer)) {
+                answers.append("\t\t<b>").append(answer).append(" (Ваш ответ)</b>\n");
+                continue;
+            }
+            answers.append("\t\t").append(answer).append("\n");
+        }
+
+        return answers;
     }
 }

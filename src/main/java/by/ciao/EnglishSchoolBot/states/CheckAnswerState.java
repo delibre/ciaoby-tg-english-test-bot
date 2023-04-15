@@ -13,6 +13,7 @@ public class CheckAnswerState extends AbstractState implements UserMessageHandle
 
     @Override
     public void apply(final String textMsg, final User user) throws Exception {
+        if (testFinished(user)) { return; }
         user.getTestState().registerAnswer(textMsg);
         UserHandlerState state = new SendQuestionState(getServiceCallback());
         state.apply(user);

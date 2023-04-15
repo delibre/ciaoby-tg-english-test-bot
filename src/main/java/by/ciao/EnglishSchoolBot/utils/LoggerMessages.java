@@ -52,4 +52,8 @@ public final class LoggerMessages {
     public static String mapSize(int size) {
         return "Size of the map is " + size;
     }
+
+    public static String propertiesException(String filename) {
+        return "Failed to load properties from " + filename;
+    }
 }

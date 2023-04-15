@@ -16,6 +16,6 @@ public class StartState extends AbstractState implements UserHandlerState {
     @Override
     public void apply(final User user) throws TelegramApiException {
         user.setState(StateEnum.GET_FULL_NAME);
-        sendText(user.getChatId(), BotResponses.start());
+        sendText(user.getChatId().toString(), BotResponses.start());
     }
 }

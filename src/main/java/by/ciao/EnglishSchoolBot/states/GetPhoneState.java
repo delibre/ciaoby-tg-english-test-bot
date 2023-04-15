@@ -20,7 +20,7 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
     @Override
     public void apply(final String textMsg, final User user) throws TelegramApiException {
         if (!Regex.isCorrectPhoneFormat(textMsg)) {
-            sendText(user.getChatId(), BotResponses.phoneFormatWarning());
+            sendText(user.getChatId().toString(), BotResponses.phoneFormatWarning());
             return;
         }
 
@@ -42,7 +42,7 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
     }
 
     private void sendOptionsForReferral(final User user) throws TelegramApiException {
-        var sm = createMessage(user.getChatId(), BotResponses.askReferral());
+        var sm = createMessage(user.getChatId().toString(), BotResponses.askReferral());
         sm.setReplyMarkup(KeyboardCreator.createInlineKeyboard(BotResponses.referralOptions()));
 
         getServiceCallback().execute(sm).ifPresent(user::setLastMessage);

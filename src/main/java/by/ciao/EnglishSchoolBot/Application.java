@@ -2,7 +2,6 @@ package by.ciao.EnglishSchoolBot;
 
 import by.ciao.EnglishSchoolBot.bot.CiaoByBot;
 import by.ciao.EnglishSchoolBot.utils.AppBanner;
-import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -22,8 +21,6 @@ public class Application {
             telegramBotsApi.registerBot(new CiaoByBot());
         } catch (TelegramApiRequestException e) {
             log.error("Failed to register bot(check internet connection / bot token or make sure only one instance of bot is running).", e);
-        } catch (ConfigurationException e) {
-            log.error("Config exception", e);
         }
         log.info("Telegram bot is ready to accept updates from user......");
     }

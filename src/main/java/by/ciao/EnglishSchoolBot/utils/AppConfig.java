@@ -13,7 +13,7 @@ public final class AppConfig {
     private static final String ENV_VAR_NAME = "PROFILE";
     private static final String DEFAULT_PROFILE = "slava-test";
     private static Properties props = new Properties();
-    private static final Logger log = LoggerFactory.getLogger(AppBanner.class);
+    private static final Logger log = LoggerFactory.getLogger(AppConfig.class);
 
     static {
         String profile = System.getenv(ENV_VAR_NAME);

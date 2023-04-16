@@ -59,7 +59,7 @@ public final class BotResponses {
     }
 
     public static String startTest() {
-        return "Ну что же, приступим к тесту. Сейчас Вам нужно будет ответить на 30 вопросов за " + AppConfig.getProperty("test_duration") + "минут.\uD83E\uDDD0\n\n" +
+        return "Ну что же, приступим к тесту. Сейчас Вам нужно будет ответить на 30 вопросов за " + AppConfig.getProperty("test_duration") + " минут.\uD83E\uDDD0\n\n" +
                 "Нажмите кнопку \"Начать тестирование\", когда будете готовы.";
     }
 

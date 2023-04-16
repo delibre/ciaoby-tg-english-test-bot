@@ -51,6 +51,6 @@ public class StartTestState extends AbstractState implements UserMessageHandlerS
                 user.getTestState().getTimer().cancel();
             }
         };
-        user.getTestState().getTimer().schedule(task, Long.parseLong(AppConfig.getProperty("test_duration")) * 1000);
+        user.getTestState().getTimer().schedule(task, Long.parseLong(AppConfig.getProperty("test_duration")) * 60 * 1000);
     }
 }

@@ -85,8 +85,7 @@ public class UsersTestState {
     public String countTime() {
         LocalTime currentTime = LocalTime.now();
         Duration elapsed = Duration.between(startTime, currentTime);
-//        Duration duration = Duration.ofMinutes(config.getInt("test_duration"));
-        Duration duration = Duration.ofSeconds(Long.parseLong(AppConfig.getProperty("test_duration")));
+        Duration duration = Duration.ofMinutes(Long.parseLong(AppConfig.getProperty("test_duration")));
 
         Duration timeLeft = duration.minus(elapsed);
 
@@ -99,8 +98,7 @@ public class UsersTestState {
     public boolean isTimeOver() {
         LocalTime currentTime = LocalTime.now();
         Duration elapsed = Duration.between(startTime, currentTime);
-//        Duration duration = Duration.ofMinutes(config.getInt("test_duration"));
-        Duration duration = Duration.ofSeconds(Long.parseLong(AppConfig.getProperty("test_duration")));
+        Duration duration = Duration.ofMinutes(Long.parseLong(AppConfig.getProperty("test_duration")));
 
         return elapsed.compareTo(duration) >= 0;
     }

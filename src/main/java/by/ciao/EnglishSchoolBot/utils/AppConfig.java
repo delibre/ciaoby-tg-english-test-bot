@@ -11,16 +11,11 @@ import java.util.Properties;
 
 public final class AppConfig {
     private static final String ENV_VAR_NAME = "PROFILE";
-    private static final String DEFAULT_PROFILE = "slava-test";
     private static Properties props = new Properties();
     private static final Logger log = LoggerFactory.getLogger(AppConfig.class);
 
     static {
         String profile = System.getenv(ENV_VAR_NAME);
-        if (profile == null) {
-            profile = DEFAULT_PROFILE;
-        }
-
         String commonFilename = "application.properties";
         String profileFilename = String.format("application-%s.properties", profile);
 

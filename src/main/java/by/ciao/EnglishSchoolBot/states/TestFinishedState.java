@@ -20,7 +20,7 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
         user.setState(StateEnum.INFO_SENT);
         deleteLastMessage(user);
 
-        sendText(user.getChatId(), BotResponses.userAnswers(user).toString());
+        sendAnswers(user);
         sendDataToAdmin(user);
     }
 
@@ -35,5 +35,32 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
     private void sendDataToAdmin(final User user) throws TelegramApiException {
         getServiceCallback().execute(createMessage(Long.parseLong(AppConfig.getProperty("admin_id")), BotResponses.dataForAdmin(user)));
         getServiceCallback().execute(createMessage(Long.parseLong(AppConfig.getProperty("tech_admin_id")), BotResponses.dataForAdmin(user)));
+    }
+
+    private void sendAnswers(final User user) throws Exception {
+        StringBuilder userAnswers = BotResponses.userAnswers(user);
+        int numAnswers = userAnswers.toString().split("\n\n").length;
+
+        if (numAnswers <= 26) {
+            sendText(user.getChatId(), userAnswers.toString());
+        } else {
+            String[] answers = userAnswers.toString().split("\n\n");
+
+            StringBuilder firstMessage = new StringBuilder();
+            StringBuilder secondMessage = new StringBuilder();
+
+            for (int i = 0; i < 15; i++) {
+                firstMessage.append(answers[i]).append("\n\n");
+            }
+
+            for (int i = 15; i < answers.length; i++) {
+                secondMessage.append(answers[i]).append("\n\n");
+            }
+
+            sendText(user.getChatId(), firstMessage.toString());
+            sendText(user.getChatId(), secondMessage.toString());
+        }
+
+        sendText(user.getChatId(), BotResponses.testFinished(user));
     }
 }

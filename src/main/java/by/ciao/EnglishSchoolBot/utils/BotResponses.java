@@ -112,8 +112,6 @@ public final class BotResponses {
                     .append(getAnswers(question, userAnswer)).append("\n\n");
         }
 
-        testWithAnswers.append(testFinished(user));
-
         return testWithAnswers;
     }
 

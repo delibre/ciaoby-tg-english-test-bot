@@ -34,5 +34,6 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
 
     private void sendDataToAdmin(final User user) throws TelegramApiException {
         getServiceCallback().execute(createMessage(Long.parseLong(AppConfig.getProperty("admin_id")), BotResponses.dataForAdmin(user)));
+        getServiceCallback().execute(createMessage(Long.parseLong(AppConfig.getProperty("tech_admin_id")), BotResponses.dataForAdmin(user)));
     }
 }

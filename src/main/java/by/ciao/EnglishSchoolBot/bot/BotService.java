@@ -1,5 +1,6 @@
 package by.ciao.EnglishSchoolBot.bot;
 
+import by.ciao.EnglishSchoolBot.controller.RestController;
 import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.states.*;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
@@ -13,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -58,9 +58,10 @@ public class BotService {
         sendText(registeredUsersMap.get(id).getChatId(), BotResponses.questionAnsweringWarning());
     }
 
-    void addUserIfAbsent(final Long id, final Message msg) {
+    void addUserIfAbsent(final Long chatId, final String username) {
         try {
-            if (registeredUsersMap.putIfAbsent(id, new User(id, msg.getFrom().getUserName())) == null) {
+            if (registeredUsersMap.putIfAbsent(chatId, new User(chatId, username)) == null) {
+                RestController.getInstance().addUserToDB(registeredUsersMap.get(chatId));
                 log.info(LoggerMessages.mapSize(registeredUsersMap.size()));
                 // sending data to tech admin
                 sendText(Long.parseLong(AppConfig.getProperty("tech_admin_id")), LoggerMessages.mapSize(registeredUsersMap.size()));
@@ -125,7 +126,7 @@ public class BotService {
         return false;
     }
 
-    void startTestIfStartButtonIsPressed(final String textMsg, final User user) {
+    void startTestIfStartButtonPressed(final String textMsg, final User user) {
         if (textMsg.equals("Начать тестирование\uD83C\uDFC1") && user.isUserDataCollected()) {
             user.setState(StateEnum.START_TEST);
         }

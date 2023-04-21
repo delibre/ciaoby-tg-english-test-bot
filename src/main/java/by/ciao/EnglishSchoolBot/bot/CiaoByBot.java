@@ -53,15 +53,15 @@ public class CiaoByBot extends TelegramLongPollingBot {
 
         } else if (service.msgHasText(update)) {
             var msg = update.getMessage();
-            var id = msg.getChatId();
+            var chatId = msg.getChatId();
 
-            if(service.isCheckAnswerState(id)) {
-                service.sendWarning(id);
+            if(service.isCheckAnswerState(chatId)) {
+                service.sendWarning(chatId);
                 return;
             }
 
-            service.addUserIfAbsent(id, msg);
-            catchMessageProcessingException(msg.getText(), service.getRegisteredUsersMap().get(id));
+            service.addUserIfAbsent(chatId, msg.getFrom().getUserName());
+            catchMessageProcessingException(msg.getText(), service.getRegisteredUsersMap().get(chatId));
 
         }  else if (service.hasContact(update)) {
             var id = update.getMessage().getChatId();
@@ -90,43 +90,27 @@ public class CiaoByBot extends TelegramLongPollingBot {
     }
 
     private void processMessage(String textMsg, User user) throws Exception {
+
         if (service.startBot(textMsg, user)) {
             return;
         }
 
-        service.startTestIfStartButtonIsPressed(textMsg, user);
+        service.startTestIfStartButtonPressed(textMsg, user);
 
         switch (user.getState()) {
-            case SEND_QUESTION:
-                service.sendQuestionHandler(user);
-                break;
-            case CHECK_ANSWER:
-                service.checkAnswerHandler(textMsg, user);
-                break;
-            case START:
-                service.startHandler(user);
-                break;
-            case GET_FULL_NAME:
-                service.getFullNameHandler(textMsg, user);
-                break;
-            case GET_PHONE:
-                service.getPhoneHandler(textMsg, user);
-                break;
-            case GET_REFERRAL:
-                service.getReferralHandler(textMsg, user);
-                break;
-            case START_TEST:
-                service.startTestHandler(textMsg, user);
-                break;
-            case TEST_FINISHED:
-                service.testFinishedHandler(user);
-                break;
-            case INFO_SENT:
-                service.infoSentHandler(user);
-                break;
-            default:
+            case SEND_QUESTION -> service.sendQuestionHandler(user);
+            case CHECK_ANSWER -> service.checkAnswerHandler(textMsg, user);
+            case START -> service.startHandler(user);
+            case GET_FULL_NAME -> service.getFullNameHandler(textMsg, user);
+            case GET_PHONE -> service.getPhoneHandler(textMsg, user);
+            case GET_REFERRAL -> service.getReferralHandler(textMsg, user);
+            case START_TEST -> service.startTestHandler(textMsg, user);
+            case TEST_FINISHED -> service.testFinishedHandler(user);
+            case INFO_SENT -> service.infoSentHandler(user);
+            default -> {
                 log.error(LoggerMessages.processMessageException(), new IllegalStateException());
                 sendToTechAdmin(LoggerMessages.processMessageException());
+            }
         }
     }
 

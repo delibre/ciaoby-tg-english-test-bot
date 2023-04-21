@@ -1,6 +1,7 @@
 package by.ciao.EnglishSchoolBot.states;
 
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
+import by.ciao.EnglishSchoolBot.controller.RestController;
 import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
@@ -22,6 +23,7 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
 
         sendAnswers(user);
         sendDataToAdmin(user);
+        RestController.getInstance().updateTestInfoInDB(user);
     }
 
     private void deleteLastMessage(final User user) throws TelegramApiException {

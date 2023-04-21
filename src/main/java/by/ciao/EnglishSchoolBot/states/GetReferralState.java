@@ -1,6 +1,7 @@
 package by.ciao.EnglishSchoolBot.states;
 
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
+import by.ciao.EnglishSchoolBot.controller.RestController;
 import by.ciao.EnglishSchoolBot.enums.StateEnum;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
@@ -18,6 +19,7 @@ public class GetReferralState extends AbstractState implements UserMessageHandle
     public void apply(final String textMsg, final User user) throws TelegramApiException {
         user.setReferral(textMsg);
         user.setState(StateEnum.START_TEST);
+        RestController.getInstance().updateContactInfoInDB(user);
 
         getServiceCallback().execute(editMessage(user, null, BotResponses.askReferral() + textMsg));
         user.setLastMessage(new Message());  // made for future question edition

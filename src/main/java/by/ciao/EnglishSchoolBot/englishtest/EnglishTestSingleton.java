@@ -7,9 +7,9 @@ import java.util.LinkedList;
 
 @Getter
 public final class EnglishTestSingleton {
+
     private static EnglishTestSingleton INSTANCE;
     private final LinkedList<Question> questions = new LinkedList<>();
-
 
     private EnglishTestSingleton() throws Exception {
         this.questions.addAll(ReadFile.readFile());

@@ -72,12 +72,14 @@ public final class RestController {
                 HttpMethod.PUT, requestEntity, String.class).getBody());
     }
 
-    public UserDTO getUserByChatId(Long chatId) {
+    public User getUserByChatId(Long chatId) {
         ResponseEntity<UserDTO> response = restTemplate.getForEntity(url + "/" + chatId, UserDTO.class);
-        if (response.getStatusCode() == HttpStatus.NOT_FOUND) {
+        UserDTO dto = response.getBody();
+
+        if (dto == null) {
             return null;
         }
 
-        return response.getBody();
+        return new User(dto.getChatId(), dto.getFullName(), dto.getUsername(), dto.getPhone(), dto.getReferral());
     }
 }

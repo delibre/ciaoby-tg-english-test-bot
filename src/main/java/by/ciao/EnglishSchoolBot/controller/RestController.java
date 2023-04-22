@@ -1,13 +1,11 @@
 package by.ciao.EnglishSchoolBot.controller;
 
 import by.ciao.EnglishSchoolBot.user.User;
+import by.ciao.EnglishSchoolBot.user.UserDTO;
 import by.ciao.EnglishSchoolBot.utils.AppConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -63,7 +61,6 @@ public final class RestController {
 
     public void updateTestInfoInDB(User user) {
         Map<String, String> requestBody = new HashMap<>();
-        System.out.println(user.getTestState().getLvl());
         requestBody.put("englishLvl", String.valueOf(user.getTestState().getLvl()));
         requestBody.put("numOfCorrectAnswers", String.valueOf(user.getTestState().getCorrectAnswers()));
 
@@ -73,5 +70,14 @@ public final class RestController {
         log.info(restTemplate.exchange(
                 url + "/update-testinfo/" + user.getChatId(),
                 HttpMethod.PUT, requestEntity, String.class).getBody());
+    }
+
+    public UserDTO getUserByChatId(Long chatId) {
+        ResponseEntity<UserDTO> response = restTemplate.getForEntity(url + "/" + chatId, UserDTO.class);
+        if (response.getStatusCode() == HttpStatus.NOT_FOUND) {
+            return null;
+        }
+
+        return response.getBody();
     }
 }

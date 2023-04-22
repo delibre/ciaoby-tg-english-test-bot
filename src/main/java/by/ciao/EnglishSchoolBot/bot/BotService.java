@@ -6,6 +6,7 @@ import by.ciao.EnglishSchoolBot.states.*;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
 import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
 import by.ciao.EnglishSchoolBot.user.User;
+import by.ciao.EnglishSchoolBot.user.UserDTO;
 import by.ciao.EnglishSchoolBot.utils.AppConfig;
 import by.ciao.EnglishSchoolBot.utils.BotResponses;
 import by.ciao.EnglishSchoolBot.utils.LoggerMessages;
@@ -60,12 +61,16 @@ public class BotService {
 
     void addUserIfAbsent(final Long chatId, final String username) {
         try {
-            if (registeredUsersMap.putIfAbsent(chatId, new User(chatId, username)) == null) {
+            UserDTO dto = RestController.getInstance().getUserByChatId(chatId);
+            if (dto == null) {
+                registeredUsersMap.putIfAbsent(chatId, new User(chatId, username));
                 RestController.getInstance().addUserToDB(registeredUsersMap.get(chatId));
                 log.info(LoggerMessages.mapSize(registeredUsersMap.size()));
                 // sending data to tech admin
                 sendText(Long.parseLong(AppConfig.getProperty("tech_admin_id")), LoggerMessages.mapSize(registeredUsersMap.size()));
                 sendText(Long.parseLong(AppConfig.getProperty("tech_admin_id")), getAppLoad().toString());
+            } else {
+                registeredUsersMap.putIfAbsent(chatId, new User(dto.getChatId(), dto.getFullName(), dto.getUsername(), dto.getPhone(), dto.getReferral()));
             }
         } catch (Exception e) {
             log.error(LoggerMessages.addUserIfAbsentException(), new RuntimeException(e));
@@ -183,6 +188,7 @@ public class BotService {
     void testFinishedHandler(final User user) throws Exception {
         UserHandlerState state = new TestFinishedState(serviceCallback);
         state.apply(user);
+        registeredUsersMap.remove(user.getChatId());
     }
 
     void infoSentHandler(final User user) throws Exception {

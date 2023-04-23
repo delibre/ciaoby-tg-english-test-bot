@@ -1,7 +1,6 @@
 package by.ciao.controller;
 
 import by.ciao.user.User;
-import by.ciao.user.UserDTO;
 import by.ciao.utils.AppConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,13 +72,6 @@ public final class RestController {
     }
 
     public User getUserByChatId(Long chatId) {
-        ResponseEntity<UserDTO> response = restTemplate.getForEntity(url + "/" + chatId, UserDTO.class);
-        UserDTO dto = response.getBody();
-
-        if (dto == null) {
-            return null;
-        }
-
-        return new User(dto.getChatId(), dto.getFullName(), dto.getUsername(), dto.getPhone(), dto.getReferral());
+        return restTemplate.exchange(url + "/" + chatId, HttpMethod.GET, null, User.class).getBody();
     }
 }

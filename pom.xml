@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.ciaobyTestBot</groupId>
-    <artifactId>Application</artifactId>
+    <artifactId>tg-english-test-bot</artifactId>
     <version>1.4.0</version>
 
     <properties>
@@ -86,7 +86,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>by.ciao.EnglishSchoolBot.Application</mainClass>
+                            <mainClass>by.ciao.Application</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

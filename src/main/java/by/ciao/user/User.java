@@ -3,11 +3,12 @@ package by.ciao.user;
 import by.ciao.englishtest.UsersTestState;
 import by.ciao.enums.StateEnum;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-@Getter
-@Setter
+@Getter @Setter
+@NoArgsConstructor
 public class User {
     private StateEnum state;
     private Message lastMessage;

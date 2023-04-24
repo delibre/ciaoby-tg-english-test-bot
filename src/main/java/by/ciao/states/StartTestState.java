@@ -6,8 +6,6 @@ import by.ciao.states.statesservice.AbstractState;
 import by.ciao.states.statesservice.UserHandlerState;
 import by.ciao.states.statesservice.UserMessageHandlerState;
 import by.ciao.user.User;
-import by.ciao.utils.BotResponses;
-import by.ciao.utils.LoggerMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +26,7 @@ public class StartTestState extends AbstractState implements UserMessageHandlerS
 
     @Override
     public void apply(final String textMsg, final User user) throws Exception {
-        if (Objects.equals(textMsg, BotResponses.startTestButton())) {
+        if (Objects.equals(textMsg, getBotResponses().startTestButton())) {
             user.setState(StateEnum.SEND_QUESTION);
             user.clearTest();
             setTimer(user);
@@ -49,7 +47,7 @@ public class StartTestState extends AbstractState implements UserMessageHandlerS
                     sendText(user.getChatId(), "Время вышло. Результаты вашего теста ниже");
                     changeStateToTestFinished(user);
                 } catch (Exception e) {
-                    log.error(LoggerMessages.setTimerException(), e);
+                    log.error(getLoggerMessages().setTimerException(), e);
                 }
                 user.getTestState().getTimer().cancel();
             }

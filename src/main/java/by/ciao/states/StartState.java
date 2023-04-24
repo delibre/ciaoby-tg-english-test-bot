@@ -1,11 +1,10 @@
 package by.ciao.states;
 
 import by.ciao.bot.ServiceCallback;
-import by.ciao.user.User;
 import by.ciao.enums.StateEnum;
 import by.ciao.states.statesservice.AbstractState;
 import by.ciao.states.statesservice.UserHandlerState;
-import by.ciao.utils.BotResponses;
+import by.ciao.user.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class StartState extends AbstractState implements UserHandlerState {
@@ -16,6 +15,6 @@ public class StartState extends AbstractState implements UserHandlerState {
     @Override
     public void apply(final User user) throws TelegramApiException {
         user.setState(StateEnum.GET_FULL_NAME);
-        sendText(user.getChatId(), BotResponses.start());
+        sendText(user.getChatId(), getBotResponses().start());
     }
 }

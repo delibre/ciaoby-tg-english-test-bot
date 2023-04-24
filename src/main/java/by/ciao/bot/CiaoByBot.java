@@ -26,10 +26,22 @@ public class CiaoByBot extends TelegramLongPollingBot {
     private String techAdminId;
     private static final Logger log = LoggerFactory.getLogger(CiaoByBot.class);
     private BotService service;
+    private BotResponses botResponses;
+    private LoggerMessages loggerMessages;
 
     @Autowired
     void setService(BotService service) {
         this.service = service;
+    }
+
+    @Autowired
+    public void setBotResponses(BotResponses botResponses) {
+        this.botResponses = botResponses;
+    }
+
+    @Autowired
+    public void setLoggerMessages(LoggerMessages loggerMessages) {
+        this.loggerMessages = loggerMessages;
     }
 
     @Override
@@ -60,8 +72,8 @@ public class CiaoByBot extends TelegramLongPollingBot {
             catchMessageProcessingException(qry.getData(), user);
             service.closeQuery(qry.getId());
         } else {
-            log.info(LoggerMessages.unexpectedCase(update.toString()));
-            sendToTechAdmin(LoggerMessages.unexpectedCase(update.toString()));
+            log.info(loggerMessages.unexpectedCase(update.toString()));
+            sendToTechAdmin(loggerMessages.unexpectedCase(update.toString()));
         }
     }
 
@@ -94,8 +106,8 @@ public class CiaoByBot extends TelegramLongPollingBot {
             case TEST_FINISHED -> service.testFinishedHandler(user);
             case INFO_SENT -> service.infoSentHandler(user);
             default -> {
-                log.error(LoggerMessages.processMessageException(), new IllegalStateException());
-                sendToTechAdmin(LoggerMessages.processMessageException());
+                log.error(loggerMessages.processMessageException(), new IllegalStateException());
+                sendToTechAdmin(loggerMessages.processMessageException());
             }
         }
     }
@@ -104,7 +116,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         try {
             processMessage(textMsg, user);
         } catch (Exception e) {
-            log.error(LoggerMessages.messageProcessingException(), e);
+            log.error(loggerMessages.messageProcessingException(), e);
             sendToTechAdmin(e.toString());
         }
     }
@@ -120,7 +132,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
                 counter++;
             } catch (TelegramApiException ignore) {}
         }
-        service.sendText(Long.parseLong(adminId), BotResponses.notificationReceivedBy(counter));
+        service.sendText(Long.parseLong(adminId), botResponses.notificationReceivedBy(counter));
     }
 
     private void sendToTechAdmin(final String textMsg) {
@@ -131,7 +143,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         try {
             execute(sm);
         } catch (TelegramApiException e) {
-            log.error(LoggerMessages.sendTextException(), e);
+            log.error(loggerMessages.sendTextException(), e);
         }
     }
 }

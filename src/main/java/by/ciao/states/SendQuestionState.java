@@ -5,8 +5,6 @@ import by.ciao.enums.StateEnum;
 import by.ciao.states.statesservice.AbstractState;
 import by.ciao.states.statesservice.UserHandlerState;
 import by.ciao.user.User;
-import by.ciao.utils.BotResponses;
-import by.ciao.utils.KeyboardCreator;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class SendQuestionState extends AbstractState implements UserHandlerState {
@@ -23,13 +21,13 @@ public class SendQuestionState extends AbstractState implements UserHandlerState
     }
 
     private void sendQuestion(final User user) throws TelegramApiException {
-        var sm = createMessage(user.getChatId(), BotResponses.getQuestion(user));
+        var sm = createMessage(user.getChatId(), getBotResponses().getQuestion(user));
 
-        var markup = KeyboardCreator.createInlineKeyboard(BotResponses.optionsForAnswers(user));
+        var markup = getKeyboardCreator().createInlineKeyboard(getBotResponses().optionsForAnswers(user));
         sm.setReplyMarkup(markup);
 
         if (user.getLastMessage() != null) {
-            getServiceCallback().execute(editMessage(user, markup, BotResponses.getQuestion(user)));
+            getServiceCallback().execute(editMessage(user, markup, getBotResponses().getQuestion(user)));
         } else {
             getServiceCallback().execute(sm).ifPresent(user::setLastMessage);
         }

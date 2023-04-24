@@ -3,6 +3,7 @@ package by.ciao.bot;
 import by.ciao.utils.LoggerMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -18,6 +19,12 @@ import java.util.Optional;
 public class ServiceCallbackImpl implements ServiceCallback {
 
     private static final Logger log = LoggerFactory.getLogger(ServiceCallbackImpl.class);
+    private LoggerMessages loggerMessages;
+
+    @Autowired
+    public void setLoggerMessages(LoggerMessages loggerMessages) {
+        this.loggerMessages = loggerMessages;
+    }
 
     @Override
     public Optional<Message> execute(Object obj) throws TelegramApiException {
@@ -36,10 +43,10 @@ public class ServiceCallbackImpl implements ServiceCallback {
             } else if (obj instanceof AnswerCallbackQuery) {
                 execute(obj);
             } else {
-                log.error(LoggerMessages.argumentExceptionInServiceVar(), new IllegalArgumentException());
+                log.error(loggerMessages.argumentExceptionInServiceVar(), new IllegalArgumentException());
             }
         } catch (TelegramApiException e) {
-            log.error(LoggerMessages.tgApiExceptionInServiceVar(), e);
+            log.error(loggerMessages.tgApiExceptionInServiceVar(), e);
         }
 
         return msg;

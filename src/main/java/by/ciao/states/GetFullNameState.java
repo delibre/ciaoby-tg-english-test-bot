@@ -5,8 +5,6 @@ import by.ciao.enums.StateEnum;
 import by.ciao.states.statesservice.AbstractState;
 import by.ciao.states.statesservice.UserMessageHandlerState;
 import by.ciao.user.User;
-import by.ciao.utils.BotResponses;
-import by.ciao.utils.KeyboardCreator;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class GetFullNameState extends AbstractState implements UserMessageHandlerState {
@@ -24,8 +22,8 @@ public class GetFullNameState extends AbstractState implements UserMessageHandle
     }
 
     private void sendPhoneButton(final User user) throws TelegramApiException {
-        var sm = createMessage(user.getChatId(), BotResponses.askForPhone());
-        sm.setReplyMarkup(KeyboardCreator.createReplyKeyboard(BotResponses.sharePhoneButton(), true));
+        var sm = createMessage(user.getChatId(), getBotResponses().askForPhone());
+        sm.setReplyMarkup(getKeyboardCreator().createReplyKeyboard(getBotResponses().sharePhoneButton(), true));
 
         getServiceCallback().execute(sm);
     }

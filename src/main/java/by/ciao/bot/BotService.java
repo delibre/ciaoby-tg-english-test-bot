@@ -35,6 +35,8 @@ public class BotService {
     private RestController restController;
     private final Map<Long, User> registeredUsersMap;
     private static final Logger log = LoggerFactory.getLogger(BotService.class);
+    private BotResponses botResponses;
+    private LoggerMessages loggerMessages;
 
     @Autowired
     public BotService(ServiceCallback serviceCallback) {
@@ -43,8 +45,18 @@ public class BotService {
     }
 
     @Autowired
+    public void setBotResponses(BotResponses botResponses) {
+        this.botResponses = botResponses;
+    }
+
+    @Autowired
     void setRestController(RestController restController) {
         this.restController = restController;
+    }
+
+    @Autowired
+    public void setLoggerMessages(LoggerMessages loggerMessages) {
+        this.loggerMessages = loggerMessages;
     }
 
     boolean msgHasText(final Update update) {
@@ -69,7 +81,7 @@ public class BotService {
     }
 
     void sendWarning(Long id) {
-        sendText(registeredUsersMap.get(id).getChatId(), BotResponses.questionAnsweringWarning());
+        sendText(registeredUsersMap.get(id).getChatId(), botResponses.questionAnsweringWarning());
     }
 
     void addUserIfAbsent(final Long chatId, final String username) {
@@ -78,15 +90,15 @@ public class BotService {
             if (user == null) {
                 registeredUsersMap.putIfAbsent(chatId, new User(chatId, username));
                 restController.addUserToDB(registeredUsersMap.get(chatId));
-                log.info(LoggerMessages.mapSize(registeredUsersMap.size()));
+                log.info(loggerMessages.mapSize(registeredUsersMap.size()));
                 // sending data to tech admin
-                sendText(Long.parseLong(techAdminId), LoggerMessages.mapSize(registeredUsersMap.size()));
+                sendText(Long.parseLong(techAdminId), loggerMessages.mapSize(registeredUsersMap.size()));
                 sendText(Long.parseLong(techAdminId), getAppLoad().toString());
             } else {
                 registeredUsersMap.putIfAbsent(chatId, user);
             }
         } catch (Exception e) {
-            log.error(LoggerMessages.addUserIfAbsentException(), new RuntimeException(e));
+            log.error(loggerMessages.addUserIfAbsentException(), new RuntimeException(e));
             sendText(Long.parseLong(techAdminId), e.toString());
         }
     }
@@ -113,7 +125,7 @@ public class BotService {
         try {
             getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), registeredUsersMap.get(id));
         } catch (Exception e) {
-            log.error(LoggerMessages.addPhoneException(), e);
+            log.error(loggerMessages.addPhoneException(), e);
             sendText(Long.parseLong(techAdminId), e.toString());
         }
     }
@@ -127,7 +139,7 @@ public class BotService {
             serviceCallback.execute(AnswerCallbackQuery.builder()
                     .callbackQueryId(id).build());
         } catch (TelegramApiException e) {
-            log.error(LoggerMessages.closeQueryException(), e);
+            log.error(loggerMessages.closeQueryException(), e);
             sendText(Long.parseLong(techAdminId), e.toString());
         }
     }
@@ -137,7 +149,7 @@ public class BotService {
             user.setState(StateEnum.START);
             user.clearTest();
         } else if (user.getState() == StateEnum.NEW_USER) {
-            sendText(user.getChatId(), BotResponses.noSuchCommand());
+            sendText(user.getChatId(), botResponses.noSuchCommand());
             return true;
         }
 
@@ -158,7 +170,7 @@ public class BotService {
         try {
             serviceCallback.execute(sm);
         } catch (TelegramApiException e) {
-            log.error(LoggerMessages.sendTextException(), e);
+            log.error(loggerMessages.sendTextException(), e);
             sendText(Long.parseLong(techAdminId), e.toString());
         }
     }

@@ -33,6 +33,24 @@ public abstract class AbstractState {
     private final ServiceCallback serviceCallback;
     private static final Logger log = LoggerFactory.getLogger(AbstractState.class);
     private RestController restController;
+    private BotResponses botResponses;
+    private KeyboardCreator keyboardCreator;
+    private LoggerMessages loggerMessages;
+
+    @Autowired
+    public void setLoggerMessages(LoggerMessages loggerMessages) {
+        this.loggerMessages = loggerMessages;
+    }
+
+    @Autowired
+    public void setKeyboardCreator(KeyboardCreator keyboardCreator) {
+        this.keyboardCreator = keyboardCreator;
+    }
+
+    @Autowired
+    public void setBotResponses(BotResponses botResponses) {
+        this.botResponses = botResponses;
+    }
 
     @Autowired
     void setRestController(RestController restController) {
@@ -44,8 +62,8 @@ public abstract class AbstractState {
     }
 
     protected void sendStartButton(final User user) throws TelegramApiException {
-        var sm = createMessage(user.getChatId(), BotResponses.startTest());
-        sm.setReplyMarkup(KeyboardCreator.createReplyKeyboard(BotResponses.startTestButton(), false));
+        var sm = createMessage(user.getChatId(), botResponses.startTest());
+        sm.setReplyMarkup(keyboardCreator.createReplyKeyboard(botResponses.startTestButton(), false));
 
         serviceCallback.execute(sm);
     }
@@ -63,7 +81,7 @@ public abstract class AbstractState {
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
-            log.error(LoggerMessages.setDelayException(), e);
+            log.error(loggerMessages.setDelayException(), e);
         }
     }
 

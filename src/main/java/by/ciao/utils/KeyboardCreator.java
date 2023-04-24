@@ -1,5 +1,6 @@
 package by.ciao.utils;
 
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -9,9 +10,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import java.util.ArrayList;
 import java.util.List;
 
-public final class KeyboardCreator {
+@Service
+public class KeyboardCreator {
 
-    public static InlineKeyboardMarkup createInlineKeyboard(final List<String> answerOptions) {
+    public InlineKeyboardMarkup createInlineKeyboard(final List<String> answerOptions) {
         var markup = new InlineKeyboardMarkup();
 
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
@@ -30,7 +32,7 @@ public final class KeyboardCreator {
         return markup;
     }
 
-    public static ReplyKeyboardMarkup createReplyKeyboard(final String buttonText, final boolean requestContact) {
+    public ReplyKeyboardMarkup createReplyKeyboard(final String buttonText, final boolean requestContact) {
         var keyboard = new ReplyKeyboardMarkup();
         keyboard.setResizeKeyboard(true);
         keyboard.setOneTimeKeyboard(false);

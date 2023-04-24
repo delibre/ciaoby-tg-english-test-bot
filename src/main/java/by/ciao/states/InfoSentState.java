@@ -2,9 +2,8 @@ package by.ciao.states;
 
 import by.ciao.bot.ServiceCallback;
 import by.ciao.states.statesservice.AbstractState;
-import by.ciao.user.User;
 import by.ciao.states.statesservice.UserHandlerState;
-import by.ciao.utils.BotResponses;
+import by.ciao.user.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class InfoSentState extends AbstractState implements UserHandlerState {
@@ -15,7 +14,7 @@ public class InfoSentState extends AbstractState implements UserHandlerState {
 
     @Override
     public void apply(final User user) throws TelegramApiException {
-        sendText(user.getChatId(), BotResponses.infoSent());
+        sendText(user.getChatId(), getBotResponses().infoSent());
     }
 
 }

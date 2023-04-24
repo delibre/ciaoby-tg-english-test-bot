@@ -12,18 +12,18 @@ import java.util.Arrays;
 import java.util.List;
 
 @Service
-public final class BotResponses {
+public class BotResponses {
 
     @Value("test_duration")
-    private static String testDuration;
-    private static EnglishTestLoader englishTestLoader;
+    private String testDuration;
+    private EnglishTestLoader englishTestLoader;
 
     @Autowired
     public void setEnglishTestLoader(EnglishTestLoader englishTest) {
-        BotResponses.englishTestLoader = englishTest;
+        this.englishTestLoader = englishTest;
     }
 
-    public static String testFinished(User user) {
+    public String testFinished(User user) {
         return """
                 Вы ответили верно на %d вопросов.
                 Ваш уровень английского %s.
@@ -31,7 +31,7 @@ public final class BotResponses {
                 """.formatted(user.getTestState().getCorrectAnswers(), user.getTestState().getResult());
     }
 
-    public static String dataForAdmin(final User user) {
+    public String dataForAdmin(final User user) {
         return """
                 Имя и Фамилия: %s
                 Номер телефона: %s
@@ -42,7 +42,7 @@ public final class BotResponses {
                 """.formatted(user.getFullName(), user.getPhone(), user.getUsername(), user.getReferral(), user.getTestState().getCorrectAnswers(), user.getTestState().getLvl());
     }
 
-    public static String start() {
+    public String start() {
         return """
                 Привет!\uD83D\uDC4B
 
@@ -56,29 +56,29 @@ public final class BotResponses {
                 """;
     }
 
-    public static String infoSent() {
+    public String infoSent() {
         return """
                 Извините, не роспознал Вашу команду.
                 Если хотите пройти тест заново - нажмите кнопку "Начать тестирование"\uD83E\uDD17
                 """;
     }
 
-    public static String phoneFormatWarning() {
+    public String phoneFormatWarning() {
         return "Неверный формат номера. Попробуйте, пожалуйста, ещё раз";
     }
 
-    public static String replyKeyboardRemoved() {
+    public String replyKeyboardRemoved() {
         return "Спасибо! Можем продолжать\uD83D\uDE0A";
     }
 
-    public static String askReferral() {
+    public String askReferral() {
         return """
                 Откуда вы о нас узнали?
                 Выберете один из вариантов ниже или же впишите свой
                 """;
     }
 
-    public static String askForPhone() {
+    public String askForPhone() {
         return """
                 Чтобы нам было удобнее с Вами связаться для согласования второго этапа (устного тестирования), укажите, пожалуйста, Ваш номер телефона\uD83D\uDE0A
 
@@ -86,7 +86,7 @@ public final class BotResponses {
                 """;
     }
 
-    public static String startTest() {
+    public String startTest() {
         return """
                 Ну что же, приступим к тесту. Сейчас Вам нужно будет ответить на 30 вопросов за %s минут.\uD83E\uDDD0
 
@@ -94,7 +94,7 @@ public final class BotResponses {
                 """.formatted(testDuration);
     }
 
-    public static String getQuestion(User user) {
+    public String getQuestion(User user) {
         return """
                 Времени осталось: %s
 
@@ -102,35 +102,35 @@ public final class BotResponses {
                 """.formatted(user.getTestState().countTime(), user.getTestState().getCurrentQuestion().numberOfQuestion(), user.getTestState().getCurrentQuestion().question());
     }
 
-    public static List<String> referralOptions() {
+    public List<String> referralOptions() {
         return new ArrayList<>(Arrays.asList("Google", "Яндекс", "Instagram/Facebook/VK/Tik-Tok", "Vse-kursy", "Еnguide", "Рекомендация от друзей"));
     }
 
-    public static List<String> optionsForAnswers(final User user) {
+    public List<String> optionsForAnswers(final User user) {
         return new ArrayList<>(user.getTestState().getCurrentQuestion().answers());
     }
 
-    public static String startTestButton() {
+    public String startTestButton() {
         return "Начать тестирование\uD83C\uDFC1";
     }
 
-    public static String sharePhoneButton() {
+    public String sharePhoneButton() {
         return "Поделиться номером";
     }
 
-    public static String questionAnsweringWarning() {
+    public String questionAnsweringWarning() {
         return "Отвечать можно только нажав кнопку с одним из вариантов ответа";
     }
 
-    public static String noSuchCommand() {
+    public String noSuchCommand() {
         return "Нет такой команды";
     }
 
-    public static String notificationReceivedBy(int counter) {
+    public String notificationReceivedBy(int counter) {
         return "Уведомление получили " + counter + " пользователей";
     }
 
-    public static StringBuilder userAnswers(User user) {
+    public StringBuilder userAnswers(User user) {
         StringBuilder testWithAnswers = new StringBuilder();
 
         for (Question question : englishTestLoader.getQuestions()) {
@@ -148,14 +148,14 @@ public final class BotResponses {
         return testWithAnswers;
     }
 
-    private static String isAnswerCorrect(Question question, String userAnswer) {
+    private String isAnswerCorrect(Question question, String userAnswer) {
         if (userAnswer.equals(question.getCorrectAnswer())) {
             return "✅ ";
         }
         return "❌ ";
     }
 
-    private static StringBuilder getAnswers(Question question, String userAnswer) {
+    private StringBuilder getAnswers(Question question, String userAnswer) {
         StringBuilder answers = new StringBuilder();
 
         for (String answer : question.answers()) {

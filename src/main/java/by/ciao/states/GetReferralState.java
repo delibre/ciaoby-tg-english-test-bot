@@ -5,7 +5,6 @@ import by.ciao.enums.StateEnum;
 import by.ciao.states.statesservice.AbstractState;
 import by.ciao.states.statesservice.UserMessageHandlerState;
 import by.ciao.user.User;
-import by.ciao.utils.BotResponses;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -21,7 +20,7 @@ public class GetReferralState extends AbstractState implements UserMessageHandle
         user.setState(StateEnum.START_TEST);
         getRestController().updateContactInfoInDB(user);
 
-        getServiceCallback().execute(editMessage(user, null, BotResponses.askReferral() + textMsg));
+        getServiceCallback().execute(editMessage(user, null, getBotResponses().askReferral() + textMsg));
         user.setLastMessage(new Message());  // made for future question edition
 
         setDelay();

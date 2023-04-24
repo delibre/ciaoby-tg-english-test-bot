@@ -31,10 +31,10 @@ public class BotService {
     private String adminId;
     @Value("tech_admin_id")
     private String techAdminId;
+    private static final Logger log = LoggerFactory.getLogger(BotService.class);
+    private final Map<Long, User> registeredUsersMap;
     private final ServiceCallback serviceCallback;
     private RestController restController;
-    private final Map<Long, User> registeredUsersMap;
-    private static final Logger log = LoggerFactory.getLogger(BotService.class);
     private BotResponses botResponses;
     private LoggerMessages loggerMessages;
 
@@ -57,6 +57,32 @@ public class BotService {
     @Autowired
     public void setLoggerMessages(LoggerMessages loggerMessages) {
         this.loggerMessages = loggerMessages;
+    }
+
+    void broadcast(String textMsg) {
+        int counter = 0;
+        for (User user : getRegisteredUsersMap().values()) {
+            var sm = SendMessage.builder()
+                    .chatId(user.getChatId().toString())
+                    .text(textMsg).build();
+            try {
+                serviceCallback.execute(sm);
+                counter++;
+            } catch (TelegramApiException ignore) {}
+        }
+        sendText(Long.parseLong(adminId), botResponses.notificationReceivedBy(counter));
+    }
+
+    void sendToTechAdmin(final String textMsg) {
+        var sm = SendMessage.builder()
+                .chatId(techAdminId)
+                .text(textMsg).build();
+
+        try {
+            serviceCallback.execute(sm);
+        } catch (TelegramApiException e) {
+            log.error(loggerMessages.sendTextException(), e);
+        }
     }
 
     boolean msgHasText(final Update update) {

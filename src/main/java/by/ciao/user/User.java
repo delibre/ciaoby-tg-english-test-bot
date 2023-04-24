@@ -5,11 +5,15 @@ import by.ciao.enums.StateEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
+@Service
 @Getter @Setter
 @NoArgsConstructor
 public class User {
+
     private StateEnum state;
     private Message lastMessage;
     private Long chatId;
@@ -24,18 +28,9 @@ public class User {
         this.chatId = chatId;
         this.username = username;
         this.phone = "нет";
-        this.testState = new UsersTestState();
     }
 
-    public User(Long chatId, String fullName, String username, String phone, String referral) {
-        this.chatId = chatId;
-        this.fullName = fullName;
-        this.username = username;
-        this.phone = phone;
-        this.referral = referral;
-    }
-
-    public void clearTest() throws Exception {
+    public void clearTest() {
         testState = new UsersTestState();
         lastMessage = null;
     }
@@ -43,4 +38,10 @@ public class User {
     public boolean isUserDataCollected() {
         return fullName != null && phone != null && referral != null;
     }
+
+    @Autowired
+    void setTestState(UsersTestState testState) {
+        this.testState = testState;
+    }
+
 }

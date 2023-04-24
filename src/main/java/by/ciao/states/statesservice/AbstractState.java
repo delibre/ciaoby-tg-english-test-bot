@@ -1,27 +1,43 @@
 package by.ciao.states.statesservice;
 
 import by.ciao.bot.ServiceCallback;
+import by.ciao.controller.RestController;
 import by.ciao.enums.StateEnum;
 import by.ciao.states.TestFinishedState;
 import by.ciao.user.User;
 import by.ciao.utils.BotResponses;
 import by.ciao.utils.KeyboardCreator;
 import by.ciao.utils.LoggerMessages;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-@AllArgsConstructor
+@Service
 @Getter
+@RequiredArgsConstructor
 public abstract class AbstractState {
+
+    @Value("admin_id")
+    private String adminId;
+    @Value("tech_admin_id")
+    private String techAdminId;
     private final ServiceCallback serviceCallback;
     private static final Logger log = LoggerFactory.getLogger(AbstractState.class);
+    private RestController restController;
+
+    @Autowired
+    void setRestController(RestController restController) {
+        this.restController = restController;
+    }
 
     protected void sendText(final Long id, final String textMsg) throws TelegramApiException {
         serviceCallback.execute(createMessage(id, textMsg));

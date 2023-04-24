@@ -1,9 +1,12 @@
 package by.ciao.englishtest;
 
 import by.ciao.enums.EnglishLevel;
-import by.ciao.utils.AppConfig;
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -11,22 +14,35 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Timer;
 
-@Getter
-@Setter
+@Service
+@Getter @Setter
 public class UsersTestState {
+
+    @Value("test_duration")
+    private String testDuration;
     private final LinkedList<Question> questions;
     private final LinkedList<String> userAnswers;
     private int correctAnswers;
     private EnglishLevel lvl;
     private final Timer timer;
     private LocalTime startTime;
+    private EnglishTestLoader englishTestLoader;
 
-    public UsersTestState() throws Exception {
+    public UsersTestState() {
         this.questions = new LinkedList<>();
-        this.questions.addAll(EnglishTestSingleton.getInstance().getQuestions());
         this.userAnswers = new LinkedList<>();
         this.correctAnswers = 0;
         this.timer = new Timer();
+    }
+
+    @Autowired
+    void setEnglishTestLoader(EnglishTestLoader englishTestLoader) {
+        this.englishTestLoader = englishTestLoader;
+    }
+
+    @PostConstruct
+    public void init() {
+        this.questions.addAll(englishTestLoader.getQuestions());
     }
 
     public Question getCurrentQuestion() {
@@ -85,7 +101,7 @@ public class UsersTestState {
     public String countTime() {
         LocalTime currentTime = LocalTime.now();
         Duration elapsed = Duration.between(startTime, currentTime);
-        Duration duration = Duration.ofMinutes(Long.parseLong(AppConfig.getProperty("test_duration")));
+        Duration duration = Duration.ofMinutes(Long.parseLong(testDuration));
 
         Duration timeLeft = duration.minus(elapsed);
 
@@ -98,7 +114,7 @@ public class UsersTestState {
     public boolean isTimeOver() {
         LocalTime currentTime = LocalTime.now();
         Duration elapsed = Duration.between(startTime, currentTime);
-        Duration duration = Duration.ofMinutes(Long.parseLong(AppConfig.getProperty("test_duration")));
+        Duration duration = Duration.ofMinutes(Long.parseLong(testDuration));
 
         return elapsed.compareTo(duration) >= 0;
     }

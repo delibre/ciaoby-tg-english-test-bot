@@ -1,50 +1,36 @@
 package by.ciao.bot;
 
 import by.ciao.user.User;
-import by.ciao.utils.AppConfig;
 import by.ciao.utils.BotResponses;
 import by.ciao.utils.LoggerMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.Optional;
-
+@Component
 public class CiaoByBot extends TelegramLongPollingBot {
+
+    @Value("bot_username")
+    private String botUsername;
+    @Value("bot_token")
+    private String botToken;
+    @Value("admin_id")
+    private String adminId;
+    @Value("tech_admin_id")
+    private String techAdminId;
     private static final Logger log = LoggerFactory.getLogger(CiaoByBot.class);
-    private final BotService service = new BotService((obj) -> {
-        Optional<Message> msg = Optional.empty();
+    private BotService service;
 
-        try {
-            if (obj instanceof SendMessage) {
-                msg = Optional.of(execute((SendMessage) obj));
-            } else if (obj instanceof DeleteMessage) {
-                execute((DeleteMessage) obj);
-            } else if (obj instanceof EditMessageText) {
-                execute((EditMessageText) obj);
-            } else if (obj instanceof EditMessageReplyMarkup) {
-                execute((EditMessageReplyMarkup) obj);
-            } else if (obj instanceof AnswerCallbackQuery) {
-                execute((AnswerCallbackQuery) obj);
-            } else {
-                log.error(LoggerMessages.argumentExceptionInServiceVar(), new IllegalArgumentException());
-                sendToTechAdmin(new IllegalArgumentException().toString());
-            }
-        } catch (TelegramApiException e) {
-            log.error(LoggerMessages.tgApiExceptionInServiceVar(), e);
-            sendToTechAdmin(e.toString());
-        }
-
-        return msg;
-    });
+    @Autowired
+    void setService(BotService service) {
+        this.service = service;
+    }
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -81,12 +67,12 @@ public class CiaoByBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return AppConfig.getProperty("bot_username");
+        return "slava_local_test_bot";
     }
 
     @Override
     public String getBotToken() {
-        return AppConfig.getProperty("bot_token");
+        return "6070947188:AAHgnO_J7nkqq5tsIQtKGFIMYNZw96rxm0M";
     }
 
     private void processMessage(String textMsg, User user) throws Exception {
@@ -134,12 +120,12 @@ public class CiaoByBot extends TelegramLongPollingBot {
                 counter++;
             } catch (TelegramApiException ignore) {}
         }
-        service.sendText(Long.parseLong(AppConfig.getProperty("admin_id")), BotResponses.notificationReceivedBy(counter));
+        service.sendText(Long.parseLong(adminId), BotResponses.notificationReceivedBy(counter));
     }
 
     private void sendToTechAdmin(final String textMsg) {
         var sm = SendMessage.builder()
-                .chatId(AppConfig.getProperty("tech_admin_id"))
+                .chatId(techAdminId)
                 .text(textMsg).build();
 
         try {

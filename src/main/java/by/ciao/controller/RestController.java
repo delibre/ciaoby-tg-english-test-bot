@@ -1,36 +1,29 @@
 package by.ciao.controller;
 
 import by.ciao.user.User;
-import by.ciao.utils.AppConfig;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public final class RestController {
+@Service
+@RequiredArgsConstructor
+public class RestController {
 
-    private static RestController INSTANCE;
     private final RestTemplate restTemplate;
-    private final HttpHeaders headers;
-    private final String url;
+    private HttpHeaders headers;
+    @Value("url")
+    private String url;
     private static final Logger log = LoggerFactory.getLogger(RestController.class);
-
-    public RestController(RestTemplate restTemplate, HttpHeaders headers, String url) {
-        this.restTemplate = restTemplate;
-        this.headers = headers;
-        this.url = url;
-    }
-
-    public static RestController getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new RestController(new RestTemplate(), new HttpHeaders(), AppConfig.getProperty("url"));
-        }
-
-        return INSTANCE;
-    }
 
     public void addUserToDB(User user) {
         Map<String, String> requestBody = new HashMap<>();

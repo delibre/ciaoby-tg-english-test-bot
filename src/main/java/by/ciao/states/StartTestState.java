@@ -6,17 +6,20 @@ import by.ciao.states.statesservice.AbstractState;
 import by.ciao.states.statesservice.UserHandlerState;
 import by.ciao.states.statesservice.UserMessageHandlerState;
 import by.ciao.user.User;
-import by.ciao.utils.AppConfig;
 import by.ciao.utils.BotResponses;
 import by.ciao.utils.LoggerMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalTime;
 import java.util.Objects;
 import java.util.TimerTask;
 
 public class StartTestState extends AbstractState implements UserMessageHandlerState {
+
+    @Value("test_duration")
+    private String testDuration;
     private static final Logger log = LoggerFactory.getLogger(StartTestState.class);
 
     public StartTestState(ServiceCallback serviceCallback) {
@@ -51,6 +54,7 @@ public class StartTestState extends AbstractState implements UserMessageHandlerS
                 user.getTestState().getTimer().cancel();
             }
         };
-        user.getTestState().getTimer().schedule(task, Long.parseLong(AppConfig.getProperty("test_duration")) * 60 * 1000);
+        user.getTestState().getTimer().schedule(task, Long.parseLong(testDuration) * 60 * 1000);
     }
+
 }

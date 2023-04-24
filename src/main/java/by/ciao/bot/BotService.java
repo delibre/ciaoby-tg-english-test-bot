@@ -2,16 +2,18 @@ package by.ciao.bot;
 
 import by.ciao.controller.RestController;
 import by.ciao.enums.StateEnum;
+import by.ciao.states.*;
 import by.ciao.states.statesservice.UserHandlerState;
 import by.ciao.states.statesservice.UserMessageHandlerState;
 import by.ciao.user.User;
-import by.ciao.utils.AppConfig;
 import by.ciao.utils.BotResponses;
 import by.ciao.utils.LoggerMessages;
-import by.ciao.states.*;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -21,16 +23,28 @@ import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+@Service
 @Getter
 public class BotService {
 
-    private final Map<Long, User> registeredUsersMap;
+    @Value("admin_id")
+    private String adminId;
+    @Value("tech_admin_id")
+    private String techAdminId;
     private final ServiceCallback serviceCallback;
+    private RestController restController;
+    private final Map<Long, User> registeredUsersMap;
     private static final Logger log = LoggerFactory.getLogger(BotService.class);
 
-    BotService(final ServiceCallback serviceCallback) {
+    @Autowired
+    public BotService(ServiceCallback serviceCallback) {
         this.serviceCallback = serviceCallback;
         this.registeredUsersMap = new HashMap<>();
+    }
+
+    @Autowired
+    void setRestController(RestController restController) {
+        this.restController = restController;
     }
 
     boolean msgHasText(final Update update) {
@@ -60,20 +74,20 @@ public class BotService {
 
     void addUserIfAbsent(final Long chatId, final String username) {
         try {
-            User user = RestController.getInstance().getUserByChatId(chatId);
+            User user = restController.getUserByChatId(chatId);
             if (user == null) {
                 registeredUsersMap.putIfAbsent(chatId, new User(chatId, username));
-                RestController.getInstance().addUserToDB(registeredUsersMap.get(chatId));
+                restController.addUserToDB(registeredUsersMap.get(chatId));
                 log.info(LoggerMessages.mapSize(registeredUsersMap.size()));
                 // sending data to tech admin
-                sendText(Long.parseLong(AppConfig.getProperty("tech_admin_id")), LoggerMessages.mapSize(registeredUsersMap.size()));
-                sendText(Long.parseLong(AppConfig.getProperty("tech_admin_id")), getAppLoad().toString());
+                sendText(Long.parseLong(techAdminId), LoggerMessages.mapSize(registeredUsersMap.size()));
+                sendText(Long.parseLong(techAdminId), getAppLoad().toString());
             } else {
                 registeredUsersMap.putIfAbsent(chatId, user);
             }
         } catch (Exception e) {
             log.error(LoggerMessages.addUserIfAbsentException(), new RuntimeException(e));
-            sendText(Long.parseLong(AppConfig.getProperty("tech_admin_id")), e.toString());
+            sendText(Long.parseLong(techAdminId), e.toString());
         }
     }
 
@@ -100,12 +114,12 @@ public class BotService {
             getPhoneHandler(update.getMessage().getContact().getPhoneNumber(), registeredUsersMap.get(id));
         } catch (Exception e) {
             log.error(LoggerMessages.addPhoneException(), e);
-            sendText(Long.parseLong(AppConfig.getProperty("tech_admin_id")), e.toString());
+            sendText(Long.parseLong(techAdminId), e.toString());
         }
     }
 
     boolean isMsgFromAdmin(Update update) {
-        return msgHasText(update) && update.getMessage().getChatId() == Long.parseLong(AppConfig.getProperty("admin_id"));
+        return msgHasText(update) && update.getMessage().getChatId() == Long.parseLong(adminId);
     }
 
     void closeQuery(final String id) {
@@ -114,11 +128,11 @@ public class BotService {
                     .callbackQueryId(id).build());
         } catch (TelegramApiException e) {
             log.error(LoggerMessages.closeQueryException(), e);
-            sendText(Long.parseLong(AppConfig.getProperty("tech_admin_id")), e.toString());
+            sendText(Long.parseLong(techAdminId), e.toString());
         }
     }
 
-    boolean startBot(final String textMsg, final User user) throws Exception {
+    boolean startBot(final String textMsg, final User user) {
         if (textMsg.equals("/start")) {
             user.setState(StateEnum.START);
             user.clearTest();
@@ -145,7 +159,7 @@ public class BotService {
             serviceCallback.execute(sm);
         } catch (TelegramApiException e) {
             log.error(LoggerMessages.sendTextException(), e);
-            sendText(Long.parseLong(AppConfig.getProperty("tech_admin_id")), e.toString());
+            sendText(Long.parseLong(techAdminId), e.toString());
         }
     }
 
@@ -193,9 +207,5 @@ public class BotService {
     void infoSentHandler(final User user) throws Exception {
         UserHandlerState state = new InfoSentState(serviceCallback);
         state.apply(user);
-    }
-
-    Map<Long, User> getRegisteredUsersMap() {
-        return registeredUsersMap;
     }
 }

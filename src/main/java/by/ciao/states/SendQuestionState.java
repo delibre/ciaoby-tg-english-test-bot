@@ -10,6 +10,7 @@ import by.ciao.utils.KeyboardCreator;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class SendQuestionState extends AbstractState implements UserHandlerState {
+
     public SendQuestionState(final ServiceCallback serviceCallback) {
         super(serviceCallback);
     }
@@ -33,4 +34,5 @@ public class SendQuestionState extends AbstractState implements UserHandlerState
             getServiceCallback().execute(sm).ifPresent(user::setLastMessage);
         }
     }
+
 }

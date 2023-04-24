@@ -1,17 +1,16 @@
 package by.ciao.states;
 
 import by.ciao.bot.ServiceCallback;
-import by.ciao.controller.RestController;
 import by.ciao.enums.StateEnum;
 import by.ciao.states.statesservice.AbstractState;
 import by.ciao.states.statesservice.UserHandlerState;
 import by.ciao.user.User;
-import by.ciao.utils.AppConfig;
 import by.ciao.utils.BotResponses;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class TestFinishedState extends AbstractState implements UserHandlerState {
+
     public TestFinishedState(final ServiceCallback serviceCallback) {
         super(serviceCallback);
     }
@@ -23,7 +22,7 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
 
         sendAnswers(user);
         sendDataToAdmin(user);
-        RestController.getInstance().updateTestInfoInDB(user);
+        getRestController().updateTestInfoInDB(user);
     }
 
     private void deleteLastMessage(final User user) throws TelegramApiException {
@@ -35,8 +34,8 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
     }
 
     private void sendDataToAdmin(final User user) throws TelegramApiException {
-        getServiceCallback().execute(createMessage(Long.parseLong(AppConfig.getProperty("admin_id")), BotResponses.dataForAdmin(user)));
-        getServiceCallback().execute(createMessage(Long.parseLong(AppConfig.getProperty("tech_admin_id")), BotResponses.dataForAdmin(user)));
+        getServiceCallback().execute(createMessage(Long.parseLong(getAdminId()), BotResponses.dataForAdmin(user)));
+        getServiceCallback().execute(createMessage(Long.parseLong(getTechAdminId()), BotResponses.dataForAdmin(user)));
     }
 
     private void sendAnswers(final User user) throws Exception {
@@ -65,4 +64,5 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
 
         sendText(user.getChatId(), BotResponses.testFinished(user));
     }
+
 }

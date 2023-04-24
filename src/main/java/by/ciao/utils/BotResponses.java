@@ -1,14 +1,28 @@
 package by.ciao.utils;
 
-import by.ciao.englishtest.EnglishTestSingleton;
+import by.ciao.englishtest.EnglishTestLoader;
 import by.ciao.englishtest.Question;
 import by.ciao.user.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Service
 public final class BotResponses {
+
+    @Value("test_duration")
+    private static String testDuration;
+    private static EnglishTestLoader englishTestLoader;
+
+    @Autowired
+    public void setEnglishTestLoader(EnglishTestLoader englishTest) {
+        BotResponses.englishTestLoader = englishTest;
+    }
+
     public static String testFinished(User user) {
         return """
                 Вы ответили верно на %d вопросов.
@@ -77,7 +91,7 @@ public final class BotResponses {
                 Ну что же, приступим к тесту. Сейчас Вам нужно будет ответить на 30 вопросов за %s минут.\uD83E\uDDD0
 
                 Нажмите кнопку "Начать тестирование", когда будете готовы.
-                """.formatted(AppConfig.getProperty("test_duration"));
+                """.formatted(testDuration);
     }
 
     public static String getQuestion(User user) {
@@ -85,7 +99,7 @@ public final class BotResponses {
                 Времени осталось: %s
 
                 %d. %s
-                """.formatted(user.getTestState().countTime(), user.getTestState().getCurrentQuestion().getNumberOfQuestion(), user.getTestState().getCurrentQuestion().getQuestion());
+                """.formatted(user.getTestState().countTime(), user.getTestState().getCurrentQuestion().numberOfQuestion(), user.getTestState().getCurrentQuestion().question());
     }
 
     public static List<String> referralOptions() {
@@ -93,7 +107,7 @@ public final class BotResponses {
     }
 
     public static List<String> optionsForAnswers(final User user) {
-        return new ArrayList<>(user.getTestState().getCurrentQuestion().getAnswers());
+        return new ArrayList<>(user.getTestState().getCurrentQuestion().answers());
     }
 
     public static String startTestButton() {
@@ -116,17 +130,17 @@ public final class BotResponses {
         return "Уведомление получили " + counter + " пользователей";
     }
 
-    public static StringBuilder userAnswers(User user) throws Exception {
+    public static StringBuilder userAnswers(User user) {
         StringBuilder testWithAnswers = new StringBuilder();
 
-        for (Question question : EnglishTestSingleton.getInstance().getQuestions()) {
+        for (Question question : englishTestLoader.getQuestions()) {
             String userAnswer = user.getTestState().getUserAnswer();
             if (userAnswer == null) {
                 break;
             }
 
-            testWithAnswers.append(isAnswerCorrect(question, userAnswer)).append(question.getNumberOfQuestion())
-                    .append(". ").append(question.getQuestion())
+            testWithAnswers.append(isAnswerCorrect(question, userAnswer)).append(question.numberOfQuestion())
+                    .append(". ").append(question.question())
                     .append("\n(Правильный ответ: <b>").append(question.getCorrectAnswer()).append("</b>)\n")
                     .append(getAnswers(question, userAnswer)).append("\n\n");
         }
@@ -144,7 +158,7 @@ public final class BotResponses {
     private static StringBuilder getAnswers(Question question, String userAnswer) {
         StringBuilder answers = new StringBuilder();
 
-        for (String answer : question.getAnswers()) {
+        for (String answer : question.answers()) {
             if (userAnswer.equals(answer)) {
                 answers.append("\t\t<b>").append(answer).append(" (Ваш ответ)</b>\n");
                 continue;
@@ -154,4 +168,5 @@ public final class BotResponses {
 
         return answers;
     }
+
 }

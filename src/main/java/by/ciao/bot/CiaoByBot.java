@@ -8,14 +8,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.util.Optional;
 
 @Component
 public class CiaoByBot extends TelegramLongPollingBot {
 
-    @Value("bot_username")
+    @Value("${bot_username}")
     private String botUsername;
-    @Value("bot_token")
+    @Value("${bot_token}")
     private String botToken;
     private static final Logger log = LoggerFactory.getLogger(CiaoByBot.class);
     private BotService service;
@@ -24,6 +33,31 @@ public class CiaoByBot extends TelegramLongPollingBot {
     @Autowired
     void setService(BotService service) {
         this.service = service;
+        service.setServiceCallback((obj) -> {
+            Optional<Message> msg = Optional.empty();
+
+            try {
+                if (obj instanceof SendMessage) {
+                    msg = Optional.of(execute((SendMessage) obj));
+                } else if (obj instanceof DeleteMessage) {
+                    execute((DeleteMessage) obj);
+                } else if (obj instanceof EditMessageText) {
+                    execute((EditMessageText) obj);
+                } else if (obj instanceof EditMessageReplyMarkup) {
+                    execute((EditMessageReplyMarkup) obj);
+                } else if (obj instanceof AnswerCallbackQuery) {
+                    execute((AnswerCallbackQuery) obj);
+                } else {
+                    log.error(loggerMessages.argumentExceptionInServiceVar(), new IllegalArgumentException());
+                    service.sendToTechAdmin(new IllegalArgumentException().toString());
+                }
+            } catch (TelegramApiException e) {
+                log.error(loggerMessages.tgApiExceptionInServiceVar(), e);
+                service.sendToTechAdmin(e.toString());
+            }
+
+            return msg;
+        });
     }
 
     @Autowired

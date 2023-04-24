@@ -19,10 +19,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RestController {
 
-    private final RestTemplate restTemplate;
-    private HttpHeaders headers;
-    @Value("url")
+    @Value("${url}")
     private String url;
+    private final RestTemplate restTemplate;
+    private final HttpHeaders headers = new HttpHeaders();
     private static final Logger log = LoggerFactory.getLogger(RestController.class);
 
     public void addUserToDB(User user) {

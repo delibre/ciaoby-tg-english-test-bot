@@ -9,9 +9,9 @@ import by.ciao.user.User;
 import by.ciao.utils.BotResponses;
 import by.ciao.utils.LoggerMessages;
 import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
@@ -24,39 +24,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-@Getter
+@Getter @Setter
 public class BotService {
 
-    @Value("admin_id")
+    @Value("${admin_id}")
     private String adminId;
-    @Value("tech_admin_id")
+    @Value("${tech_admin_id}")
     private String techAdminId;
     private static final Logger log = LoggerFactory.getLogger(BotService.class);
     private final Map<Long, User> registeredUsersMap;
-    private final ServiceCallback serviceCallback;
-    private RestController restController;
-    private BotResponses botResponses;
-    private LoggerMessages loggerMessages;
+    private ServiceCallback serviceCallback;
+    private final RestController restController;
+    private final BotResponses botResponses;
+    private final LoggerMessages loggerMessages;
 
-    @Autowired
-    public BotService(ServiceCallback serviceCallback) {
-        this.serviceCallback = serviceCallback;
-        this.registeredUsersMap = new HashMap<>();
-    }
-
-    @Autowired
-    public void setBotResponses(BotResponses botResponses) {
-        this.botResponses = botResponses;
-    }
-
-    @Autowired
-    void setRestController(RestController restController) {
+    public BotService(RestController restController, BotResponses botResponses, LoggerMessages loggerMessages) {
         this.restController = restController;
-    }
-
-    @Autowired
-    public void setLoggerMessages(LoggerMessages loggerMessages) {
+        this.botResponses = botResponses;
         this.loggerMessages = loggerMessages;
+        this.registeredUsersMap = new HashMap<>();
     }
 
     void broadcast(String textMsg) {
@@ -245,5 +231,9 @@ public class BotService {
     void infoSentHandler(final User user) throws Exception {
         UserHandlerState state = new InfoSentState(serviceCallback);
         state.apply(user);
+    }
+
+    public void setServiceCallback(ServiceCallback serviceCallback) {
+        this.serviceCallback = serviceCallback;
     }
 }

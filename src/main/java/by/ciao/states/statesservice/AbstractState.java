@@ -26,9 +26,9 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @RequiredArgsConstructor
 public abstract class AbstractState {
 
-    @Value("admin_id")
+    @Value("${admin_id}")
     private String adminId;
-    @Value("tech_admin_id")
+    @Value("${tech_admin_id}")
     private String techAdminId;
     private final ServiceCallback serviceCallback;
     private static final Logger log = LoggerFactory.getLogger(AbstractState.class);

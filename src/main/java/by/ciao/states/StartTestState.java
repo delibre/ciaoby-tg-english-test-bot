@@ -16,7 +16,7 @@ import java.util.TimerTask;
 
 public class StartTestState extends AbstractState implements UserMessageHandlerState {
 
-    @Value("test_duration")
+    @Value("${test_duration}")
     private String testDuration;
     private static final Logger log = LoggerFactory.getLogger(StartTestState.class);
 

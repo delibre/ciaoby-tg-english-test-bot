@@ -8,6 +8,7 @@ import by.ciao.user.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class StartState extends AbstractState implements UserHandlerState {
+
     public StartState(final ServiceCallback serviceCallback) {
         super(serviceCallback);
     }

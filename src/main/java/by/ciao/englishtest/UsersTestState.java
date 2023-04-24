@@ -18,7 +18,7 @@ import java.util.Timer;
 @Getter @Setter
 public class UsersTestState {
 
-    @Value("test_duration")
+    @Value("${test_duration}")
     private String testDuration;
     private final LinkedList<Question> questions;
     private final LinkedList<String> userAnswers;

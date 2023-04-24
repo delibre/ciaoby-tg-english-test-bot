@@ -14,7 +14,7 @@ import java.util.List;
 @Service
 public class BotResponses {
 
-    @Value("test_duration")
+    @Value("${test_duration}")
     private String testDuration;
     private EnglishTestLoader englishTestLoader;
 

@@ -27,14 +27,6 @@ public class User {
         this.testState = new UsersTestState();
     }
 
-    public User(Long chatId, String fullName, String username, String phone, String referral) {
-        this.chatId = chatId;
-        this.fullName = fullName;
-        this.username = username;
-        this.phone = phone;
-        this.referral = referral;
-    }
-
     public void clearTest() throws Exception {
         testState = new UsersTestState();
         lastMessage = null;

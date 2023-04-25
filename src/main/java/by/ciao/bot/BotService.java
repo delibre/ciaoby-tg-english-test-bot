@@ -85,13 +85,18 @@ public class BotService {
         return update.hasMessage() && update.getMessage().getContact() != null;
     }
 
-    boolean hasCallbackAndCorrectState(final Update update) {
+    boolean hasCallback(final Update update) {
         var updateHasCallbackQuery = update.hasCallbackQuery();
         var userExists = registeredUsersMap.containsKey(update.getCallbackQuery().getFrom().getId());
+
+        return updateHasCallbackQuery && userExists;
+    }
+
+    boolean isGetReferralOrCheckAnswerState(final Update update) {
         var userStateIsGetReferral = registeredUsersMap.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.GET_REFERRAL;
         var userStateIsCheckAnswer = registeredUsersMap.get(update.getCallbackQuery().getFrom().getId()).getState() == StateEnum.CHECK_ANSWER;
 
-        return updateHasCallbackQuery && userExists && (userStateIsGetReferral || userStateIsCheckAnswer);
+        return userStateIsGetReferral || userStateIsCheckAnswer;
     }
 
     void closeQuery(final String id) {

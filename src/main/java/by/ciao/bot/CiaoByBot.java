@@ -51,9 +51,11 @@ public class CiaoByBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if (service.isMsgFromAdmin(update)) {
+
             service.broadcast(update.getMessage().getText());
 
         } else if (service.msgHasText(update)) {
+
             var msg = update.getMessage();
             var chatId = msg.getChatId();
 
@@ -66,21 +68,26 @@ public class CiaoByBot extends TelegramLongPollingBot {
             catchMessageProcessingException(msg.getText(), service.getRegisteredUsersMap().get(chatId));
 
         }  else if (service.hasContact(update)) {
+
             var chatId = update.getMessage().getChatId();
             var phone = update.getMessage().getContact().getPhoneNumber();
             var user = service.getRegisteredUsersMap().get(chatId);
 
             catchMessageProcessingException(phone, user);
 
-        } else if (service.hasCallbackAndCorrectState(update)) {
+        } else if (service.hasCallback(update) && service.isGetReferralOrCheckAnswerState(update)) {
+
             var qry = update.getCallbackQuery();
             var user = service.getRegisteredUsersMap().get(qry.getFrom().getId());
 
             catchMessageProcessingException(qry.getData(), user);
             service.closeQuery(qry.getId());
+
         } else {
+
             log.info(LoggerMessages.unexpectedCase(update.toString()));
             sendToTechAdmin(LoggerMessages.unexpectedCase(update.toString()));
+
         }
     }
 

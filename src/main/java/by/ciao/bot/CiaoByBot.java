@@ -1,8 +1,10 @@
 package by.ciao.bot;
 
+import by.ciao.states.*;
+import by.ciao.states.statesservice.UserHandlerState;
+import by.ciao.states.statesservice.UserMessageHandlerState;
 import by.ciao.user.User;
 import by.ciao.utils.AppConfig;
-import by.ciao.utils.BotResponses;
 import by.ciao.utils.LoggerMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +51,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if (service.isMsgFromAdmin(update)) {
-            broadcast(update.getMessage().getText());
+            service.broadcast(update.getMessage().getText());
 
         } else if (service.msgHasText(update)) {
             var msg = update.getMessage();
@@ -64,8 +66,11 @@ public class CiaoByBot extends TelegramLongPollingBot {
             catchMessageProcessingException(msg.getText(), service.getRegisteredUsersMap().get(chatId));
 
         }  else if (service.hasContact(update)) {
-            var id = update.getMessage().getChatId();
-            service.addPhone(update, id);
+            var chatId = update.getMessage().getChatId();
+            var phone = update.getMessage().getContact().getPhoneNumber();
+            var user = service.getRegisteredUsersMap().get(chatId);
+
+            catchMessageProcessingException(phone, user);
 
         } else if (service.hasCallbackAndCorrectState(update)) {
             var qry = update.getCallbackQuery();
@@ -98,15 +103,43 @@ public class CiaoByBot extends TelegramLongPollingBot {
         service.startTestIfStartButtonPressed(textMsg, user);
 
         switch (user.getState()) {
-            case SEND_QUESTION -> service.sendQuestionHandler(user);
-            case CHECK_ANSWER -> service.checkAnswerHandler(textMsg, user);
-            case START -> service.startHandler(user);
-            case GET_FULL_NAME -> service.getFullNameHandler(textMsg, user);
-            case GET_PHONE -> service.getPhoneHandler(textMsg, user);
-            case GET_REFERRAL -> service.getReferralHandler(textMsg, user);
-            case START_TEST -> service.startTestHandler(textMsg, user);
-            case TEST_FINISHED -> service.testFinishedHandler(user);
-            case INFO_SENT -> service.infoSentHandler(user);
+            case SEND_QUESTION -> {
+                UserHandlerState state = new SendQuestionState(service.getServiceCallback());
+                state.apply(user);
+            }
+            case CHECK_ANSWER -> {
+                UserMessageHandlerState state = new CheckAnswerState(service.getServiceCallback());
+                state.apply(textMsg, user);
+            }
+            case START -> {
+                UserHandlerState state = new StartState(service.getServiceCallback());
+                state.apply(user);
+            }
+            case GET_FULL_NAME -> {
+                UserMessageHandlerState state = new GetFullNameState(service.getServiceCallback());
+                state.apply(textMsg, user);
+            }
+            case GET_PHONE -> {
+                UserMessageHandlerState state = new GetPhoneState(service.getServiceCallback());
+                state.apply(textMsg, user);
+            }
+            case GET_REFERRAL -> {
+                UserMessageHandlerState state = new GetReferralState(service.getServiceCallback());
+                state.apply(textMsg, user);
+            }
+            case START_TEST -> {
+                UserMessageHandlerState state = new StartTestState(service.getServiceCallback());
+                state.apply(textMsg, user);
+            }
+            case TEST_FINISHED -> {
+                UserHandlerState state = new TestFinishedState(service.getServiceCallback());
+                state.apply(user);
+                service.getRegisteredUsersMap().remove(user.getChatId());
+            }
+            case INFO_SENT -> {
+                UserHandlerState state = new InfoSentState(service.getServiceCallback());
+                state.apply(user);
+            }
             default -> {
                 log.error(LoggerMessages.processMessageException(), new IllegalStateException());
                 sendToTechAdmin(LoggerMessages.processMessageException());
@@ -121,20 +154,6 @@ public class CiaoByBot extends TelegramLongPollingBot {
             log.error(LoggerMessages.messageProcessingException(), e);
             sendToTechAdmin(e.toString());
         }
-    }
-
-    private void broadcast(String textMsg) {
-        int counter = 0;
-        for (User user : service.getRegisteredUsersMap().values()) {
-            var sm = SendMessage.builder()
-                    .chatId(user.getChatId().toString())
-                    .text(textMsg).build();
-            try {
-                execute(sm);
-                counter++;
-            } catch (TelegramApiException ignore) {}
-        }
-        service.sendText(Long.parseLong(AppConfig.getProperty("admin_id")), BotResponses.notificationReceivedBy(counter));
     }
 
     private void sendToTechAdmin(final String textMsg) {

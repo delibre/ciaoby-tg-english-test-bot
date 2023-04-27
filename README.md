@@ -21,26 +21,25 @@ All three microservices have been deployed on [**"AWS Cloud Computing Services"*
 ### If you want to start and test the bot locally:
 
 1. Follow the link ["Telegram User Data Provider"](https://github.com/delibre/tg-user-data-provider)
-and proceed according to the guidelines <br/><br/> 
+and proceed according to the guidelines 
 
 2. Follow the link  ["Telegram Admin Bot"](https://github.com/delibre/tg-admin-bot)
-and proceed according to the guidelines <br/><br/>
+and proceed according to the guidelines 
 
-3. Download the latest release of this project <br/><br/> 
+3. Download the latest release of this project 
 
-4. Launch the ["Telegram User Data Provider"](https://github.com/delibre/tg-user-data-provider) application <br/><br/>
+4. Launch the ["Telegram User Data Provider"](https://github.com/delibre/tg-user-data-provider) application 
 
-5. Next, start the ["Telegram Admin Bot"](https://github.com/delibre/tg-admin-bot) application <br/><br/>
+5. Next, start the ["Telegram Admin Bot"](https://github.com/delibre/tg-admin-bot) application 
 
 6. The bot's configuration involves multiple profiles. To launch it with a specific profile, you will need to create
-a system variable named "PROFILE=slava-test" <br/><br/>
+a system variable named "PROFILE=slava-test" 
 
-7. Start the application <br/><br/>
+7. Start the application 
 
 8. Download and install the Telegram app or use the browser version to create an account if you don't have one already
-<br/><br/>
 
-9. After the bot's app was started follow the link ["Local Test Bot"](https://t.me/slava_local_test_bot) <br/><br/>
+9. After the bot's app was started follow the link ["Local Test Bot"](https://t.me/slava_local_test_bot) 
 
 
 ### User interface:
@@ -80,12 +79,13 @@ to the admin bot and received by the admin
 
 9. The administrator can send push notifications to all users who have activated the bot by simply sending a message to
 the activated tester bot. After sending the message, the administrator will receive information on how many users 
-received the message
+received the message  
 ![Example of push image](docs/push.png)
 ![Example of received push](docs/receive_push.png) <br/><br/>
 
 10. All necessary logs are sent to tech admin:  
 ![Example of logs received by tech admin image](docs/tech_admin_example.png)
+
 
 ## Source Code Review 
 
@@ -109,7 +109,6 @@ public enum StateEnum {
 }
 ```
 Each state has its own handler class that implements the necessary logic.
-
 
 ### Bot's class implementation
 
@@ -215,7 +214,6 @@ private final BotService service = new BotService((obj) -> {
 });
 ```
 
-
 ### Other essential classes
 
 The **"RestControllerSingleton"** class is an essential component of the application that follows the singleton design
@@ -226,7 +224,7 @@ The last one crucial class is a **"EnglishTestSingleton"** that uses the singlet
 in the English test.
 
 
-### License
+## License
 
 MIT
 

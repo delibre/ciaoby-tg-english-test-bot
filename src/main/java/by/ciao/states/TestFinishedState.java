@@ -1,7 +1,7 @@
 package by.ciao.states;
 
 import by.ciao.bot.ServiceCallback;
-import by.ciao.controller.RestController;
+import by.ciao.controller.RestControllerSingleton;
 import by.ciao.enums.StateEnum;
 import by.ciao.states.statesservice.AbstractState;
 import by.ciao.states.statesservice.UserHandlerState;
@@ -23,7 +23,7 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
 
         sendAnswers(user);
         sendDataToAdmin(user);
-        RestController.getInstance().updateTestInfoInDB(user);
+        RestControllerSingleton.getInstance().updateTestInfoInDB(user);
     }
 
     private void deleteLastMessage(final User user) throws TelegramApiException {
@@ -41,28 +41,32 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
 
     private void sendAnswers(final User user) throws Exception {
         StringBuilder userAnswers = BotResponses.userAnswers(user);
-        int numAnswers = userAnswers.toString().split("\n\n").length;
 
-        if (numAnswers <= 26) {
-            sendText(user.getChatId(), userAnswers.toString());
-        } else {
-            String[] answers = userAnswers.toString().split("\n\n");
+        if(!userAnswers.isEmpty()) {
+            int numAnswers = userAnswers.toString().split("\n\n").length;
 
-            StringBuilder firstMessage = new StringBuilder();
-            StringBuilder secondMessage = new StringBuilder();
+            if (numAnswers <= 26) {
+                sendText(user.getChatId(), userAnswers.toString());
+            } else {
+                String[] answers = userAnswers.toString().split("\n\n");
 
-            for (int i = 0; i < 15; i++) {
-                firstMessage.append(answers[i]).append("\n\n");
+                StringBuilder firstMessage = new StringBuilder();
+                StringBuilder secondMessage = new StringBuilder();
+
+                for (int i = 0; i < 15; i++) {
+                    firstMessage.append(answers[i]).append("\n\n");
+                }
+
+                for (int i = 15; i < answers.length; i++) {
+                    secondMessage.append(answers[i]).append("\n\n");
+                }
+
+                sendText(user.getChatId(), firstMessage.toString());
+                sendText(user.getChatId(), secondMessage.toString());
             }
-
-            for (int i = 15; i < answers.length; i++) {
-                secondMessage.append(answers[i]).append("\n\n");
-            }
-
-            sendText(user.getChatId(), firstMessage.toString());
-            sendText(user.getChatId(), secondMessage.toString());
         }
 
         sendText(user.getChatId(), BotResponses.testFinished(user));
     }
+
 }

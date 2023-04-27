@@ -65,7 +65,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
             }
 
             service.addUserIfAbsent(chatId, msg.getFrom().getUserName());
-            catchMessageProcessingException(msg.getText(), service.getRegisteredUsersMap().get(chatId));
+            processMessageWithExceptionHandling(msg.getText(), service.getRegisteredUsersMap().get(chatId));
 
         }  else if (service.hasContact(update)) {
 
@@ -73,14 +73,14 @@ public class CiaoByBot extends TelegramLongPollingBot {
             var phone = update.getMessage().getContact().getPhoneNumber();
             var user = service.getRegisteredUsersMap().get(chatId);
 
-            catchMessageProcessingException(phone, user);
+            processMessageWithExceptionHandling(phone, user);
 
         } else if (service.hasCallback(update) && service.isGetReferralOrCheckAnswerState(update)) {
 
             var qry = update.getCallbackQuery();
             var user = service.getRegisteredUsersMap().get(qry.getFrom().getId());
 
-            catchMessageProcessingException(qry.getData(), user);
+            processMessageWithExceptionHandling(qry.getData(), user);
             service.closeQuery(qry.getId());
 
         } else {
@@ -154,7 +154,7 @@ public class CiaoByBot extends TelegramLongPollingBot {
         }
     }
 
-    private void catchMessageProcessingException(final String textMsg, final User user) {
+    private void processMessageWithExceptionHandling(final String textMsg, final User user) {
         try {
             processMessage(textMsg, user);
         } catch (Exception e) {

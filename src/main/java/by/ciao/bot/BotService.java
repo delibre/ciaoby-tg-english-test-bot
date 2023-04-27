@@ -1,6 +1,6 @@
 package by.ciao.bot;
 
-import by.ciao.controller.RestController;
+import by.ciao.controller.RestControllerSingleton;
 import by.ciao.enums.StateEnum;
 import by.ciao.user.User;
 import by.ciao.utils.AppConfig;
@@ -63,11 +63,11 @@ public class BotService {
     void addUserIfAbsent(final Long chatId, final String username) {
 
         try {
-            User user = RestController.getInstance().getUserByChatId(chatId);
+            User user = RestControllerSingleton.getInstance().getUserByChatId(chatId);
 
             if (user == null) {
                 registeredUsersMap.putIfAbsent(chatId, new User(chatId, username));
-                RestController.getInstance().addUserToDB(registeredUsersMap.get(chatId));
+                RestControllerSingleton.getInstance().addUserToDB(registeredUsersMap.get(chatId));
                 // sending data to tech admin
                 log.info(LoggerMessages.mapSize(registeredUsersMap.size()));
                 sendText(Long.parseLong(AppConfig.getProperty("tech_admin_id")), LoggerMessages.mapSize(registeredUsersMap.size()));

@@ -10,23 +10,23 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class RestController {
+public final class RestControllerSingleton {
 
-    private static RestController INSTANCE;
+    private static RestControllerSingleton INSTANCE;
     private final RestTemplate restTemplate;
     private final HttpHeaders headers;
     private final String url;
-    private static final Logger log = LoggerFactory.getLogger(RestController.class);
+    private static final Logger log = LoggerFactory.getLogger(RestControllerSingleton.class);
 
-    public RestController(RestTemplate restTemplate, HttpHeaders headers, String url) {
+    public RestControllerSingleton(RestTemplate restTemplate, HttpHeaders headers, String url) {
         this.restTemplate = restTemplate;
         this.headers = headers;
         this.url = url;
     }
 
-    public static RestController getInstance() {
+    public static RestControllerSingleton getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new RestController(new RestTemplate(), new HttpHeaders(), AppConfig.getProperty("url"));
+            INSTANCE = new RestControllerSingleton(new RestTemplate(), new HttpHeaders(), AppConfig.getProperty("url"));
         }
 
         return INSTANCE;

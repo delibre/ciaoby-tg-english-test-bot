@@ -16,6 +16,18 @@ user information.
 
 All three microservices have been deployed on [**"AWS Cloud Computing Services"**](https://aws.amazon.com/). 
 
+### Technologies used
+
+* **Java17**
+* **Telegram Bots API** v6.5.0
+* **Spring Web Framework** v6.0.0
+* **Lombok** v1.18.26
+* **Commons Configuration Library** v1.10
+* **Commons Logging Library** v1.2
+* **SLF4J API** v2.0.5
+* **SLF4J Simple** v2.0.5
+* **Aspose Cells** v23.3
+
 ## Guidelines
 
 ### If you want to start and test the bot locally:
@@ -91,8 +103,8 @@ received the message
 
 ### Finite State Machine Implementation
 
-The entire application follows the principles of a **finite state machine**, where each response from the bot is associated 
-with a specific state implemented as an enum:
+The entire application follows the principles of a **finite state machine**, where each response from the bot is 
+associated with a specific state implemented as an enum:
 
 ```java
 public enum StateEnum {
@@ -112,10 +124,10 @@ Each state has its own handler class that implements the necessary logic.
 
 ### Bot's class implementation
 
-Below is the method that manages the states in the bot's **"CiaoByBot"** class. It is responsible for processing incoming 
-messages from users and determining the appropriate state based on the user's current state. The method determines the
-user's state and then applies the appropriate state handler to perform the necessary actions. If the user's state is not
-recognized, an error message is logged and sent to the technical administrator.
+Below is the method that manages the states in the bot's **"CiaoByBot"** class. It is responsible for processing 
+incoming messages from users and determining the appropriate state based on the user's current state. The method 
+determines the user's state and then applies the appropriate state handler to perform the necessary actions. If the 
+user's state is not recognized, an error message is logged and sent to the technical administrator.
 
 ```java
 private void processMessage(String textMsg, User user) throws Exception {
@@ -182,7 +194,7 @@ public void onUpdateReceived(Update update) {
 }
 ```
 
-The **"CiaoByBot"** class also includes an important feature which is the creation of a callback function for the 
+The **"CiaoByBot"** class also includes an important feature which is the creation of a **callback** function for the 
 execute method from the **"TelegramLongPollingBot"** class. This is used to simplify the implementation of certain 
 state classes.
 
@@ -214,14 +226,37 @@ private final BotService service = new BotService((obj) -> {
 });
 ```
 
-### Other essential classes
+### Other essentials
 
-The **"RestControllerSingleton"** class is an essential component of the application that follows the singleton design
-pattern. It facilitates communication with a REST API and performs CRUD operations on user data. With the help of 
-**"RestTemplate"**, this class has methods to add, update, and retrieve user data by making HTTP requests.
+* The **"RestControllerSingleton"** class is an essential component of the application that follows the **singleton 
+design pattern**. It facilitates communication with a REST API and performs CRUD operations on user data. With the 
+help of **"RestTemplate"**, this class has methods to add, update, and retrieve user data by making HTTP requests.  
 
-The last one crucial class is a **"EnglishTestSingleton"** that uses the singleton design pattern to manage questions
+
+* One more crucial class is a **"EnglishTestSingleton"** that uses the **singleton design pattern** to manage questions
 in the English test.
+
+
+* The following method, called setTimer, which is used in **"StartTestState"** class, utilizes **multithreading** to 
+implement a timer for the test. Once the timer runs out, the user's test state is changed to "test finished" and the
+timer is canceled.
+
+```java
+private void setTimer(User user) {
+    TimerTask task = new TimerTask() {
+        public void run() {
+            try {
+                sendText(user.getChatId(), "Время вышло. Результаты вашего теста ниже");
+                changeStateToTestFinished(user);
+            } catch (Exception e) {
+                log.error(LoggerMessages.setTimerException(), e);
+            }
+            user.getTestState().getTimer().cancel();
+        }
+    };
+    user.getTestState().getTimer().schedule(task, Long.parseLong(AppConfig.getProperty("test_duration")) * 60 * 1000);
+}
+```
 
 
 ## License

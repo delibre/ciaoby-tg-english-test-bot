@@ -10,6 +10,7 @@ import by.ciao.utils.KeyboardCreator;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class GetFullNameState extends AbstractState implements UserMessageHandlerState {
+
     public GetFullNameState(final ServiceCallback serviceCallback) {
         super(serviceCallback);
     }
@@ -28,4 +29,5 @@ public class GetFullNameState extends AbstractState implements UserMessageHandle
 
         getServiceCallback().execute(sm);
     }
+
 }

@@ -17,9 +17,10 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-@AllArgsConstructor
 @Getter
+@AllArgsConstructor
 public abstract class AbstractState {
+
     private final ServiceCallback serviceCallback;
     private static final Logger log = LoggerFactory.getLogger(AbstractState.class);
 

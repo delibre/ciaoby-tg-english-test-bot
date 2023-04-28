@@ -13,6 +13,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRem
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class GetPhoneState extends AbstractState implements UserMessageHandlerState {
+
     public GetPhoneState(final ServiceCallback serviceCallback) {
         super(serviceCallback);
     }
@@ -38,7 +39,7 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
 
         getServiceCallback().execute(removeMessage);
 
-        setDelay(); // Made to humanise bot's responses, so it is not sending lots of messages in one second.
+        setDelay();
     }
 
     private void sendOptionsForReferral(final User user) throws TelegramApiException {
@@ -47,4 +48,5 @@ public class GetPhoneState extends AbstractState implements UserMessageHandlerSt
 
         getServiceCallback().execute(sm).ifPresent(user::setLastMessage);
     }
+
 }

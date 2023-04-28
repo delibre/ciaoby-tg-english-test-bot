@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class KeyboardCreator {
+
     public static InlineKeyboardMarkup createInlineKeyboard(final List<String> answerOptions) {
         var markup = new InlineKeyboardMarkup();
 
@@ -47,4 +48,5 @@ public final class KeyboardCreator {
 
         return keyboard;
     }
+
 }

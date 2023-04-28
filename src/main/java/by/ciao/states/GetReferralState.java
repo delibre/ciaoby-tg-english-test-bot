@@ -11,6 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class GetReferralState extends AbstractState implements UserMessageHandlerState {
+
     public GetReferralState(final ServiceCallback serviceCallback) {
         super(serviceCallback);
     }
@@ -24,7 +25,8 @@ public class GetReferralState extends AbstractState implements UserMessageHandle
         getServiceCallback().execute(editMessage(user, null, BotResponses.askReferral() + textMsg));
         user.setLastMessage(new Message());  // made for future question edition
 
-        setDelay();  // Made to humanise bot's responses, so it is not sending lots of messages in one second.
+        setDelay();
         sendStartButton(user);
     }
+
 }

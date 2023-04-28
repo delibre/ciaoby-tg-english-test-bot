@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 @Getter @Setter
 @NoArgsConstructor
 public class User {
+
     private StateEnum state;
     private Message lastMessage;
     private Long chatId;
@@ -35,4 +36,5 @@ public class User {
     public boolean isUserDataCollected() {
         return fullName != null && phone != null && referral != null;
     }
+
 }

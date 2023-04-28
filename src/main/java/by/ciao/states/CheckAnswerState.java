@@ -7,6 +7,7 @@ import by.ciao.states.statesservice.UserMessageHandlerState;
 import by.ciao.user.User;
 
 public class CheckAnswerState extends AbstractState implements UserMessageHandlerState {
+
     public CheckAnswerState(final ServiceCallback serviceCallback) {
         super(serviceCallback);
     }
@@ -18,4 +19,5 @@ public class CheckAnswerState extends AbstractState implements UserMessageHandle
         UserHandlerState state = new SendQuestionState(getServiceCallback());
         state.apply(user);
     }
+
 }

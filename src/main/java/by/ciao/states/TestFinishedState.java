@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class TestFinishedState extends AbstractState implements UserHandlerState {
+
     public TestFinishedState(final ServiceCallback serviceCallback) {
         super(serviceCallback);
     }

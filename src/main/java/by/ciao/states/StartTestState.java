@@ -17,6 +17,7 @@ import java.util.Objects;
 import java.util.TimerTask;
 
 public class StartTestState extends AbstractState implements UserMessageHandlerState {
+
     private static final Logger log = LoggerFactory.getLogger(StartTestState.class);
 
     public StartTestState(ServiceCallback serviceCallback) {
@@ -53,4 +54,5 @@ public class StartTestState extends AbstractState implements UserMessageHandlerS
         };
         user.getTestState().getTimer().schedule(task, Long.parseLong(AppConfig.getProperty("test_duration")) * 60 * 1000);
     }
+
 }

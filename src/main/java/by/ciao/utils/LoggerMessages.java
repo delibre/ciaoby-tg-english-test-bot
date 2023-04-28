@@ -1,6 +1,7 @@
 package by.ciao.utils;
 
 public final class LoggerMessages {
+
     public static String argumentExceptionInServiceVar() {
         return "IllegalArgumentException on execute method call in BotService class: Object type is not supported\n";
     }
@@ -19,10 +20,6 @@ public final class LoggerMessages {
 
     public static String messageProcessingException() {
         return "messageProcessing() method in CiaoByBot class\n";
-    }
-
-    public static String addPhoneException() {
-        return "addPhone() method in CiaoByBot class\n";
     }
 
     public static String closeQueryException() {
@@ -56,4 +53,5 @@ public final class LoggerMessages {
     public static String propertiesException(String filename) {
         return "Failed to load properties from " + filename;
     }
+
 }

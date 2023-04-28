@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class BotResponses {
+
     public static String testFinished(User user) {
         return """
                 Вы ответили верно на %d вопросов.
@@ -86,7 +87,7 @@ public final class BotResponses {
                 Времени осталось: %s
 
                 %d. %s
-                """.formatted(user.getTestState().countTime(), user.getTestState().getCurrentQuestion().getNumberOfQuestion(), user.getTestState().getCurrentQuestion().getQuestion());
+                """.formatted(user.getTestState().countTime(), user.getTestState().getCurrentQuestion().numberOfQuestion(), user.getTestState().getCurrentQuestion().question());
     }
 
     public static List<String> referralOptions() {
@@ -94,7 +95,7 @@ public final class BotResponses {
     }
 
     public static List<String> optionsForAnswers(final User user) {
-        return new ArrayList<>(user.getTestState().getCurrentQuestion().getAnswers());
+        return new ArrayList<>(user.getTestState().getCurrentQuestion().answers());
     }
 
     public static String startTestButton() {
@@ -126,8 +127,8 @@ public final class BotResponses {
                 break;
             }
 
-            testWithAnswers.append(isAnswerCorrect(question, userAnswer)).append(question.getNumberOfQuestion())
-                    .append(". ").append(question.getQuestion())
+            testWithAnswers.append(isAnswerCorrect(question, userAnswer)).append(question.numberOfQuestion())
+                    .append(". ").append(question.question())
                     .append("\n(Правильный ответ: <b>").append(question.getCorrectAnswer()).append("</b>)\n")
                     .append(getAnswers(question, userAnswer)).append("\n\n");
         }
@@ -145,7 +146,7 @@ public final class BotResponses {
     private static StringBuilder getAnswers(Question question, String userAnswer) {
         StringBuilder answers = new StringBuilder();
 
-        for (String answer : question.getAnswers()) {
+        for (String answer : question.answers()) {
             if (userAnswer.equals(answer)) {
                 answers.append("\t\t<b>").append(answer).append(" (Ваш ответ)</b>\n");
                 continue;
@@ -155,4 +156,5 @@ public final class BotResponses {
 
         return answers;
     }
+
 }

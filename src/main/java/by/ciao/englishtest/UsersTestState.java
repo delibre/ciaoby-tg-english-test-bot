@@ -11,8 +11,7 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Timer;
 
-@Getter
-@Setter
+@Getter @Setter
 public class UsersTestState {
     private final LinkedList<Question> questions;
     private final LinkedList<String> userAnswers;

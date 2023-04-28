@@ -122,7 +122,7 @@ public enum StateEnum {
 ```
 Each state has its own handler class that implements the necessary logic.
 
-### Bot's class implementation
+### Bot's Class Implementation
 
 Below is the method that manages the states in the bot's **"CiaoByBot"** class. It is responsible for processing 
 incoming messages from users and determining the appropriate state based on the user's current state. The method 
@@ -226,7 +226,7 @@ private final BotService service = new BotService((obj) -> {
 });
 ```
 
-### Other essentials
+### Other Essentials
 
 * The **"RestControllerSingleton"** class is an essential component of the application that follows the **singleton 
 design pattern**. It facilitates communication with a REST API and performs CRUD operations on user data. With the 

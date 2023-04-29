@@ -278,6 +278,10 @@ private void setTimer(User user) {
   variables of the application.
 
 
+* The application logs all the required data and forwards it to the technical administrator as push notifications 
+through the bot.
+
+
 ## License
 
 MIT

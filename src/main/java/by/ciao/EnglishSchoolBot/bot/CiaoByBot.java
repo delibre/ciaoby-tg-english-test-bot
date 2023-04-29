@@ -1,46 +1,24 @@
 package by.ciao.EnglishSchoolBot.bot;
 
-import by.ciao.EnglishSchoolBot.user.User;
-import by.ciao.EnglishSchoolBot.utils.AppConfig;
-import by.ciao.EnglishSchoolBot.utils.BotResponses;
-import by.ciao.EnglishSchoolBot.utils.LoggerMessages;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import by.ciao.EnglishSchoolBot.dto.UserInfoDTO;
+import by.ciao.EnglishSchoolBot.enums.States;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.Optional;
-
 public class CiaoByBot extends TelegramLongPollingBot {
-    private static final Logger log = LoggerFactory.getLogger(CiaoByBot.class);
-    private final BotService service = new BotService((obj) -> {
-        Optional<Message> msg = Optional.empty();
+    private final BotService service = new BotService((sm, dm, em) -> {
+        Message msg = null;
 
         try {
-            if (obj instanceof SendMessage) {
-                msg = Optional.of(execute((SendMessage) obj));
-            } else if (obj instanceof DeleteMessage) {
-                execute((DeleteMessage) obj);
-            } else if (obj instanceof EditMessageText) {
-                execute((EditMessageText) obj);
-            } else if (obj instanceof EditMessageReplyMarkup) {
-                execute((EditMessageReplyMarkup) obj);
-            } else if (obj instanceof AnswerCallbackQuery) {
-                execute((AnswerCallbackQuery) obj);
-            } else {
-                log.error(LoggerMessages.argumentExceptionInServiceVar(), new IllegalArgumentException());
-                sendToTechAdmin(new IllegalArgumentException().toString());
-            }
+            if (dm == null && em == null) msg = execute(sm);
+            else if (sm == null && em == null) execute(dm);
+            else if (dm == null && sm == null) execute(em);
         } catch (TelegramApiException e) {
-            log.error(LoggerMessages.tgApiExceptionInServiceVar(), e);
-            sendToTechAdmin(e.toString());
+            throw new RuntimeException(e);
         }
 
         return msg;
@@ -48,120 +26,102 @@ public class CiaoByBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (service.isMsgFromAdmin(update)) {
-            broadcast(update.getMessage().getText());
-
-        } else if (service.msgHasText(update)) {
+        if (update.hasMessage() && update.getMessage().hasText()){
             var msg = update.getMessage();
             var id = msg.getChatId();
 
-            if(service.isCheckAnswerState(id)) {
-                service.sendWarning(id);
+            if(service.getRegisteredUsers().containsKey(id) && service.getRegisteredUsers().get(id).getState() == States.CHECK_ANSWER) {
+                sendText(service.getRegisteredUsers().get(id).getChatId(), "Отвечать можно только нажав кнопку с одним из вариантов ответа");
                 return;
             }
+            if (!service.getRegisteredUsers().containsKey(id))
+                service.getRegisteredUsers().put(id, new UserInfoDTO(id, msg.getFrom().getUserName()));
 
-            service.addUserIfAbsent(id, msg);
-            catchMessageProcessingException(msg.getText(), service.getRegisteredUsersMap().get(id));
+            parseMessage(msg.getText(), service.getRegisteredUsers().get(id));
 
-        }  else if (service.hasContact(update)) {
-            var id = update.getMessage().getChatId();
-            service.addPhone(update, id);
+        }  else if (update.hasMessage() && update.getMessage().getContact() != null) {
+            service.getPhoneNumberHandler(update.getMessage().getContact().getPhoneNumber(),
+                                    service.getRegisteredUsers().get(update.getMessage().getChatId()));
 
-        } else if (service.hasCallbackAndCorrectState(update)) {
+        } else if (update.hasCallbackQuery() && service.getRegisteredUsers().containsKey(update.getCallbackQuery().getFrom().getId())) {
             var qry = update.getCallbackQuery();
-            var user = service.getRegisteredUsersMap().get(qry.getFrom().getId());
+            parseMessage(qry.getData(), service.getRegisteredUsers().get(qry.getFrom().getId()));
 
-            catchMessageProcessingException(qry.getData(), user);
-            service.closeQuery(qry.getId());
-        } else {
-            log.info(LoggerMessages.unexpectedCase(update.toString()));
-            sendToTechAdmin(LoggerMessages.unexpectedCase(update.toString()));
+            try {
+                execute(AnswerCallbackQuery.builder()
+                        .callbackQueryId(qry.getId()).build());
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
     @Override
     public String getBotUsername() {
-        return AppConfig.getProperty("bot_username");
+        return "testForProd_bot";
     }
 
     @Override
     public String getBotToken() {
-        return AppConfig.getProperty("bot_token");
+        return "6167400176:AAGg4892WjlM0mMxUgdmdoQXID2X9UPw4lo";
     }
 
-    private void processMessage(String textMsg, User user) throws Exception {
-        if (service.startBot(textMsg, user)) {
+    private void parseMessage(String textMsg, UserInfoDTO user) {
+        if (textMsg.equals("/start")) {
+            user.setState(States.START);
+            user.clearTest();
+        } else if (user.getState() == null) {
+            sendText(user.getChatId(), "Нет такой команды");
             return;
         }
 
-        service.startTestIfStartButtonIsPressed(textMsg, user);
+        if (textMsg.equals("Начать тестирование\uD83C\uDFC1")) {
+            user.setState(States.QUESTION_TO_SEND);
+            user.clearTest();
+        }
 
         switch (user.getState()) {
-            case SEND_QUESTION:
-                service.sendQuestionHandler(user);
+            case START:
+                service.startHandler(user);
+                break;
+            case GET_NAME_AND_SURNAME:
+                service.getNameAndSurnameHandler(textMsg, user);
+                break;
+            case GET_PHONE_NUMBER:
+                service.getPhoneNumberHandler(textMsg, user);
+                break;
+            case GET_REVIEW:
+                service.getReviewHandler(textMsg, user);
+                break;
+            case TEST_TODO:
+                service.testToDoHandler(textMsg, user);
+                break;
+            case QUESTION_TO_SEND:
+                service.questionToSendHandler(user);
                 break;
             case CHECK_ANSWER:
                 service.checkAnswerHandler(textMsg, user);
                 break;
-            case START:
-                service.startHandler(user);
+            case TEST_ENDED:
+                service.testEndedHandler(user);
                 break;
-            case GET_FULL_NAME:
-                service.getFullNameHandler(textMsg, user);
-                break;
-            case GET_PHONE:
-                service.getPhoneHandler(textMsg, user);
-                break;
-            case GET_REFERRAL:
-                service.getReferralHandler(textMsg, user);
-                break;
-            case START_TEST:
-                service.startTestHandler(textMsg, user);
-                break;
-            case TEST_FINISHED:
-                service.testFinishedHandler(user);
-                break;
-            case INFO_SENT:
-                service.infoSentHandler(user);
+            case END_ALL:
+                service.testEndAllHandler(user);
                 break;
             default:
-                log.error(LoggerMessages.processMessageException(), new IllegalStateException());
-                sendToTechAdmin(LoggerMessages.processMessageException());
+                throw new IllegalStateException();
         }
     }
 
-    private void catchMessageProcessingException(final String textMsg, final User user) {
-        try {
-            processMessage(textMsg, user);
-        } catch (Exception e) {
-            log.error(LoggerMessages.messageProcessingException(), e);
-            sendToTechAdmin(e.toString());
-        }
-    }
-
-    private void broadcast(String textMsg) {
-        int counter = 0;
-        for (User user : service.getRegisteredUsersMap().values()) {
-            var sm = SendMessage.builder()
-                    .chatId(user.getChatId().toString())
-                    .text(textMsg).build();
-            try {
-                execute(sm);
-                counter++;
-            } catch (TelegramApiException ignore) {}
-        }
-        service.sendText(Long.parseLong(AppConfig.getProperty("admin_id")), BotResponses.notificationReceivedBy(counter));
-    }
-
-    private void sendToTechAdmin(final String textMsg) {
+    public void sendText(Long who, String what){
         var sm = SendMessage.builder()
-                .chatId(AppConfig.getProperty("tech_admin_id"))
-                .text(textMsg).build();
+                .chatId(who.toString())
+                .text(what).build();
 
         try {
             execute(sm);
         } catch (TelegramApiException e) {
-            log.error(LoggerMessages.sendTextException(), e);
+            throw new RuntimeException(e);
         }
     }
 }

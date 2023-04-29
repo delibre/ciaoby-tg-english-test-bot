@@ -1,4 +1,4 @@
-package by.ciao.EnglishSchoolBot.utils;
+package by.ciao.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.util.Objects;
 
 public final class AppBanner {
+
     private static final Logger log = LoggerFactory.getLogger(AppBanner.class);
 
     public static void printBanner() {
@@ -24,5 +25,7 @@ public final class AppBanner {
         } catch (IOException e) {
             log.error(LoggerMessages.printBannerException(), e);
         }
+
     }
+
 }

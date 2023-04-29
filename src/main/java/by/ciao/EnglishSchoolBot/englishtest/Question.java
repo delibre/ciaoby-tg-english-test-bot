@@ -3,17 +3,25 @@ package by.ciao.EnglishSchoolBot.englishtest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 
 @Getter
 @AllArgsConstructor
 public class Question {
     private final int numberOfQuestion;
     private final String question;
-    private final ArrayList<String> answers;
-    private final int correctAnswerIndex;
+    private final String[] answers;
+    private final int correctAnswer;
 
     public String getCorrectAnswer() {
-        return answers.get(correctAnswerIndex - 1);
+        return answers[correctAnswer-1];
+    }
+
+    @Override
+    public String toString() {
+        return "Question{" +
+                "question='" + question + '\'' +
+                ", answers=" + Arrays.toString(answers) +
+                '}';
     }
 }

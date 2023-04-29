@@ -1,4 +1,4 @@
-package by.ciao.EnglishSchoolBot.utils;
+package by.ciao.utils;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class KeyboardCreator {
+
     public static InlineKeyboardMarkup createInlineKeyboard(final List<String> answerOptions) {
         var markup = new InlineKeyboardMarkup();
 
@@ -47,4 +48,5 @@ public final class KeyboardCreator {
 
         return keyboard;
     }
+
 }

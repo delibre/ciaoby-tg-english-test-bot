@@ -1,21 +1,20 @@
 package by.ciao.EnglishSchoolBot.states;
 
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
+import by.ciao.EnglishSchoolBot.dto.UserInfoDTO;
+import by.ciao.EnglishSchoolBot.enums.States;
+import by.ciao.EnglishSchoolBot.states.statesservice.State;
 import by.ciao.EnglishSchoolBot.states.statesservice.AbstractState;
-import by.ciao.EnglishSchoolBot.states.statesservice.UserHandlerState;
-import by.ciao.EnglishSchoolBot.states.statesservice.UserMessageHandlerState;
-import by.ciao.EnglishSchoolBot.user.User;
 
-public class CheckAnswerState extends AbstractState implements UserMessageHandlerState {
-    public CheckAnswerState(final ServiceCallback serviceCallback) {
-        super(serviceCallback);
+public class CheckAnswerState extends AbstractState {
+    public CheckAnswerState(ServiceCallback serviceCallback) {
+        super(serviceCallback, States.CHECK_ANSWER);
     }
 
     @Override
-    public void apply(final String textMsg, final User user) throws Exception {
-        if (testFinished(user)) { return; }
+    public void apply(String textMsg, UserInfoDTO user) {
         user.getTestState().registerAnswer(textMsg);
-        UserHandlerState state = new SendQuestionState(getServiceCallback());
-        state.apply(user);
+        State state = new QuestionToSendState(getServiceCallback());
+        state.apply(textMsg, user);
     }
 }

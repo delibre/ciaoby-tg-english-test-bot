@@ -1,6 +1,6 @@
-package by.ciao.EnglishSchoolBot.utils;
+package by.ciao.utils;
 
-import by.ciao.EnglishSchoolBot.englishtest.Question;
+import by.ciao.englishtest.Question;
 import com.aspose.cells.Cells;
 import com.aspose.cells.Workbook;
 
@@ -37,4 +37,5 @@ public final class ReadFile {
 
         return answersAndSkipOption;
     }
+
 }

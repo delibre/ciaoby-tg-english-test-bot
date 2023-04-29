@@ -1,7 +1,7 @@
-package by.ciao.EnglishSchoolBot;
+package by.ciao;
 
-import by.ciao.EnglishSchoolBot.bot.CiaoByBot;
-import by.ciao.EnglishSchoolBot.utils.AppBanner;
+import by.ciao.bot.CiaoByBot;
+import by.ciao.utils.AppBanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 public class Application {
+
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
     public static void main(String[] args) throws TelegramApiException {
@@ -24,4 +25,5 @@ public class Application {
         }
         log.info("Telegram bot is ready to accept updates from user......");
     }
+
 }

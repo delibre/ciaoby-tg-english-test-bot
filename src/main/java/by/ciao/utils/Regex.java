@@ -1,8 +1,9 @@
-package by.ciao.EnglishSchoolBot.utils;
+package by.ciao.utils;
 
 import java.util.regex.Pattern;
 
 public final class Regex {
+
     public static boolean isCorrectPhoneFormat(final String phone) {
         String patterns
                 = "^(\\+?\\d{1,3}( )?)?((\\(\\d{3}\\))|\\d{3})[- .]?\\d{3}[- .]?\\d{4}$"
@@ -12,4 +13,5 @@ public final class Regex {
 
         return Pattern.compile(patterns).matcher(phone).matches();
     }
+
 }

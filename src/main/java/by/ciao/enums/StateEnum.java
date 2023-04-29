@@ -1,4 +1,4 @@
-package by.ciao.EnglishSchoolBot.enums;
+package by.ciao.enums;
 
 public enum StateEnum {
     NEW_USER,

@@ -1,4 +1,4 @@
-package by.ciao.EnglishSchoolBot.utils;
+package by.ciao.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Properties;
 
 public final class AppConfig {
+
     private static final String ENV_VAR_NAME = "PROFILE";
     private static Properties props = new Properties();
     private static final Logger log = LoggerFactory.getLogger(AppConfig.class);
@@ -52,4 +53,5 @@ public final class AppConfig {
     public static String getProperty(String key) {
         return props.getProperty(key);
     }
+
 }

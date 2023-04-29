@@ -1,84 +1,53 @@
 package by.ciao.EnglishSchoolBot.states.statesservice;
 
 import by.ciao.EnglishSchoolBot.bot.ServiceCallback;
-import by.ciao.EnglishSchoolBot.enums.StateEnum;
-import by.ciao.EnglishSchoolBot.states.TestFinishedState;
-import by.ciao.EnglishSchoolBot.user.User;
-import by.ciao.EnglishSchoolBot.utils.BotResponses;
-import by.ciao.EnglishSchoolBot.utils.KeyboardCreator;
-import by.ciao.EnglishSchoolBot.utils.LoggerMessages;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.telegram.telegrambots.meta.api.methods.ParseMode;
+import by.ciao.EnglishSchoolBot.dto.UserInfoDTO;
+import by.ciao.EnglishSchoolBot.enums.States;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @Getter
-public abstract class AbstractState {
+public abstract class AbstractState implements State {
     private final ServiceCallback serviceCallback;
-    private static final Logger log = LoggerFactory.getLogger(AbstractState.class);
+    private final States state;
 
-    protected void sendText(final Long id, final String textMsg) throws TelegramApiException {
-        serviceCallback.execute(createMessage(id, textMsg));
-    }
-
-    protected void sendStartButton(final User user) throws TelegramApiException {
-        var sm = createMessage(user.getChatId(), BotResponses.startTest());
-        sm.setReplyMarkup(KeyboardCreator.createReplyKeyboard(BotResponses.startTestButton(), false));
-
-        serviceCallback.execute(sm);
-    }
-
-    protected SendMessage createMessage(final Long id, final String textMsg) {
+    public void sendText(Long who, String what){
         var sm = SendMessage.builder()
-                .chatId(id)
-                .text(textMsg).build();
-        sm.setParseMode(ParseMode.HTML);
-        return sm;
+                .chatId(who.toString())
+                .text(what).build();
+
+        serviceCallback.execute(sm, null, null);
     }
 
-    // Made to humanise bot's responses, so it is not sending lots of messages in one second.
-    protected void setDelay() {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            log.error(LoggerMessages.setDelayException(), e);
-        }
-    }
-
-    protected EditMessageText editMessage(User user, InlineKeyboardMarkup markup, String text) {
-        var editMessageText = EditMessageText.builder()
+    public void sendStartButton(UserInfoDTO user) {
+        var sm = SendMessage.builder()
                 .chatId(user.getChatId().toString())
-                .messageId(user.getLastMessage().getMessageId())
-                .text(text).build();
-        editMessageText.setReplyMarkup(markup);
+                .text("Ну что же, приступим к тесту. Сейчас Вам нужно будет ответить на 30 вопросов.\uD83E\uDDD0 " +
+                        "Ограничений по времени нет.\n" +
+                        "\nНажмите кнопку \"Начать тестирование\", когда будете готовы.").build();
 
-        return editMessageText;
-    }
+        var keyboard = new ReplyKeyboardMarkup();
+        keyboard.setResizeKeyboard(true);
+        keyboard.setOneTimeKeyboard(false);
 
-    protected boolean testFinished(User user) throws Exception {
-        if (user.getTestState().isFinished() || user.getTestState().isTimeOver()) {
-            isTimeOver(user);
-            changeStateToTestFinished(user);
-            return true;
-        }
-        return false;
-    }
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
 
-    protected void changeStateToTestFinished(User user) throws Exception {
-        user.setState(StateEnum.TEST_FINISHED);
-        UserHandlerState state = new TestFinishedState(getServiceCallback());
-        state.apply(user);
-    }
+        var row = new KeyboardRow();
+        row.add(new KeyboardButton("Начать тестирование\uD83C\uDFC1"));
 
-    private void isTimeOver(User user) {
-        if (!user.getTestState().isTimeOver()) {
-            user.getTestState().getTimer().cancel();
-        }
+        keyboardRows.add(row);
+
+        keyboard.setKeyboard(keyboardRows);
+        sm.setReplyMarkup(keyboard);
+
+        serviceCallback.execute(sm, null, null);
     }
 }

@@ -32,9 +32,10 @@ All three microservices have been deployed on [**"AWS Cloud Computing Services"*
 ### TODO
 
 * Allow the administrator to access any chat between the user and the bot upon request and write messages on behalf of 
-the bot.
+the bot
 * Add FAQ section for the user
 * Establish a secure storage space to store configuration properties
+
 
 ## Guidelines
 

@@ -3,8 +3,9 @@
 ## Overview
 
 The "English Level Tester" is a Telegram bot developed for the online Belarusian English school
-[**"CIAO.BY"**](https://ciao.by/). Its purpose is to test the user's English level and gather their contact information.
-This production bot can be accessed via the link provided [**"English Level Tester"**](https://t.me/English_Schoo_lBot).
+[**"CIAO.BY"**](https://ciao.by/) or [**"GAAGA.PL"**](https://gaaga.pl/). Its purpose is to test the user's English 
+level and gather their contact information. This production bot can be accessed via the link provided 
+[**"English Level Tester"**](https://t.me/English_Schoo_lBot).
 
 To support the bot's functionality, two additional microservices have been implemented:
 
@@ -44,8 +45,15 @@ and proceed according to the guidelines
 
 5. Next, start the ["Telegram Admin Bot"](https://github.com/delibre/tg-admin-bot) application 
 
-6. The bot's configuration involves multiple profiles. To launch it with a specific profile, you will need to create
-a system variable named "PROFILE=slava-test" 
+6. Create application.properties file
+```properties
+tech_admin_id = <Telegram user id of technical administrator>
+admin_id = <Telegram user id of administrator>
+bot_username = <bot's username>
+bot_token = <bot's token>
+test_duration = 35
+url = http://<IP>:<port>/api/v1/users - url of the "User Data Provider" microservice
+```
 
 7. Start the application 
 

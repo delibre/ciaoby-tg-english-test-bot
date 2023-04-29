@@ -47,12 +47,12 @@ and proceed according to the guidelines
 
 6. Create application.properties file
 ```properties
-tech_admin_id = <Telegram user id of technical administrator>
-admin_id = <Telegram user id of administrator>
-bot_username = <bot's username>
-bot_token = <bot's token>
-test_duration = 35
-url = http://<IP>:<port>/api/v1/users - url of the "User Data Provider" microservice
+-Dtech_admin_id= <Telegram user id of technical administrator>
+-Dadmin_id= <Telegram user id of administrator>
+-Dbot_username= <bot's username>
+-Dbot_token= <bot's token>
+-Dtest_duration= 35
+-Durl= http://<IP>:<port>/api/v1/users - url of the "User Data Provider" microservice
 ```
 
 7. Start the application 

@@ -24,7 +24,7 @@ public class TestFinishedState extends AbstractState implements UserHandlerState
 
         sendAnswers(user);
         sendDataToAdmin(user);
-        RestControllerSingleton.getInstance().updateTestInfoInDB(user);
+        RestControllerSingleton.getInstance().updateTestInfo(user);
     }
 
     private void deleteLastMessage(final User user) throws TelegramApiException {

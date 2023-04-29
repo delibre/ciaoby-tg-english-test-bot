@@ -15,18 +15,18 @@ public final class RestControllerSingleton {
     private static RestControllerSingleton INSTANCE;
     private final RestTemplate restTemplate;
     private final HttpHeaders headers;
-    private final String url;
+    private final String userDataProviderUrl;
     private static final Logger log = LoggerFactory.getLogger(RestControllerSingleton.class);
 
     public RestControllerSingleton(RestTemplate restTemplate, HttpHeaders headers, String url) {
         this.restTemplate = restTemplate;
         this.headers = headers;
-        this.url = url;
+        this.userDataProviderUrl = url;
     }
 
     public static RestControllerSingleton getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new RestControllerSingleton(new RestTemplate(), new HttpHeaders(), AppConfig.getProperty("url"));
+            INSTANCE = new RestControllerSingleton(new RestTemplate(), new HttpHeaders(), AppConfig.getProperty("user_data_provider_url"));
         }
 
         return INSTANCE;
@@ -40,10 +40,10 @@ public final class RestControllerSingleton {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
 
-        log.info(restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class).getBody());
+        log.info(restTemplate.exchange(userDataProviderUrl, HttpMethod.POST, requestEntity, String.class).getBody());
     }
 
-    public void updateContactInfoInDB(User user) {
+    public void updateContactInfo(User user) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("fullName", user.getFullName());
         requestBody.put("phone", user.getPhone());
@@ -54,11 +54,11 @@ public final class RestControllerSingleton {
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
 
         log.info(restTemplate.exchange(
-                url + "/update-contactinfo/" + user.getChatId(),
+                userDataProviderUrl + "/update-contactinfo/" + user.getChatId(),
                 HttpMethod.PUT, requestEntity, String.class).getBody());
     }
 
-    public void updateTestInfoInDB(User user) {
+    public void updateTestInfo(User user) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("englishLvl", String.valueOf(user.getTestState().getLvl()));
         requestBody.put("numOfCorrectAnswers", String.valueOf(user.getTestState().getCorrectAnswers()));
@@ -67,11 +67,11 @@ public final class RestControllerSingleton {
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
 
         log.info(restTemplate.exchange(
-                url + "/update-testinfo/" + user.getChatId(),
+                userDataProviderUrl + "/update-testinfo/" + user.getChatId(),
                 HttpMethod.PUT, requestEntity, String.class).getBody());
     }
 
     public User getUserByChatId(Long chatId) {
-        return restTemplate.exchange(url + "/" + chatId, HttpMethod.GET, null, User.class).getBody();
+        return restTemplate.exchange(userDataProviderUrl + "/" + chatId, HttpMethod.GET, null, User.class).getBody();
     }
 }

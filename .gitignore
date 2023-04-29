@@ -29,4 +29,4 @@ build/
 java/build/**
 
 # Properties
-src/main/resources/*.properties
+*.properties

@@ -23,13 +23,15 @@ public class BotService {
     private final Map<Long, User> registeredUsersMap;
     private final ServiceCallback serviceCallback;
     private static final Logger log = LoggerFactory.getLogger(BotService.class);
+    private final String adminId = AppConfig.getProperty("admin_id");
+    private final String techAdminId = AppConfig.getProperty("tech_admin_id");
+
 
     BotService(final ServiceCallback serviceCallback) {
         this.serviceCallback = serviceCallback;
         this.registeredUsersMap = new HashMap<>();
     }
 
-    // onUpdateReceived service methods
     boolean isMsgFromAdmin(Update update) {
         return msgHasText(update) && update.getMessage().getChatId() == Long.parseLong(AppConfig.getProperty("admin_id"));
     }
@@ -45,7 +47,7 @@ public class BotService {
                 counter++;
             } catch (TelegramApiException ignore) {}
         }
-        sendText(Long.parseLong(AppConfig.getProperty("admin_id")), BotResponses.notificationReceivedBy(counter));
+        sendInfoToTechAdmin(BotResponses.notificationReceivedBy(counter));
     }
 
     boolean msgHasText(final Update update) {
@@ -66,18 +68,20 @@ public class BotService {
             User user = RestControllerSingleton.getInstance().getUserByChatId(chatId);
 
             if (user == null) {
+
                 registeredUsersMap.putIfAbsent(chatId, new User(chatId, username));
                 RestControllerSingleton.getInstance().addUserToDB(registeredUsersMap.get(chatId));
-                // sending data to tech admin
+
                 log.info(LoggerMessages.mapSize(registeredUsersMap.size()));
-                sendText(Long.parseLong(AppConfig.getProperty("tech_admin_id")), LoggerMessages.mapSize(registeredUsersMap.size()));
+                sendInfoToTechAdmin(LoggerMessages.mapSize(registeredUsersMap.size()));
+
             } else {
                 registeredUsersMap.putIfAbsent(chatId, user);
             }
 
         } catch (Exception e) {
             log.error(LoggerMessages.addUserIfAbsentException(), new RuntimeException(e));
-            sendText(Long.parseLong(AppConfig.getProperty("tech_admin_id")), e.toString());
+            sendInfoToTechAdmin(e.toString());
         }
     }
 
@@ -105,11 +109,10 @@ public class BotService {
                     .callbackQueryId(id).build());
         } catch (TelegramApiException e) {
             log.error(LoggerMessages.closeQueryException(), e);
-            sendText(Long.parseLong(AppConfig.getProperty("tech_admin_id")), e.toString());
+            sendInfoToTechAdmin(e.toString());
         }
     }
 
-    // processMessage service methods
     boolean startBot(final String textMsg, final User user) throws Exception {
         if (textMsg.equals("/start")) {
             user.setState(StateEnum.START);
@@ -131,6 +134,18 @@ public class BotService {
     void sendText(final Long id, final String textMsg) {
         var sm = SendMessage.builder()
                 .chatId(id)
+                .text(textMsg).build();
+
+        try {
+            serviceCallback.execute(sm);
+        } catch (TelegramApiException e) {
+            log.error(LoggerMessages.sendTextException(), e);
+        }
+    }
+
+    void sendInfoToTechAdmin(final String textMsg) {
+        var sm = SendMessage.builder()
+                .chatId(techAdminId)
                 .text(textMsg).build();
 
         try {

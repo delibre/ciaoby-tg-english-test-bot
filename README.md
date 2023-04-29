@@ -29,6 +29,13 @@ All three microservices have been deployed on [**"AWS Cloud Computing Services"*
 * **SLF4J Simple** v2.0.5
 * **Aspose Cells** v23.3
 
+### TODO
+
+* Allow the administrator to access any chat between the user and the bot upon request and write messages on behalf of 
+the bot.
+* Add FAQ section for the user
+* Establish a secure storage space to store configuration properties
+
 ## Guidelines
 
 ### If you want to start and test the bot locally:
@@ -39,21 +46,20 @@ and proceed according to the guidelines
 2. Follow the link  ["Telegram Admin Bot"](https://github.com/delibre/tg-admin-bot)
 and proceed according to the guidelines 
 
-3. Download the latest release of this project 
+3. Download the latest release of this project
 
-4. Launch the ["Telegram User Data Provider"](https://github.com/delibre/tg-user-data-provider) application 
-
-5. Next, start the ["Telegram Admin Bot"](https://github.com/delibre/tg-admin-bot) application 
-
-6. Create application.properties file
+4. Create application.properties file
 ```properties
--Dtech_admin_id= <Telegram user id of technical administrator>
--Dadmin_id= <Telegram user id of administrator>
--Dbot_username= <bot's username>
--Dbot_token= <bot's token>
--Dtest_duration= 35
--Durl= http://<IP>:<port>/api/v1/users - url of the "User Data Provider" microservice
+tech_admin_id = <Telegram user id of technical administrator>
+admin_id = <Telegram user id of administrator>
+bot_username = <bot's username>
+bot_token = <bot's token>
+test_duration = 35
+user_data_provider_url = http://<IP>:<port>/api/v1/users - url of the "User Data Provider" microservice
 ```
+5. Launch the ["Telegram User Data Provider"](https://github.com/delibre/tg-user-data-provider) application
+
+6. Next, start the ["Telegram Admin Bot"](https://github.com/delibre/tg-admin-bot) application
 
 7. Start the application 
 
@@ -265,6 +271,10 @@ private void setTimer(User user) {
     user.getTestState().getTimer().schedule(task, Long.parseLong(AppConfig.getProperty("test_duration")) * 60 * 1000);
 }
 ```
+
+* The **"AppConfig"** class is in charge of handling the configuration profile of the application, such as local or
+  production. To ensure the correct configuration is used, the **PROFILE** variable must be set in the environment
+  variables of the application.
 
 
 ## License

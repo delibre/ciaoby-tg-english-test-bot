@@ -2,7 +2,7 @@
 
 ## Overview
 
-The "English Level Tester" is a Telegram bot developed for the online Belarusian English school
+The "English Level Tester" is a microservice which represents a Telegram bot developed for the online English school
 [**"CIAO.BY"**](https://ciao.by/) or [**"GAAGA.PL"**](https://gaaga.pl/). Its purpose is to test the user's English 
 level and gather their contact information. This production bot can be accessed via the link provided 
 [**"English Level Tester"**](https://t.me/ciaoby_bot).

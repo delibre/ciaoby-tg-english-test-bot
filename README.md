@@ -9,7 +9,7 @@ level and gather their contact information. This production bot can be accessed 
 
 To support the bot's functionality, two additional microservices have been implemented:
 
-* [**"Telegram User Data Provider"**](https://github.com/delibre/tg-user-data-provider) a REST API application designed
+* [**"Telegram User Data Provider"**](https://github.com/delibre/tg-user-data-provider) a REST API designed
 to manage user information in the database
 
 * [**"Telegram Admin Bot"**](https://github.com/delibre/tg-admin-bot) a Telegram bot that allows administrators to view
